@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -107,6 +108,34 @@ class StateAndUtilitiesTests(unittest.TestCase):
             result = subprocess.run([sys.executable, state, "status", project], capture_output=True, text=True)
             self.assertEqual(result.returncode, 1)
             self.assertIn("review-invalidated", result.stdout)
+
+    def test_review_state_uses_project_relative_paths(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            flags = []
+            for name in ("package", "claims", "story", "sources", "cover", "opening"):
+                path = project / name
+                path.write_text(name)
+                flags.extend([f"--{name}", str(path)])
+            state_script = ROOT / "scripts" / "project_state.py"
+            subprocess.run([sys.executable, state_script, "init", project], check=True, capture_output=True)
+            subprocess.run([sys.executable, state_script, "review", project, *flags], check=True, capture_output=True)
+            state = json.loads((project / ".impact-video-state.json").read_text())
+            self.assertEqual(state["review"]["files"]["package"]["path"], "package")
+            self.assertNotIn(str(project), json.dumps(state))
+
+    def test_openrouter_key_rejects_config_injection(self):
+        tts_module = module("openrouter_tts")
+        old = os.environ.get("OPENROUTER_API_KEY")
+        os.environ["OPENROUTER_API_KEY"] = "sk-or-v1-validvalue1234567890\nheader = injected"
+        try:
+            with self.assertRaises(RuntimeError):
+                tts_module.api_key_from_environment()
+        finally:
+            if old is None:
+                os.environ.pop("OPENROUTER_API_KEY", None)
+            else:
+                os.environ["OPENROUTER_API_KEY"] = old
 
     def test_caption_pipeline_covers_duration(self):
         with tempfile.TemporaryDirectory() as tmp:

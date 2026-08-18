@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import ssl
 import subprocess
 import sys
@@ -16,6 +17,17 @@ from pathlib import Path
 
 
 ENDPOINT = "https://openrouter.ai/api/v1/audio/speech"
+OPENROUTER_KEY = re.compile(r"\Ask-or-v1-[A-Za-z0-9_-]{20,}\Z")
+
+
+def api_key_from_environment() -> str:
+    """Read a key without persisting it and reject curl-config control characters."""
+    token = os.environ.get("OPENROUTER_API_KEY", "").strip().strip('"').strip("'").strip()
+    if not token:
+        raise RuntimeError("OPENROUTER_API_KEY is not set")
+    if not OPENROUTER_KEY.fullmatch(token):
+        raise RuntimeError("OPENROUTER_API_KEY has an invalid format")
+    return token
 
 
 def tls_context() -> ssl.SSLContext:
@@ -38,11 +50,7 @@ def narration_from_args(args: argparse.Namespace) -> str:
 
 
 def synthesize(text: str, output: Path, model: str, voice: str, speed: float) -> None:
-    token = os.environ.get("OPENROUTER_API_KEY", "").strip().strip('"').strip("'").strip()
-    if not token:
-        raise RuntimeError("OPENROUTER_API_KEY is not set")
-    if not token.startswith("sk-or-v1-"):
-        raise RuntimeError("OPENROUTER_API_KEY does not start with sk-or-v1-")
+    token = api_key_from_environment()
     if not 0.7 <= speed <= 1.3:
         raise ValueError("speed must be between 0.7 and 1.3")
     payload = {

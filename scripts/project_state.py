@@ -27,10 +27,10 @@ def write(project: Path, state: dict) -> None:
     (project / STATE).write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def integrity(state: dict) -> tuple[bool, list[str]]:
+def integrity(state: dict, project: Path) -> tuple[bool, list[str]]:
     changed = []
     for name, item in state.get("review", {}).get("files", {}).items():
-        path = Path(item["path"])
+        path = project / item["path"]
         if not path.is_file() or digest(path) != item["sha256"]:
             changed.append(name)
     return not changed, changed
@@ -55,7 +55,13 @@ def main() -> int:
 
     if args.command == "init":
         project.mkdir(parents=True, exist_ok=True)
-        write(project, {"schema_version": 1, "stage": "draft", "review": None, "approval": None})
+        write(project, {
+            "schema_version": 2,
+            "project_root": ".",
+            "stage": "draft",
+            "review": None,
+            "approval": None,
+        })
     elif args.command == "review":
         state = read(project)
         files = {}
@@ -63,7 +69,11 @@ def main() -> int:
             path = getattr(args, name).expanduser().resolve()
             if not path.is_file():
                 raise SystemExit(f"Missing review file: {path}")
-            files[name] = {"path": str(path), "sha256": digest(path)}
+            try:
+                relative = path.relative_to(project)
+            except ValueError:
+                raise SystemExit(f"Review file must be inside the project directory: {path}") from None
+            files[name] = {"path": relative.as_posix(), "sha256": digest(path)}
         state.update({
             "stage": "review-ready",
             "review": {"created_at": datetime.now(timezone.utc).isoformat(), "files": files},
@@ -74,7 +84,7 @@ def main() -> int:
         state = read(project)
         if not state.get("review"):
             raise SystemExit("No combined review registered")
-        ok, changed = integrity(state)
+        ok, changed = integrity(state, project)
         if not ok:
             raise SystemExit(f"Review inputs changed: {', '.join(changed)}")
         state["stage"] = "approved"
@@ -82,7 +92,7 @@ def main() -> int:
         write(project, state)
     else:
         state = read(project)
-        ok, changed = integrity(state) if state.get("review") else (True, [])
+        ok, changed = integrity(state, project) if state.get("review") else (True, [])
         if state.get("approval") and not ok:
             state["stage"] = "review-invalidated"
             state["approval"] = None

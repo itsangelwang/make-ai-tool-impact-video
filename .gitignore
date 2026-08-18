@@ -5,6 +5,7 @@ node_modules/
 renders/
 qa/
 .review-state.json
+.impact-video-state.json
 .env
 .env.*
 !.env.example

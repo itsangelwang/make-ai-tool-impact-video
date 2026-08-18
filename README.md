@@ -12,6 +12,8 @@
 
 截至本仓库更新时，原项目的 GitHub 元数据没有显示开源许可证。本处致谢与链接不代表原项目采用 MIT 或其他开源许可证。若需要复制、再分发或商业使用原项目中的代码、品牌或专属模板，请先向原作者确认授权。
 
+本仓库不授予 AceMode 上游代码、品牌或专属模板的任何权利。在上游授权得到书面确认或相关实现完成独立重写之前，不应把本仓库改为 MIT 等开放许可证，也不应复制、再分发或商业使用可能源自上游的受保护内容。
+
 它不只介绍产品功能，而是围绕同一个人物、同一个任务，说明：
 
 - 使用前具体怎么做；
@@ -103,6 +105,8 @@ make-ai-tool-impact-video/
 │   ├── project_state.py
 │   ├── caption_pipeline.py
 │   ├── deepgram_tts.py
+│   ├── openrouter_tts.py
+│   ├── generate_ui_sfx.mjs
 │   ├── scaffold_project.py
 │   └── verify_video.py
 └── tests/test_skill.py

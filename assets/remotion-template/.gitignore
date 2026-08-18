@@ -2,3 +2,4 @@ node_modules/
 renders/
 qa/
 .remotion/
+.impact-video-state.json
