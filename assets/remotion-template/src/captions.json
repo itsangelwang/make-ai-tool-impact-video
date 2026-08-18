@@ -1,0 +1,9 @@
+[
+  {
+    "text": "明天要开会，却要翻五份旧记录。",
+    "startMs": 0,
+    "endMs": 3500,
+    "highlightCool": [],
+    "highlightWarm": ["五份旧记录"]
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "name": "ai-tool-impact-video",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "studio": "remotion studio src/index.jsx",
+    "render": "remotion render src/index.jsx VerticalImpact renders/final.mp4 --codec h264 --crf 18",
+    "cover": "remotion still src/index.jsx VerticalImpact qa/cover.png --frame 0",
+    "opening": "remotion render src/index.jsx VerticalImpact qa/opening.mp4 --frames 0-89 --codec h264 --crf 20"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.512",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "remotion": "4.0.512"
+  }
+}

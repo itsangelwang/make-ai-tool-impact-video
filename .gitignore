@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+node_modules/
+renders/
+qa/
+.review-state.json

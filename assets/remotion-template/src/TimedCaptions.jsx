@@ -1,0 +1,34 @@
+import React from 'react';
+import {spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import captions from './captions.json';
+
+const containsIndex = (text, index, terms = []) => terms.some((term) => {
+  let start = text.indexOf(term);
+  while (start !== -1) {
+    if (index >= start && index < start + term.length) return true;
+    start = text.indexOf(term, start + 1);
+  }
+  return false;
+});
+
+export const TimedCaptions = () => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const ms = frame * 1000 / fps;
+  const cue = captions.find((item) => ms >= item.startMs && ms < item.endMs);
+  if (!cue) return null;
+  const localFrame = (ms - cue.startMs) * fps / 1000;
+  const durationFrames = (cue.endMs - cue.startMs) * fps / 1000;
+  const stagger = Math.min(1.35, Math.max(.55, (durationFrames - 28) / Math.max(cue.text.length, 1)));
+  return (
+    <div style={{position:'absolute',left:64,right:64,bottom:112,zIndex:100,display:'flex',alignItems:'center',justifyContent:'center',flexWrap:'wrap',padding:'22px 27px',borderRadius:25,background:'rgba(23,25,35,.92)',boxShadow:'0 16px 42px rgba(0,0,0,.20)'}}>
+      {cue.text.split('').map((char, index) => {
+        const progress = spring({frame:localFrame-index*stagger,fps,config:{damping:12,stiffness:190}});
+        const warm = containsIndex(cue.text,index,cue.highlightWarm);
+        const cool = !warm && containsIndex(cue.text,index,cue.highlightCool);
+        const emphasized = warm || cool;
+        return <span key={`${char}-${index}`} style={{display:'inline-block',whiteSpace:char===' '?'pre':'normal',fontFamily:'Hannotate SC, Kaiti SC, PingFang SC, sans-serif',fontSize:emphasized?42:38,lineHeight:1.35,fontWeight:emphasized?950:850,color:warm?'#FF9B74':cool?'#B9AFFF':'#fff',opacity:progress,transform:`translateY(${(1-progress)*(emphasized?38:28)}px) rotate(${(1-progress)*(index%2?5:-4)}deg) scale(${(.72+progress*.28)*(emphasized?1.14:1)})`}}>{char}</span>;
+      })}
+    </div>
+  );
+};

@@ -1,0 +1,19 @@
+{
+  "duration_sec": 60,
+  "audio": "",
+  "palette": {"paper": "#F7F4EE", "ink": "#171923", "muted": "#687080", "cool": "#6857F5", "warm": "#F06449"},
+  "before_steps": ["打开多份材料", "逐条复制整理", "手动检查遗漏"],
+  "after_steps": ["提交同一批材料", "AI 先完成整理", "人核对关键结果"],
+  "transitions": [
+    {"start_sec":15.6,"end_sec":17,"label":"把同一批材料交给 AI","symbol":"→","color":"#6857F5"}
+  ],
+  "scenes": [
+    {"id":"s1","type":"pain-hook","label":"真实痛点","headline":"材料越多，整理越慢","visual":"待办不断堆积","start_sec":0,"end_sec":7},
+    {"id":"s2","type":"before-workflow","label":"使用前","headline":"时间花在重复搬运","visual":"三步手工流程","start_sec":7,"end_sec":17},
+    {"id":"s3","type":"ai-handoff","label":"变化点","headline":"AI 只接走最机械的一步","visual":"读取 → 归类 → 草拟","start_sec":17,"end_sec":27},
+    {"id":"s4","type":"after-workflow","label":"使用后","headline":"顺序变了，责任没消失","visual":"新流程","start_sec":27,"end_sec":38},
+    {"id":"s5","type":"before-after","label":"前后对比","headline":"同一个人，同一个任务","visual":"前后流程","start_sec":38,"end_sec":48},
+    {"id":"s6","type":"human-check","label":"人的责任","headline":"AI 给草稿，人来把关","visual":"确认事实、隐私和最终决定","start_sec":48,"end_sec":55},
+    {"id":"s7","type":"next-action","label":"低风险试法","headline":"先从一次真实任务开始","visual":"拿一份非敏感材料做对照测试","start_sec":55,"end_sec":60}
+  ]
+}

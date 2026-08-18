@@ -1,0 +1,4 @@
+interface:
+  display_name: "一分钟 AI 工具影响视频"
+  short_description: "把 AI 工具做成有证据、有案例、可读可念的竖屏视频"
+  default_prompt: "使用 $make-ai-tool-impact-video 把这个 AI 工具制作成一分钟普通人能看懂的 9:16 工作流影响视频。"
