@@ -7,7 +7,7 @@
 - **No TTS timestamps:** measure final audio and distribute phrase cues, then visually inspect synchronization.
 - **No FFmpeg/FFprobe:** produce the review artifacts but do not describe the MP4 as QA-passed.
 - **No Chromium/Remotion dependencies:** report the missing prerequisite; do not silently switch to a different visual system.
-- **Duration outside 55–65 seconds:** revise the script and repeat review approval; do not speed up or stretch narration.
+- **Duration outside 55–65 seconds:** first remove repetition. If verified interaction or stable evidence still needs more time, allow a review up to 75 seconds and disclose it; do not speed up or stretch narration.
 - **Caption can display but cannot be spoken:** audit each cue by Han characters per second, cut redundant narration, and preserve pauses; do not treat character animation completion as speech timing.
 - **Transition overlaps the next page:** use a dedicated full-frame transition ending at the next scene boundary; do not place a readable title over outgoing or incoming content.
 - **Two transitions feel repetitive:** keep the chapter transition and replace the second with an object handoff, morph, zoom, or internal state change.

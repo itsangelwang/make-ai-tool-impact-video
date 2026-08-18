@@ -46,6 +46,20 @@ Use rhythm in waves:
 - Give every readable chapter transition a dedicated full-frame background for about 1.2–1.5 seconds.
 - Do not stack two transitions with the same color, wording, and communication purpose. Replace the second with an object handoff or internal morph.
 - A transition must finish before the incoming scene becomes visible.
+- Build every consequential beat as enter → act → stable result. Do not cut immediately after the action.
+- Reserve at least 1.2 seconds of stable result hold for a simple state and roughly 1.8–2.5 seconds for a product screen, generated output, evidence comparison, or responsibility boundary.
+- If the viewer cannot inspect the state at normal playback speed, remove secondary text, split the beat, or extend the review. Do not solve overload by accelerating captions.
+- Audit the second half independently; dense explainers often become faster after the product handoff even when the opening is readable.
+
+## Token- and compute-efficient review
+
+Use progressive review by default:
+
+1. Render stills for composition, hierarchy, and safe-area checks.
+2. Render 5–15 second clips for disputed motion, clicks, transitions, caption timing, and camera focus.
+3. Render the full video only after the local clips establish the interaction and pacing direction, or when a global timeline change requires a continuity check.
+
+Do not repeatedly render or re-analyze an unchanged full composition. Suppress verbose renderer progress when possible and report only failures, output paths, duration, and QA findings. Reuse representative frames for unchanged components. A local clip approval does not replace the final full-video audit before delivery.
 
 ## Review audit
 

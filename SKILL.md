@@ -84,12 +84,26 @@ When feedback reveals confusion, repair the causal chain rather than polishing t
 - If a transition is unreadable, give it a dedicated full-frame hold and end the outgoing caption first.
 - If captions cannot be spoken naturally, cut repeated narration before extending the video.
 - If AI and human roles blur, use separate regions and animate the artifact handoff.
+- If a visible product action can be demonstrated truthfully, use cleared real UI or a faithful reconstructed interaction before using step cards or an abstract diagram. Show cursor approach, click feedback, resulting modal/state, and a stable result hold.
+- Structure consequential actions as enter → act → stable result. Use semantic push-ins and gentle pull-backs to focus attention on clicks, generated results, evidence, and human checks.
+- Add restrained, frame-synced UI sound when it clarifies a visible click, typing action, upload, processing state, or completion. Keep narration dominant and never use sound to disguise an unreadably fast cut. Generate source-safe sounds with `scripts/generate_ui_sfx.mjs` when needed.
 
-Render local review segments for disputed beats; render the full review after the causal chain or timing changes.
+Render stills first for layout and 5–15 second local clips for disputed motion or pacing. Render the full review only after local direction is established, or after a global timeline change requires continuity review. Avoid re-rendering or re-analyzing unchanged full compositions.
 
 ## 5. Finish and verify
 
-Generate final TTS only after approval. Never use a voice the user has rejected. For English, use Deepgram Flux TTS batch by default when the user has access; Flux is Early Access, so keep Aura-2 as the stable fallback. Store the key only in `DEEPGRAM_API_KEY`, never in JSON, source files, logs, or Git. Audition at least two short samples before committing to a voice.
+Generate final TTS only after approval. Never use a voice the user has rejected. For English, use the provider for which the user has credentials. Store credentials only in provider-specific environment variables, never in JSON, source files, logs, or Git. Audition at least two 8–12 second samples before committing to a voice or generating the full narration.
+
+For OpenRouter, use the dedicated `/api/v1/audio/speech` path through `scripts/openrouter_tts.py`. When available, start with `deepgram/flux-tts:free`; query the live OpenRouter model catalog before use because free aliases and availability can change. Do not confuse the generic `openrouter/free` text router with the speech-specific Flux model.
+
+```bash
+OPENROUTER_API_KEY=... python3 <skill-dir>/scripts/openrouter_tts.py \
+  --text "Tomorrow's meeting is already on your calendar." \
+  --output <project-dir>/video/qa/voice-sample.mp3 \
+  --model deepgram/flux-tts:free --voice flux-hannah-en --speed 0.95
+```
+
+For Deepgram, use Flux TTS batch when the user has access; Flux is Early Access, so keep Aura-2 as the stable fallback. Store the key only in `DEEPGRAM_API_KEY`.
 
 ```bash
 DEEPGRAM_API_KEY=... python3 <skill-dir>/scripts/deepgram_tts.py \
@@ -100,7 +114,7 @@ DEEPGRAM_API_KEY=... python3 <skill-dir>/scripts/deepgram_tts.py \
 
 Prefer a neural provider with timestamps; Deepgram batch audio does not itself supply word timestamps, so measure the final audio and generate phrase timing with `caption_pipeline.py`, then manually spot-check phrase boundaries against the waveform.
 
-Target 55–65 seconds. Do not time-stretch speech. Render `VerticalImpact`, then run:
+Target 55–65 seconds. Permit a review up to 75 seconds when verified product interaction, stable result holds, or human-check evidence would otherwise become unreadable; report the extension and shorten later only by removing repetition. Do not time-stretch speech. Render `VerticalImpact`, then run:
 
 ```bash
 python3 <skill-dir>/scripts/verify_video.py \

@@ -29,6 +29,7 @@ Use this reference for English-speaking audiences. Default to US English unless 
 ## Voice
 
 - Prefer a conversational American voice that sounds like a capable coworker, not an ad read or customer-service bot.
+- For OpenRouter, audition `deepgram/flux-tts:free` first while its free alias is available. Use the dedicated speech endpoint, keep `OPENROUTER_API_KEY` out of files and logs, and generate only an 8–12 second passage until the user approves the voice. Shortlist `flux-hannah-en`, `flux-heather-en`, and `flux-wes-en`. Treat the generic free text router and Flux TTS as separate models; query the live catalog before every audition because free aliases can change.
 - For Deepgram Flux TTS, shortlist `flux-hannah-en` (thoughtful storytelling), `flux-heather-en` (engaging), and `flux-wes-en` (warm). Audition the same 8–12 second passage for comparison.
 - Start at speed `0.95` or `1.0` and expressivity `0` or `1`. Do not fix an overlong script by accelerating it.
 - Flux TTS and `/v2/speak` are Early Access. If access or stability fails, use Aura-2 such as `aura-2-andromeda-en` or `aura-2-arcas-en`, disclose the fallback in the review, and require a fresh voice approval.

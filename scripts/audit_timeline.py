@@ -23,8 +23,8 @@ def validate(data: dict) -> list[str]:
     duration = float(data.get("duration_sec", 0))
     language = str(data.get("language", "zh-CN"))
     english = language.startswith("en")
-    if not 55 <= duration <= 65:
-        errors.append(f"duration_sec must be 55-65; got {duration:g}")
+    if not 55 <= duration <= 75:
+        errors.append(f"duration_sec must be 55-75; got {duration:g}")
 
     captions = data.get("captions")
     if not isinstance(captions, list) or not captions:

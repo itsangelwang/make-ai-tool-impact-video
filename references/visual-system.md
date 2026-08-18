@@ -49,6 +49,27 @@ Use an abstract workflow only when a literal action cannot be shown clearly, wou
 
 Prefer one clear action per beat. For a three-step abstract workflow, show three short animated beats rather than placing all steps on screen at once.
 
+## Reconstruct real interaction when evidence permits
+
+Use this evidence ladder for any visible product operation:
+
+1. Cleared real screen recording or official product demo.
+2. Cleared real screenshot animated with truthful cursor, crop, zoom, and state changes.
+3. A clearly labeled, faithful reconstruction of the real interaction environment based on verified UI behavior.
+4. An abstract workflow only when the first three options are unavailable or would imply unsupported access.
+
+For a reconstructed interaction, preserve the product's recognizable information architecture without copying protected brand assets beyond cleared evidence. Show the surrounding workspace, the control being clicked, the resulting menu or modal, and the next state. Do not replace `Settings → Import → Choose files` with three static cards. Animate the cursor clicking Settings, reveal Import inside the settings surface, open a file picker, select concrete files, confirm the action, and show the imported result.
+
+Treat a click as a causal event with five visible phases: cursor approaches, target reacts, click feedback appears, the old state yields, and the new state enters. Hold the new state long enough to understand the relationship. For prompts, show typing, a clearly visible Send click, immediate button feedback, a short processing state, and the resulting view entering slowly enough to connect cause and effect.
+
+Use camera-scale motion as attention guidance. Push in toward the clicked control, selected file, generated result, unfinished item, or verification sentence; then settle gently to a stable scale. Avoid constant zooming. Every push-in must answer “what should the viewer inspect now?”
+
+## UI sound as causal feedback
+
+Use restrained interface sound when it makes an on-screen action easier to understand. Synchronize a light click with button depression, subtle key taps with visible typing, a short rising cue with upload or processing, and a quiet confirmation tone with a completed state. Keep sounds dry, brief, and lower than narration. Do not add decorative beeps to static text or play a sound without a visible cause.
+
+Prefer source-safe generated sounds or cleared product recordings. Use `scripts/generate_ui_sfx.mjs` to create a small reusable UI set when licensed recordings are unavailable. Align each sound to the exact action frame and leave the following visual result stable; sound does not justify a faster cut.
+
 ## Establish the task before the actions
 
 Before showing a sequence of clicks, searches, or copy-and-paste actions, establish the concrete task those actions are meant to complete. Show the deadline or trigger, the desired deliverable, and two or three pieces of information the person needs. For example: tomorrow's meeting → one-page preparation summary → previous decisions, unfinished tasks, and owners.
