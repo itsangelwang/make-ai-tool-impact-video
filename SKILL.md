@@ -1,6 +1,6 @@
 ---
 name: make-ai-tool-impact-video
-description: Research a named AI tool and create a roughly one-minute, 9:16 Chinese workflow explainer for ordinary people, with one concrete before/after case, verified claims, real product evidence, Remotion motion design, readable paced captions, combined review, and delivery QA. Use when turning an AI product name, launch page, demo, or capability into an accessible vertical video that explains what changes, what the person still owns, who it suits, and how to try it safely.
+description: Research a named AI tool and create a roughly one-minute, 9:16 workflow explainer for Chinese or English-speaking markets, with one concrete before/after case, verified claims, real product evidence, localized writing and design, natural TTS, Remotion motion, readable captions, combined review, and delivery QA. Use when turning an AI product name, launch page, demo, or capability into an accessible vertical video that explains what changes, what the person still owns, who it suits, and how to try it safely.
 ---
 
 # Make AI Tool Impact Video
@@ -9,7 +9,7 @@ Explain one workflow change for one person doing one task. Treat the tool as the
 
 ## Inputs
 
-Require a tool name or URL. Accept audience, task, platform, voice, palette, and end-brand preferences. When audience or task is absent, research first and choose the clearest supported ordinary-person case.
+Require a tool name or URL. Accept audience, task, platform, language, market, accent, voice, palette, and end-brand preferences. Default to `zh-CN` and the Chinese market unless the user requests English; default English work to `en-US` and a US audience. When audience or task is absent, research first and choose the clearest supported ordinary-person case.
 
 Use `<skill-dir>` as this Skill directory and replace placeholders with absolute paths.
 
@@ -27,6 +27,8 @@ Choose exactly one audience, task, and example thread. Define `before_steps`, `a
 ## 2. Build one causal story
 
 Read [references/story-contract.md](references/story-contract.md) and [references/visual-system.md](references/visual-system.md). When the project uses silent or animated captions, also read [references/pacing-and-review.md](references/pacing-and-review.md). Read [references/brand-system.md](references/brand-system.md) only when an end brand is requested.
+
+For an English-speaking audience, also read [references/english-market.md](references/english-market.md). Adapt the idea rather than translating Chinese copy line by line. Localize the hook, example names, dates, workplace vocabulary, fonts, caption units, voice, and call to action.
 
 Use this order:
 
@@ -87,7 +89,16 @@ Render local review segments for disputed beats; render the full review after th
 
 ## 5. Finish and verify
 
-Generate final TTS only after approval. Never use a voice the user has rejected. Prefer a neural provider with timestamps; otherwise measure audio and generate phrase timing with `caption_pipeline.py`.
+Generate final TTS only after approval. Never use a voice the user has rejected. For English, use Deepgram Flux TTS batch by default when the user has access; Flux is Early Access, so keep Aura-2 as the stable fallback. Store the key only in `DEEPGRAM_API_KEY`, never in JSON, source files, logs, or Git. Audition at least two short samples before committing to a voice.
+
+```bash
+DEEPGRAM_API_KEY=... python3 <skill-dir>/scripts/deepgram_tts.py \
+  --script <project-dir>/script-package.json \
+  --output <project-dir>/video/public/audio/narration.mp3 \
+  --model flux-hannah-en --speed 0.95 --expressivity 1
+```
+
+Prefer a neural provider with timestamps; Deepgram batch audio does not itself supply word timestamps, so measure the final audio and generate phrase timing with `caption_pipeline.py`, then manually spot-check phrase boundaries against the waveform.
 
 Target 55–65 seconds. Do not time-stretch speech. Render `VerticalImpact`, then run:
 

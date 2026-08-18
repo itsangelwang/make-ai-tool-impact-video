@@ -14,9 +14,15 @@ def han_count(text: str) -> int:
     return len(re.findall(r"[\u3400-\u9fff]", text))
 
 
+def word_count(text: str) -> int:
+    return len(re.findall(r"\b[\w]+(?:[’'-][\w]+)*\b", text, flags=re.UNICODE))
+
+
 def validate(data: dict) -> list[str]:
     errors: list[str] = []
     duration = float(data.get("duration_sec", 0))
+    language = str(data.get("language", "zh-CN"))
+    english = language.startswith("en")
     if not 55 <= duration <= 65:
         errors.append(f"duration_sec must be 55-65; got {duration:g}")
 
@@ -25,7 +31,7 @@ def validate(data: dict) -> list[str]:
         errors.append("captions must be a non-empty list")
         captions = []
     previous_end = 0.0
-    total_han = 0
+    total_units = 0
     spoken_seconds = 0.0
     for index, cue in enumerate(captions):
         if not all(key in cue for key in ("start_sec", "end_sec", "text")):
@@ -38,20 +44,26 @@ def validate(data: dict) -> list[str]:
             errors.append(f"caption {index} has invalid bounds")
             continue
         cue_duration = end - start
-        count = han_count(str(cue["text"]))
+        count = word_count(str(cue["text"])) if english else han_count(str(cue["text"]))
         rate = count / cue_duration
-        if rate > 4.2:
-            errors.append(f"caption {index} is too fast: {rate:.2f} Han/s")
-        if cue_duration < count / 4.2 + 0.2:
+        limit = 2.7 if english else 4.2
+        unit = "words/s" if english else "Han/s"
+        if rate > limit:
+            errors.append(f"caption {index} is too fast: {rate:.2f} {unit}")
+        if cue_duration < count / limit + 0.2:
             errors.append(f"caption {index} lacks a spoken pause")
         previous_end = end
-        total_han += count
+        total_units += count
         spoken_seconds += cue_duration
 
-    if total_han and not 140 <= total_han <= 195:
-        errors.append(f"caption narration should contain 140-195 Han characters; got {total_han}")
-    if spoken_seconds and total_han / spoken_seconds > 3.8:
-        errors.append(f"average caption pace is too fast: {total_han / spoken_seconds:.2f} Han/s")
+    if english and total_units and not 100 <= total_units <= 140:
+        errors.append(f"English caption narration should contain 100-140 words; got {total_units}")
+    if not english and total_units and not 140 <= total_units <= 195:
+        errors.append(f"caption narration should contain 140-195 Han characters; got {total_units}")
+    average_limit = 2.5 if english else 3.8
+    if spoken_seconds and total_units / spoken_seconds > average_limit:
+        unit = "words/s" if english else "Han/s"
+        errors.append(f"average caption pace is too fast: {total_units / spoken_seconds:.2f} {unit}")
 
     transitions = data.get("transitions", [])
     if not isinstance(transitions, list):

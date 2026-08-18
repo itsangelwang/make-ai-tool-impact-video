@@ -5,3 +5,6 @@ node_modules/
 renders/
 qa/
 .review-state.json
+.env
+.env.*
+!.env.example

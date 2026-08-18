@@ -1,4 +1,6 @@
 {
+  "language": "zh-CN",
+  "market": "CN",
   "duration_sec": 60,
   "audio": "",
   "palette": {"paper": "#F7F4EE", "ink": "#171923", "muted": "#687080", "cool": "#6857F5", "warm": "#F06449"},

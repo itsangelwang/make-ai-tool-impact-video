@@ -17,7 +17,7 @@ READINESS = {"use-now", "try-now", "watch", "future"}
 LEVELS = {"observed", "vendor-claim", "inference", "hypothesis"}
 SOURCE_TYPES = {"official", "independent", "community", "user-provided"}
 REQUIRED = {
-    "schema_version", "tool", "audience", "task", "before_steps", "friction",
+    "schema_version", "language", "market", "tool", "audience", "task", "before_steps", "friction",
     "ai_change", "after_steps", "human_check", "readiness", "next_action",
     "narration", "scenes",
 }
@@ -30,6 +30,10 @@ def load(path: Path):
 
 def han_count(text: str) -> int:
     return len(re.findall(r"[\u3400-\u9fff]", text))
+
+
+def word_count(text: str) -> int:
+    return len(re.findall(r"\b[\w]+(?:[’'-][\w]+)*\b", text, flags=re.UNICODE))
 
 
 def validate(package: dict, ledger: dict) -> list[str]:
@@ -49,14 +53,28 @@ def validate(package: dict, ledger: dict) -> list[str]:
         errors.append("after_steps must contain 2-4 steps")
     if package["readiness"] not in READINESS:
         errors.append(f"readiness must be one of {sorted(READINESS)}")
+    language = package["language"]
+    if language not in {"zh-CN", "en-US", "en-GB", "en-AU"}:
+        errors.append("language must be zh-CN, en-US, en-GB, or en-AU")
     narration = package["narration"]
-    count = han_count(narration)
-    if not 150 <= count <= 190:
-        errors.append(f"narration must contain 150-190 Han characters; got {count}")
+    if str(language).startswith("en"):
+        count = word_count(narration)
+        if not 105 <= count <= 135:
+            errors.append(f"English narration must contain 105-135 words; got {count}")
+    else:
+        count = han_count(narration)
+        if not 150 <= count <= 190:
+            errors.append(f"narration must contain 150-190 Han characters; got {count}")
     if re.search(r"[（(](画面|镜头|转场|字幕|特效)|\[(画面|镜头|转场|字幕|特效)", narration):
         errors.append("narration contains stage directions")
     if re.match(r"^.{0,12}(公司|模型|发布了|推出了)", narration):
         errors.append("narration opens with a technical release instead of the task pain")
+    if str(language).startswith("en") and re.match(
+        r"^\s*(?:today|introducing|[\w.-]+\s+(?:has\s+)?(?:launched|released|announced))\b",
+        narration,
+        flags=re.IGNORECASE,
+    ):
+        errors.append("English narration opens with a product release instead of the task pain")
 
     scenes = package["scenes"]
     if not isinstance(scenes, list) or not 5 <= len(scenes) <= 7:

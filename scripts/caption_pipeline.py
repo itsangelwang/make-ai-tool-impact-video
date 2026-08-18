@@ -23,13 +23,17 @@ def main() -> int:
     if args.duration_ms <= 0:
         raise SystemExit("duration-ms must be positive")
     package = json.loads(args.script.read_text(encoding="utf-8"))
+    language = str(package.get("language", "zh-CN"))
     chunks = phrases(package["narration"])
-    weights = [max(1, len(re.findall(r"[\u3400-\u9fffA-Za-z0-9]", chunk))) for chunk in chunks]
+    if language.startswith("en"):
+        weights = [max(1, len(re.findall(r"\b[\w]+(?:[’'-][\w]+)*\b", chunk))) for chunk in chunks]
+    else:
+        weights = [max(1, len(re.findall(r"[\u3400-\u9fffA-Za-z0-9]", chunk))) for chunk in chunks]
     total = sum(weights)
     cues, cursor = [], 0
     for index, (chunk, weight) in enumerate(zip(chunks, weights)):
         end = args.duration_ms if index == len(chunks) - 1 else round(cursor + args.duration_ms * weight / total)
-        cues.append({"text": chunk, "startMs": cursor, "endMs": end})
+        cues.append({"text": chunk, "startMs": cursor, "endMs": end, "language": language})
         cursor = end
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(cues, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

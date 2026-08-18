@@ -1,6 +1,8 @@
 # Make AI Tool Impact Video
 
-一个用于 Codex 的视频制作 Skill：把新出的 AI 工具讲成普通人能看懂的一分钟竖屏视频。
+一个用于 Codex 的视频制作 Skill：把新出的 AI 工具讲成普通人能看懂的一分钟竖屏视频。现在同时支持中文市场和英语市场；英语模式会原生改写脚本、例子、视觉层级、字幕节奏和旁白，而不是逐句翻译中文版。
+
+> English: Turn one AI tool into an evidence-based, one-minute vertical workflow story for Chinese or English-speaking audiences. The English mode localizes the hook, example, typography, captions, voice, and call to action instead of translating copy literally.
 
 ## 来源与致谢
 
@@ -43,6 +45,15 @@
 先生成合并审片包，确认后再渲染完整视频
 ```
 
+英语市场请求示例：
+
+```text
+Language: en-US
+Market: US
+Voice: Deepgram Flux TTS, conversational American English
+Create the combined review package first. Wait for approval before the final voice and render.
+```
+
 ## 它会做什么
 
 Skill 包含一条完整制作流程：
@@ -52,7 +63,7 @@ Skill 包含一条完整制作流程：
 3. 编写使用前、AI 介入点、使用后和人工检查的因果故事；
 4. 优先使用真实产品界面和合法素材；
 5. 用 Remotion 制作原生 1080×1920 动态视频；
-6. 生成可读、可自然口播的逐字字幕；
+6. 中文按语义逐字、英文按词或短语生成可读字幕；
 7. 检查语速、转场重叠、素材来源和视频技术指标；
 8. 先提交合并审片，获得确认后再完成配音和最终渲染。
 
@@ -63,6 +74,7 @@ Skill 包含一条完整制作流程：
 - “旧资料”“草稿”“原文”“负责人”等词第一次出现时，必须展示具体对象和具体值。
 - 画面能说明的动作不重复口播。
 - 55–65 秒视频通常控制在约 150–190 个中文字。
+- 英语版通常控制在约 105–135 个英文单词，平均约 2.0–2.5 words/s。
 - 单句建议保持约 3–4 个中文字/秒，超过 4.2 字/秒会被校验器拦截。
 - 可读转场使用独立全屏画面，不能覆盖前后页面或字幕结尾。
 - 字幕重点按语义高亮，不能随机给文字上色。
@@ -81,6 +93,7 @@ make-ai-tool-impact-video/
 │   ├── story-contract.md
 │   ├── visual-system.md
 │   ├── pacing-and-review.md
+│   ├── english-market.md
 │   ├── brand-system.md
 │   └── failure-modes.md
 ├── scripts/
@@ -89,6 +102,7 @@ make-ai-tool-impact-video/
 │   ├── validate_sources.py
 │   ├── project_state.py
 │   ├── caption_pipeline.py
+│   ├── deepgram_tts.py
 │   ├── scaffold_project.py
 │   └── verify_video.py
 └── tests/test_skill.py
@@ -118,6 +132,22 @@ npm ci
 ```bash
 python3 -m unittest discover -s tests -v
 ```
+
+## Deepgram Flux TTS
+
+英文旁白默认支持 Deepgram Flux TTS 的批量 REST 接口。Flux TTS 目前属于 Early Access，因此 Skill 会把 Aura-2 作为回退方案。API key 只能通过环境变量读取：
+
+```bash
+export DEEPGRAM_API_KEY="your-key"
+python3 scripts/deepgram_tts.py \
+  --script script-package.json \
+  --output video/public/audio/narration.mp3 \
+  --model flux-hannah-en \
+  --speed 0.95 \
+  --expressivity 1
+```
+
+不要把 key 写进命令历史、JSON、`.env` 提交或 GitHub。仓库已忽略 `.env` 与 `.env.*`。建议先用同一段 8–12 秒英文试听 `flux-hannah-en`、`flux-heather-en` 和 `flux-wes-en`，确认后再生成整段旁白。
 
 校验脚本与事实账本：
 

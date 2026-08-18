@@ -18,6 +18,7 @@ def module(name):
 
 validator = module("validate_package")
 timeline_validator = module("audit_timeline")
+deepgram_tts = module("deepgram_tts")
 
 
 def package(task="整理会议纪要", audience="项目经理"):
@@ -30,6 +31,8 @@ def package(task="整理会议纪要", audience="项目经理"):
         start = end
     return {
         "schema_version": 1,
+        "language": "zh-CN",
+        "market": "CN",
         "tool": {"name": "Example AI", "url": "https://example.com", "one_line_capability": "整理输入材料"},
         "audience": audience,
         "task": task,
@@ -71,6 +74,20 @@ class PackageTests(unittest.TestCase):
         item = package()
         item["scenes"][-1]["end_sec"] = 70
         self.assertTrue(any("55-65" in e for e in validator.validate(item, ledger())))
+
+    def test_english_market_package(self):
+        item = package("build a meeting prep brief", "project manager")
+        item["language"] = "en-US"
+        item["market"] = "US"
+        item["narration"] = " ".join(["work"] * 120)
+        self.assertEqual(validator.validate(item, ledger()), [])
+
+    def test_english_release_opening_fails(self):
+        item = package()
+        item["language"] = "en-US"
+        item["market"] = "US"
+        item["narration"] = "Introducing a new AI tool. " + " ".join(["work"] * 115)
+        self.assertTrue(any("product release" in e for e in validator.validate(item, ledger())))
 
 
 class StateAndUtilitiesTests(unittest.TestCase):
@@ -132,6 +149,24 @@ class StateAndUtilitiesTests(unittest.TestCase):
         self.assertTrue(any("too fast" in error for error in errors))
         self.assertTrue(any("overlaps" in error for error in errors))
         self.assertTrue(any("at least 1.2" in error for error in errors))
+
+    def test_english_timeline(self):
+        data = {
+            "language": "en-US",
+            "duration_sec": 60,
+            "captions": [
+                {"start_sec": 0, "end_sec": 25, "text": " ".join(["work"] * 55)},
+                {"start_sec": 26.5, "end_sec": 58, "text": " ".join(["check"] * 55)},
+            ],
+            "transitions": [{"start_sec": 25, "end_sec": 26.5, "readable": True}],
+        }
+        self.assertEqual(timeline_validator.validate(data), [])
+
+    def test_flux_url_and_key_safety(self):
+        url = deepgram_tts.build_url("flux-hannah-en", 0.95, 1, "mp3")
+        self.assertIn("/v2/speak?", url)
+        self.assertIn("model=flux-hannah-en", url)
+        self.assertNotIn("DEEPGRAM_API_KEY", url)
 
 
 if __name__ == "__main__":
