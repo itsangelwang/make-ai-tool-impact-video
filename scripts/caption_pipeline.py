@@ -8,6 +8,8 @@ import json
 import re
 from pathlib import Path
 
+from safe_io import atomic_write_json
+
 
 def phrases(text: str) -> list[str]:
     parts = [p.strip() for p in re.split(r"(?<=[，。！？；：,.!?;:])", text) if p.strip()]
@@ -35,8 +37,7 @@ def main() -> int:
         end = args.duration_ms if index == len(chunks) - 1 else round(cursor + args.duration_ms * weight / total)
         cues.append({"text": chunk, "startMs": cursor, "endMs": end, "language": language})
         cursor = end
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(cues, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    atomic_write_json(args.output, cues)
     print(json.dumps({"ok": True, "cues": len(cues), "duration_ms": args.duration_ms}))
     return 0
 

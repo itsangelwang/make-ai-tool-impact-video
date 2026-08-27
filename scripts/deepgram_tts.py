@@ -58,7 +58,8 @@ def synthesize(text: str, output: Path, model: str, speed: float, expressivity: 
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = None
     try:
-        with urllib.request.urlopen(request, timeout=120) as response:
+        # The Request URL is constructed from the fixed HTTPS Deepgram endpoint.
+        with urllib.request.urlopen(request, timeout=120) as response:  # nosec B310
             with tempfile.NamedTemporaryFile(dir=output.parent, delete=False) as handle:
                 temporary = Path(handle.name)
                 handle.write(response.read())
@@ -88,7 +89,7 @@ def main() -> int:
     except (ValueError, RuntimeError, OSError, json.JSONDecodeError) as error:
         print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False))
         return 1
-    print(json.dumps({"ok": True, "output": str(args.output), "model": args.model}, ensure_ascii=False))
+    print(json.dumps({"ok": True, "output": args.output.name, "model": args.model}, ensure_ascii=False))
     return 0
 
 

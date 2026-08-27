@@ -6,8 +6,10 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
-import subprocess
+import subprocess  # nosec B404
 from pathlib import Path
+
+from safe_io import atomic_write_json
 
 
 def main() -> int:
@@ -17,17 +19,21 @@ def main() -> int:
     parser.add_argument("--report", required=True, type=Path)
     args = parser.parse_args()
     errors = []
-    if not shutil.which("ffprobe") or not shutil.which("ffmpeg"):
+    ffprobe = shutil.which("ffprobe")
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffprobe or not ffmpeg:
         errors.append("ffmpeg and ffprobe are required")
         probe = {}
     elif not args.video.is_file():
         errors.append("video file is missing")
         probe = {}
     else:
-        result = subprocess.run([
-            "ffprobe", "-v", "error", "-show_streams", "-show_format", "-of", "json", str(args.video)
+        result = subprocess.run([  # nosec B603
+            ffprobe, "-v", "error", "-show_streams", "-show_format", "-of", "json", str(args.video)
         ], capture_output=True, text=True, check=True)
         probe = json.loads(result.stdout)
+        # ffprobe includes the input filename, which may be an absolute private path.
+        probe.get("format", {}).pop("filename", None)
         streams = probe.get("streams", [])
         videos = [s for s in streams if s.get("codec_type") == "video"]
         audios = [s for s in streams if s.get("codec_type") == "audio"]
@@ -40,7 +46,11 @@ def main() -> int:
         duration = float(probe.get("format", {}).get("duration", 0))
         if not 55 <= duration <= 65:
             errors.append(f"duration must be 55-65 seconds; got {duration:.3f}")
-        decode = subprocess.run(["ffmpeg", "-v", "error", "-i", str(args.video), "-f", "null", "-"], capture_output=True, text=True)
+        decode = subprocess.run(  # nosec B603
+            [ffmpeg, "-v", "error", "-i", str(args.video), "-f", "null", "-"],
+            capture_output=True,
+            text=True,
+        )
         if decode.returncode:
             errors.append("full decode failed")
     try:
@@ -55,8 +65,7 @@ def main() -> int:
     except (OSError, ValueError, KeyError, TypeError) as exc:
         errors.append(f"invalid captions: {exc}")
     report = {"ok": not errors, "errors": errors, "probe": probe}
-    args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    atomic_write_json(args.report, report)
     print(json.dumps({"ok": not errors, "errors": errors}, ensure_ascii=False, indent=2))
     return 0 if not errors else 1
 

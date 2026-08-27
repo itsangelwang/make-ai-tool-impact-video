@@ -9,6 +9,8 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from safe_io import atomic_write_json, project_file
+
 STATE = ".impact-video-state.json"
 
 
@@ -24,13 +26,17 @@ def read(project: Path) -> dict:
 
 
 def write(project: Path, state: dict) -> None:
-    (project / STATE).write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    atomic_write_json(project / STATE, state)
 
 
 def integrity(state: dict, project: Path) -> tuple[bool, list[str]]:
     changed = []
     for name, item in state.get("review", {}).get("files", {}).items():
-        path = project / item["path"]
+        try:
+            path = project_file(project, item["path"])
+        except (KeyError, TypeError, ValueError):
+            changed.append(name)
+            continue
         if not path.is_file() or digest(path) != item["sha256"]:
             changed.append(name)
     return not changed, changed
@@ -68,11 +74,11 @@ def main() -> int:
         for name in ("package", "claims", "story", "sources", "cover", "opening"):
             path = getattr(args, name).expanduser().resolve()
             if not path.is_file():
-                raise SystemExit(f"Missing review file: {path}")
+                raise SystemExit(f"Missing review file for --{name}")
             try:
                 relative = path.relative_to(project)
             except ValueError:
-                raise SystemExit(f"Review file must be inside the project directory: {path}") from None
+                raise SystemExit(f"Review file for --{name} must be inside the project directory") from None
             files[name] = {"path": relative.as_posix(), "sha256": digest(path)}
         state.update({
             "stage": "review-ready",

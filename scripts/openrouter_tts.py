@@ -7,8 +7,9 @@ import argparse
 import json
 import os
 import re
+import shutil
 import ssl
-import subprocess
+import subprocess  # nosec B404
 import sys
 import tempfile
 import urllib.error
@@ -81,8 +82,11 @@ def synthesize(text: str, output: Path, model: str, voice: str, speed: float) ->
             'show-error',
             'fail-with-body',
         ])
-        result = subprocess.run(
-            ["curl", "--config", "-"],
+        curl = shutil.which("curl")
+        if not curl:
+            raise RuntimeError("curl is required")
+        result = subprocess.run(  # nosec B603
+            [curl, "--config", "-"],
             input=config,
             text=True,
             capture_output=True,
@@ -116,7 +120,7 @@ def main() -> int:
     except (ValueError, RuntimeError, OSError, json.JSONDecodeError) as error:
         print(json.dumps({"ok": False, "error": str(error)}, ensure_ascii=False))
         return 1
-    print(json.dumps({"ok": True, "output": str(args.output), "model": args.model, "voice": args.voice}, ensure_ascii=False))
+    print(json.dumps({"ok": True, "output": args.output.name, "model": args.model, "voice": args.voice}, ensure_ascii=False))
     return 0
 
 

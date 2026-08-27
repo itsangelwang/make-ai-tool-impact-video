@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
 
 
 def module(name):
@@ -20,6 +21,7 @@ def module(name):
 validator = module("validate_package")
 timeline_validator = module("audit_timeline")
 deepgram_tts = module("deepgram_tts")
+project_state = module("project_state")
 
 
 def package(task="整理会议纪要", audience="项目经理"):
@@ -92,6 +94,32 @@ class PackageTests(unittest.TestCase):
 
 
 class StateAndUtilitiesTests(unittest.TestCase):
+    def test_state_cannot_read_outside_project(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            project = root / "project"
+            project.mkdir()
+            private = root / "private.txt"
+            private.write_text("private")
+            state = {"review": {"files": {"package": {
+                "path": "../private.txt", "sha256": project_state.digest(private)
+            }}}}
+            ok, changed = project_state.integrity(state, project)
+            self.assertFalse(ok)
+            self.assertEqual(changed, ["package"])
+
+    def test_atomic_state_write_replaces_symlink_not_target(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            project = root / "project"
+            project.mkdir()
+            private = root / "private.txt"
+            private.write_text("keep")
+            (project / ".impact-video-state.json").symlink_to(private)
+            project_state.write(project, {"stage": "draft"})
+            self.assertEqual(private.read_text(), "keep")
+            self.assertFalse((project / ".impact-video-state.json").is_symlink())
+
     def test_approval_invalidates_after_change(self):
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp)
