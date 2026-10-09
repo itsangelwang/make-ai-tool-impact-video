@@ -65,8 +65,7 @@ def synthesize(text: str, output: Path, model: str, speed: float, expressivity: 
                 handle.write(response.read())
         temporary.replace(output)
     except urllib.error.HTTPError as error:
-        detail = error.read().decode("utf-8", errors="replace")[:500]
-        raise RuntimeError(f"Deepgram returned HTTP {error.code}: {detail}") from error
+        raise RuntimeError(f"Deepgram returned HTTP {error.code}") from None
     finally:
         if temporary and temporary.exists():
             temporary.unlink()

@@ -94,8 +94,7 @@ def synthesize(text: str, output: Path, model: str, voice: str, speed: float) ->
             check=False,
         )
         if result.returncode:
-            detail = temporary.read_text(encoding="utf-8", errors="replace")[:500]
-            raise RuntimeError(f"OpenRouter request failed: {detail or result.stderr.strip()}")
+            raise RuntimeError(f"OpenRouter request failed (curl exit {result.returncode})")
         temporary.replace(output)
     finally:
         if payload_file and payload_file.exists():
