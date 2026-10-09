@@ -26,7 +26,7 @@ Choose exactly one audience, task, and example thread. Define `before_steps`, `a
 
 ## 2. Build one causal story
 
-Read [references/story-contract.md](references/story-contract.md) and [references/visual-system.md](references/visual-system.md). When the project uses silent or animated captions, also read [references/pacing-and-review.md](references/pacing-and-review.md). Read [references/brand-system.md](references/brand-system.md) only when an end brand is requested.
+Read [references/story-contract.md](references/story-contract.md) and [references/visual-system.md](references/visual-system.md). For narration, audio, timing, or animated captions, also read [references/pacing-and-review.md](references/pacing-and-review.md). Read [references/brand-system.md](references/brand-system.md) only when an end brand is requested.
 
 For an English-speaking audience, also read [references/english-market.md](references/english-market.md). Adapt the idea rather than translating Chinese copy line by line. Localize the hook, example names, dates, workplace vocabulary, fonts, caption units, voice, and call to action.
 
@@ -49,6 +49,8 @@ python3 <skill-dir>/scripts/validate_package.py \
   <project-dir>/script-package.json \
   <project-dir>/claim-ledger.json
 ```
+
+Keep `video/src/timeline.json` as the canonical timed narration. Render captions from it and generate TTS from the same cue text; do not maintain a separate hard-coded caption list. Keep `script-package.json` narration equivalent to the concatenated cues and validate both before rendering.
 
 ## 3. Create the combined review
 
@@ -114,7 +116,19 @@ DEEPGRAM_API_KEY=... python3 <skill-dir>/scripts/deepgram_tts.py \
 
 Prefer a neural provider with timestamps; Deepgram batch audio does not itself supply word timestamps, so measure the final audio and generate phrase timing with `caption_pipeline.py`, then manually spot-check phrase boundaries against the waveform.
 
-Target 55–65 seconds. Permit a review up to 75 seconds when verified product interaction, stable result holds, or human-check evidence would otherwise become unreadable; report the extension and shorten later only by removing repetition. Do not time-stretch speech. Render `VerticalImpact`, then run:
+For Fish Audio, keep credentials in an ignored `.env` file and keep only placeholders in `.env.example`. Use an original synthetic voice or a voice the user has permission to use; do not clone another provider's preset voice. Generate 8–12 second auditions before the full narration. Use `s2.1-pro-free` only when its current availability and the user's intended usage comply with Fish Audio's live terms.
+
+```bash
+python3 <skill-dir>/scripts/fish_audio_tts.py \
+  --env-file <skill-dir>/.env \
+  --text "Tomorrow's meeting is coming up." \
+  --reference-id <fish-voice-model-id> \
+  --output <project-dir>/video/qa/fish-voice-sample.mp3
+```
+
+When the visuals are already approved, synthesize one clip per canonical timeline cue, place each clip at its cue start, normalize the final mix to approximately -16 LUFS with true peak at or below -1.5 dB, and remux it with the existing video stream. Do not rerender unchanged visuals solely to replace narration.
+
+Target 55–65 seconds. Permit a review up to 75 seconds when verified product interaction, stable result holds, or human-check evidence would otherwise become unreadable; report the extension and shorten later only by removing repetition. For a user-requested longer workflow, document a duration exception and validate timing/bounds independently rather than claiming the default validator passed. Do not time-stretch speech. Render `VerticalImpact`, then run:
 
 ```bash
 python3 <skill-dir>/scripts/verify_video.py \

@@ -22,7 +22,7 @@ Use zoom only to direct attention to a consequential detail: the selected import
 
 When a chapter transition contains a readable label, give it a dedicated full-frame background for roughly 1.2–1.5 seconds. Do not layer a transition title over the outgoing or incoming scene. Hold the title stable long enough to read, then reveal the next scene; shorter overlays are reserved for nonverbal action handoffs.
 
-End the outgoing caption before a readable transition begins. For character-by-character captions, adapt the stagger to phrase length and preserve a stable fully revealed hold; never let the transition cover the final words. Place a full-frame transition entirely before the next scene boundary so the incoming scene starts unobscured.
+End the outgoing caption before a readable transition begins. For captions revealed by semantic word groups, adapt the stagger to phrase length and preserve a stable fully revealed hold; never let the transition cover the final words. Place a full-frame transition entirely before the next scene boundary so the incoming scene starts unobscured.
 
 Render captions once at composition root. Keep critical content inside 72 px horizontal and 120 px vertical safe margins. Reserve the lower 310 px for captions and platform controls.
 
@@ -75,3 +75,25 @@ Prefer source-safe generated sounds or cleared product recordings. Use `scripts/
 Before showing a sequence of clicks, searches, or copy-and-paste actions, establish the concrete task those actions are meant to complete. Show the deadline or trigger, the desired deliverable, and two or three pieces of information the person needs. For example: tomorrow's meeting → one-page preparation summary → previous decisions, unfinished tasks, and owners.
 
 The viewer should understand both “what is the person doing?” and “what are they trying to finish?” before the manual workflow accelerates. Keep the goal visible through a stable artifact, such as an empty summary page, checklist, calendar event, application form, itinerary, or draft. Let later actions visibly fill or complete that artifact.
+
+## Product identity and workflow continuity
+
+Use official original logo and wordmark assets with their native proportions and colors. Do not substitute an asterisk, emoji, generic typeface, or the video accent color for a product identity. Record the source and rights status separately from factual UI evidence. Narrative mentions can use the video font; branded headers, avatars, and identity labels use the real mark. Preserve user-supplied brand spelling and tagline exactly.
+
+Build input, output, human edits, verification, and export from one shared example data model. Show enough substantive input to justify the output; use honest scrolling and page counts rather than padding with repeated text. Keep draft/completed, sent/approved, and scheduled/performed distinct throughout.
+
+Before and after must show who performs the work: manually read, decide, and type versus AI drafting and organizing, followed by human review. Prove each important feature through a visible action: reopen a saved artifact, ask for a change on the same document, type a direct edit, show saving, and carry that edit into the export. Do not rely on a badge or headline as feature evidence.
+
+UI typing uses character entry and a caret. Captions reveal short semantic word groups with a stable final hold; they are not an editor typing simulation. Copy/paste must show selection, contextual menu or shortcut, and the full transferred payload; rewriting must show actual new typing. Anchor zoom to the pointer or target in the same coordinate system. Stop camera motion while people read the result.
+
+For mobile, show one question per page and distinguish section headings through hierarchy, spacing, icons, and background blocks. Never draw outlines over the text. Use a separate transition before explaining a product distinction. Prefer an animated same-document interaction over a dense competitor table. Verify competitor AI features before claiming a difference.
+
+## Collaboration, persistence, and navigation
+
+For collaborative AI documents, demonstrate access and causality: share the document, choose verified editing permissions, show the invited person entering, send a human request, then show the AI revision on that same document. Do not imply automatic team access or unsolicited continuous AI edits. Verify the actual product interaction before reconstructing it.
+
+Show the selected input as one example, not a mandatory route. When supported, briefly show alternatives such as existing conversation or a file with large recognizable objects. Avoid a small-print disclaimer.
+
+Use a thin, unlabeled segmented progress bar when chapter titles already exist. Align segment lengths to real chapter durations; avoid duplicate headings. Keep official wordmarks and product descriptors on one line with preserved proportions, and do not describe a custom descriptor as an official logo.
+
+Explain an important boundary through a readable action and result, not tiny footnotes. If the same-document workspace is the distinction, show saving, reopening, a requested revision and a direct human edit rather than claiming that competing editors lack AI.

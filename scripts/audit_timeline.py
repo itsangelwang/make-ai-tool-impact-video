@@ -56,8 +56,8 @@ def validate(data: dict) -> list[str]:
         total_units += count
         spoken_seconds += cue_duration
 
-    if english and total_units and not 100 <= total_units <= 140:
-        errors.append(f"English caption narration should contain 100-140 words; got {total_units}")
+    if english and total_units and not 90 <= total_units <= 140:
+        errors.append(f"English caption narration should contain 90-140 words; got {total_units}")
     if not english and total_units and not 140 <= total_units <= 195:
         errors.append(f"caption narration should contain 140-195 Han characters; got {total_units}")
     average_limit = 2.5 if english else 3.8

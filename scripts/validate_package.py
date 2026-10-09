@@ -59,8 +59,8 @@ def validate(package: dict, ledger: dict) -> list[str]:
     narration = package["narration"]
     if str(language).startswith("en"):
         count = word_count(narration)
-        if not 105 <= count <= 135:
-            errors.append(f"English narration must contain 105-135 words; got {count}")
+        if not 90 <= count <= 135:
+            errors.append(f"English narration must contain 90-135 words; got {count}")
     else:
         count = han_count(narration)
         if not 150 <= count <= 190:

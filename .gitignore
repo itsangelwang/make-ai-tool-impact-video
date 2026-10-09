@@ -9,3 +9,11 @@ qa/
 .env
 .env.*
 !.env.example
+
+# Local credentials, recordings and project data
+*.pem
+*.key
+credentials*.json
+secrets*.json
+*.log
+projects/

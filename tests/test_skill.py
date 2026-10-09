@@ -22,6 +22,7 @@ validator = module("validate_package")
 timeline_validator = module("audit_timeline")
 deepgram_tts = module("deepgram_tts")
 project_state = module("project_state")
+fish_audio_tts = module("fish_audio_tts")
 
 
 def package(task="整理会议纪要", audience="项目经理"):
@@ -164,6 +165,67 @@ class StateAndUtilitiesTests(unittest.TestCase):
                 os.environ.pop("OPENROUTER_API_KEY", None)
             else:
                 os.environ["OPENROUTER_API_KEY"] = old
+
+    def test_fish_key_rejects_config_injection(self):
+        old = os.environ.get("FISH_AUDIO_API_KEY")
+        os.environ["FISH_AUDIO_API_KEY"] = "valid-looking-fish-key-123456\nheader=injected"
+        try:
+            with self.assertRaises(RuntimeError):
+                fish_audio_tts.secret_from_environment()
+        finally:
+            if old is None:
+                os.environ.pop("FISH_AUDIO_API_KEY", None)
+            else:
+                os.environ["FISH_AUDIO_API_KEY"] = old
+
+    def test_fish_env_loads_without_overriding_existing_values(self):
+        old_key = os.environ.get("FISH_AUDIO_API_KEY")
+        old_voice = os.environ.get("FISH_AUDIO_REFERENCE_ID")
+        os.environ["FISH_AUDIO_API_KEY"] = "existing-key-value-1234567890"
+        os.environ.pop("FISH_AUDIO_REFERENCE_ID", None)
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                env_file = Path(tmp) / ".env"
+                env_file.write_text(
+                    "FISH_AUDIO_API_KEY=file-key-value-1234567890\n"
+                    "FISH_AUDIO_REFERENCE_ID=voice_12345678\n"
+                )
+                fish_audio_tts.load_env(env_file)
+            self.assertEqual(os.environ["FISH_AUDIO_API_KEY"], "existing-key-value-1234567890")
+            self.assertEqual(os.environ["FISH_AUDIO_REFERENCE_ID"], "voice_12345678")
+        finally:
+            if old_key is None:
+                os.environ.pop("FISH_AUDIO_API_KEY", None)
+            else:
+                os.environ["FISH_AUDIO_API_KEY"] = old_key
+            if old_voice is None:
+                os.environ.pop("FISH_AUDIO_REFERENCE_ID", None)
+            else:
+                os.environ["FISH_AUDIO_REFERENCE_ID"] = old_voice
+
+    def test_fish_dry_run_needs_no_api_key_and_writes_no_audio(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "sample.mp3"
+            env = os.environ.copy()
+            env.pop("FISH_AUDIO_API_KEY", None)
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    ROOT / "scripts" / "fish_audio_tts.py",
+                    "--text",
+                    "A short voice test.",
+                    "--output",
+                    output,
+                    "--reference-id",
+                    "voice_12345678",
+                    "--dry-run",
+                ],
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertFalse(output.exists())
 
     def test_caption_pipeline_covers_duration(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -76,7 +76,7 @@ Skill 包含一条完整制作流程：
 - “旧资料”“草稿”“原文”“负责人”等词第一次出现时，必须展示具体对象和具体值。
 - 画面能说明的动作不重复口播。
 - 55–65 秒视频通常控制在约 150–190 个中文字。
-- 英语版通常控制在约 105–135 个英文单词，平均约 2.0–2.5 words/s。
+- 英语版通常控制在约 90–135 个英文单词，平均约 2.0–2.5 words/s。
 - 单句建议保持约 3–4 个中文字/秒，超过 4.2 字/秒会被校验器拦截。
 - 可读转场使用独立全屏画面，不能覆盖前后页面或字幕结尾。
 - 字幕重点按语义高亮，不能随机给文字上色。
@@ -106,6 +106,8 @@ make-ai-tool-impact-video/
 │   ├── caption_pipeline.py
 │   ├── deepgram_tts.py
 │   ├── openrouter_tts.py
+│   ├── fish_audio_tts.py
+│   ├── generate_original_bgm.py
 │   ├── generate_ui_sfx.mjs
 │   ├── scaffold_project.py
 │   └── verify_video.py
@@ -152,6 +154,21 @@ python3 scripts/deepgram_tts.py \
 ```
 
 不要把 key 写进命令历史、JSON、`.env` 提交或 GitHub。仓库已忽略 `.env` 与 `.env.*`。建议先用同一段 8–12 秒英文试听 `flux-hannah-en`、`flux-heather-en` 和 `flux-wes-en`，确认后再生成整段旁白。
+
+## Fish Audio TTS
+
+Fish Audio 作为自然英文人声的可选方案。只使用你有权使用的公开声音或自有声音，不复制 Hannah 或其他可识别声音。先把 `.env.example` 复制为本机 `.env`，再在本机填写 Key 和声音的 reference ID；`.env` 已被 Git 忽略。
+
+```bash
+python3 scripts/fish_audio_tts.py \
+  --script script-package.json \
+  --output video/public/audio/narration-fish.mp3 \
+  --reference-id YOUR_AUTHORIZED_REFERENCE_ID \
+  --model s2.1-pro-free \
+  --dry-run
+```
+
+移除 `--dry-run` 才会调用 Fish Audio。先生成 8–12 秒试听，确认声音后再生成整段，以节省额度。
 
 校验脚本与事实账本：
 

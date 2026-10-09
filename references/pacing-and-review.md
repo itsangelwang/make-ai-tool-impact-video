@@ -6,7 +6,7 @@ Treat display completion and speakability as different constraints.
 
 - Target roughly 150–190 Han characters for a 55–65 second video with readable transitions.
 - Target 3–4 Han characters per second per spoken cue; flag any cue above 4.2.
-- For English, target roughly 105–135 words and an average of 2.0–2.5 words per spoken second; flag a cue above 2.7 words per second.
+- For English, target roughly 90–135 words: use 90–105 for an intentionally fast, energetic delivery with readable transition gaps, and 105–135 for a calmer delivery. Flag a cue above 2.7 words per spoken second.
 - End a cue before a readable chapter transition begins.
 - Preserve a short pause after the last spoken word and a stable hold after character animation completes.
 - Cut narration that merely repeats an obvious action before extending duration.
@@ -77,3 +77,17 @@ Watch once without pausing and answer:
 10. Can a viewer recount before, changed step, after, human check, and fit?
 
 After any timing, script, voice, or visual-direction change, invalidate the previous review and inspect the full video again.
+
+## Narration and regression checks
+
+Reuse a previously accepted voice and documented auditions when the user has not changed the preference. Generate complete semantic sentences, not isolated caption fragments, and map the audio to the canonical timeline. Check each clip's natural duration before assembling; do not cut spoken words or stretch audio to conceal an overfull cue. Speech, action, and caption must describe the same state, including matching section names. User authorization to proceed after QA remains valid when that condition is satisfied.
+
+Final QA must inspect the entire sequence as well as changed frames: empty deliverable → manual workload → substantial handoff → AI result → persistent same-document revision → human check → same exported file. Record what was actually verified; frame sampling or decoding is not equivalent to watching the full video or listening to the narration.
+
+## Expressive audio and scoped revisions
+
+For an energetic short-video voice, direct sentence-level emphasis, contrast and pitch variation, then audition one representative segment. Fast delivery alone is insufficient. Reuse accepted unchanged cues; regenerate only affected sentences. Preserve naturally spoken words and fit visual timing around measured audio.
+
+Make typing sound like varied key presses, with brief pauses and a distinct return key, synchronized to human entry. AI generation should not sound like a person typing. Avoid piercing beeps. Keep music and operation sounds below speech; a gentle music dip and return can mark a chapter without an unrelated transition sweep. Use `scripts/generate_original_bgm.py` for an original configurable bed when appropriate; listen to the mix before approval.
+
+If the requested workflow needs more than 75 seconds, first remove repetition, then explicitly record a justified duration exception in QA. Do not claim the default duration validator passed. A second model or tool should first improve one disputed 5–15 second segment from source and frames, preserving approved facts, voice and assets before expanding the scope.
