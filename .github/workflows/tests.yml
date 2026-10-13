@@ -30,3 +30,12 @@ jobs:
           node-version: "20"
       - run: npm ci --no-audit --no-fund
       - run: npx remotion still src/index.jsx VerticalImpact /tmp/cover.png --frame 0 --log=error
+      - name: Render reusable motion components
+        run: |
+          npx remotion still src/index.jsx ComponentsDemo /tmp/components-start.png --frame 0 --log=error
+          npx remotion still src/index.jsx ComponentsDemo /tmp/components-click.png --frame 62 --log=error
+          npx remotion still src/index.jsx ComponentsDemo /tmp/components-result.png --frame 210 --log=error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: components-demo-stills
+          path: /tmp/components-*.png

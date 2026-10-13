@@ -100,6 +100,8 @@ When feedback reveals confusion, repair the causal chain rather than polishing t
 - Structure consequential actions as enter → act → stable result. Use semantic push-ins and gentle pull-backs to focus attention on clicks, generated results, evidence, and human checks.
 - Add restrained, frame-synced UI sound when it clarifies a visible click, typing action, upload, processing state, or completion. Keep narration dominant and never use sound to disguise an unreadably fast cut. Generate source-safe sounds with `scripts/generate_ui_sfx.mjs` when needed.
 
+Reuse `Cursor`, `TypingText`, `FocusZoom`, and `ProgressBar` from the Remotion template for visible UI actions; see [references/visual-system.md](references/visual-system.md) and the English `ComponentsDemo` composition for props and click choreography.
+
 Render stills first for layout and 5–15 second local clips for disputed motion or pacing. Render the full review only after local direction is established, or after a global timeline change requires continuity review. Avoid re-rendering or re-analyzing unchanged full compositions.
 
 ## 5. Finish and verify
