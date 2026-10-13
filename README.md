@@ -1,6 +1,6 @@
 # Make AI Tool Impact Video
 
-一个用于 Codex 的视频制作 Skill：把 AI 工具的功能，讲成普通人能看懂的竖屏短视频。支持中文和英语市场。
+一个可同时用于 Codex 和 Claude Code 的视频制作 Skill：把 AI 工具的功能，讲成普通人能看懂的竖屏短视频。支持中文和英语市场。
 
 围绕一个具体任务，直观展示使用前怎么做、AI 改变了哪一步，以及使用后得到什么结果。
 
@@ -16,16 +16,23 @@
 
 ## 安装
 
-让 Codex 从本仓库安装 Skill，或克隆后将文件夹放入 Codex 的 Skills 目录：
+克隆一份到本地，再分别链接到 Codex 和 Claude Code 的 Skills 目录。两个工具共用同一份文件，不会出现两个版本：
 
 ```bash
-git clone https://github.com/itsangelwang/make-ai-tool-impact-video.git
+git clone https://github.com/itsangelwang/make-ai-tool-impact-video.git ~/skills/make-ai-tool-impact-video
+mkdir -p ~/.codex/skills ~/.claude/skills
+ln -s ~/skills/make-ai-tool-impact-video ~/.codex/skills/make-ai-tool-impact-video
+ln -s ~/skills/make-ai-tool-impact-video ~/.claude/skills/make-ai-tool-impact-video
 ```
+
+配音密钥放在仓库外面，例如 `~/.config/make-ai-tool-impact-video/.env`（格式参考 `.env.example`）。
 
 ## 使用
 
+在 Codex 里用 `$make-ai-tool-impact-video` 调用，在 Claude Code 里用 `/make-ai-tool-impact-video` 调用，或者直接描述需求：
+
 ```text
-使用 $make-ai-tool-impact-video，为这个 AI 工具制作一条约一分钟的竖屏视频：<产品名称或链接>
+使用 make-ai-tool-impact-video，为这个 AI 工具制作一条约一分钟的竖屏视频：<产品名称或链接>
 目标市场：美国
 语言：英语
 具体任务：把工作笔记整理成一份可继续修改的周报
@@ -39,6 +46,15 @@ git clone https://github.com/itsangelwang/make-ai-tool-impact-video.git
 默认制作 1080×1920、30fps 的 9:16 视频，并提供封面、字幕和来源说明。视频长度可按内容调整。
 
 具体制作流程见 [SKILL.md](SKILL.md)。
+
+## 用两个 AI 工具一起维护
+
+规则写在 [AGENTS.md](AGENTS.md)，Codex 和 Claude Code 都会读取。简单来说：
+
+1. 开始前先 `git pull`，拿到 GitHub 上的最新版本。
+2. 同一时间只让一个工具修改。
+3. 每次修改开一个分支（`codex/...` 或 `claude/...`），跑通测试后发 PR，确认后再合并。
+4. 可以让另一个工具审查这个 PR，互相查漏补缺。
 
 ## 来源与致谢
 

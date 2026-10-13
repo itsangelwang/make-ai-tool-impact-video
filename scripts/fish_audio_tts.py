@@ -18,11 +18,13 @@ from pathlib import Path
 ENDPOINT = "https://api.fish.audio/v1/tts"
 SAFE_SECRET = re.compile(r"\A[^\s\x00-\x1f\x7f]{20,512}\Z")
 SAFE_REFERENCE_ID = re.compile(r"\A[A-Za-z0-9_-]{8,128}\Z")
+DEFAULT_ENV_FILE = Path("~/.config/make-ai-tool-impact-video/.env")
 MODELS = {"s1", "s2-pro", "s2.1-pro", "s2.1-pro-free", "drama-3-preview"}
 
 
 def load_env(path: Path) -> None:
     """Load simple KEY=VALUE entries without overriding the caller environment."""
+    path = path.expanduser()
     if not path.is_file():
         return
     for number, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -135,7 +137,7 @@ def main() -> int:
     source.add_argument("--text")
     source.add_argument("--script", type=Path)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--env-file", type=Path, default=Path(".env"))
+    parser.add_argument("--env-file", type=Path, default=DEFAULT_ENV_FILE)
     parser.add_argument("--reference-id")
     parser.add_argument("--model", default="s2.1-pro-free", choices=sorted(MODELS))
     parser.add_argument("--speed", type=float, default=1.0)

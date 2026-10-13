@@ -178,6 +178,21 @@ class StateAndUtilitiesTests(unittest.TestCase):
             else:
                 os.environ["FISH_AUDIO_API_KEY"] = old
 
+    def test_deepgram_key_rejects_header_injection(self):
+        old = os.environ.get("DEEPGRAM_API_KEY")
+        os.environ["DEEPGRAM_API_KEY"] = "valid-looking-deepgram-key-1234\nX-Injected: 1"
+        try:
+            with self.assertRaises(RuntimeError):
+                deepgram_tts.api_key_from_environment()
+        finally:
+            if old is None:
+                os.environ.pop("DEEPGRAM_API_KEY", None)
+            else:
+                os.environ["DEEPGRAM_API_KEY"] = old
+
+    def test_fish_default_env_file_is_outside_skill(self):
+        self.assertEqual(fish_audio_tts.DEFAULT_ENV_FILE.parts[0], "~")
+
     def test_fish_env_loads_without_overriding_existing_values(self):
         old_key = os.environ.get("FISH_AUDIO_API_KEY")
         old_voice = os.environ.get("FISH_AUDIO_REFERENCE_ID")

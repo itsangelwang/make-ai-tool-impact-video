@@ -6,6 +6,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
+import ssl
 import sys
 import tempfile
 import urllib.error
@@ -15,6 +17,25 @@ from pathlib import Path
 
 
 FLUX_SPEEDS = {0.85, 0.9, 0.95, 1.0, 1.05, 1.1, 1.15}
+SAFE_SECRET = re.compile(r"\A[^\s\x00-\x1f\x7f]{20,512}\Z")
+
+
+def api_key_from_environment() -> str:
+    token = os.environ.get("DEEPGRAM_API_KEY", "").strip()
+    if not token:
+        raise RuntimeError("DEEPGRAM_API_KEY is not set")
+    if not SAFE_SECRET.fullmatch(token):
+        raise RuntimeError("DEEPGRAM_API_KEY has an invalid format")
+    return token
+
+
+def tls_context() -> ssl.SSLContext:
+    try:
+        import certifi
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context()
 
 
 def build_url(model: str, speed: float, expressivity: int, encoding: str) -> str:
@@ -46,9 +67,7 @@ def narration_from_args(args: argparse.Namespace) -> str:
 
 
 def synthesize(text: str, output: Path, model: str, speed: float, expressivity: int, encoding: str) -> None:
-    token = os.environ.get("DEEPGRAM_API_KEY")
-    if not token:
-        raise RuntimeError("DEEPGRAM_API_KEY is not set")
+    token = api_key_from_environment()
     request = urllib.request.Request(
         build_url(model, speed, expressivity, encoding),
         data=json.dumps({"text": text}).encode("utf-8"),
@@ -59,13 +78,15 @@ def synthesize(text: str, output: Path, model: str, speed: float, expressivity: 
     temporary = None
     try:
         # The Request URL is constructed from the fixed HTTPS Deepgram endpoint.
-        with urllib.request.urlopen(request, timeout=120) as response:  # nosec B310
+        with urllib.request.urlopen(request, context=tls_context(), timeout=120) as response:  # nosec B310
             with tempfile.NamedTemporaryFile(dir=output.parent, delete=False) as handle:
                 temporary = Path(handle.name)
                 handle.write(response.read())
         temporary.replace(output)
     except urllib.error.HTTPError as error:
         raise RuntimeError(f"Deepgram returned HTTP {error.code}") from None
+    except urllib.error.URLError:
+        raise RuntimeError("Deepgram request failed; check connectivity and TLS configuration") from None
     finally:
         if temporary and temporary.exists():
             temporary.unlink()
