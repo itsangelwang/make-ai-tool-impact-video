@@ -9,7 +9,15 @@ import re
 import sys
 from pathlib import Path
 
+from build_captions import normalize
 from limits import LIMITS, lang_key, max_duration
+
+VOICE_TAG = re.compile(r"\[[^\]]*\]")
+
+
+def voice_matches_text(voice: str, text: str) -> bool:
+    """A cue's voice line may add [emotion] tags but must speak the caption's words."""
+    return normalize(VOICE_TAG.sub(" ", voice)).casefold() == normalize(text).casefold()
 
 
 def han_count(text: str) -> int:
@@ -41,6 +49,8 @@ def validate(data: dict, duration_exception: str | None = None) -> list[str]:
         if not all(key in cue for key in ("start_sec", "end_sec", "text")):
             errors.append(f"caption {index} requires start_sec, end_sec, and text")
             continue
+        if "voice" in cue and not (isinstance(cue["voice"], str) and voice_matches_text(cue["voice"], str(cue["text"]))):
+            errors.append(f"caption {index} voice must match its text apart from [tags]")
         start, end = float(cue["start_sec"]), float(cue["end_sec"])
         if start < previous_end - 0.001:
             errors.append(f"caption {index} overlaps the previous caption")

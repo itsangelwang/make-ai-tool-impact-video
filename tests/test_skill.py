@@ -217,6 +217,16 @@ class StateAndUtilitiesTests(unittest.TestCase):
     def test_fish_default_env_file_is_outside_skill(self):
         self.assertEqual(fish_audio_tts.DEFAULT_ENV_FILE.parts[0], "~")
 
+    def test_fish_preset_supplies_voice_and_flags_override(self):
+        def dry_run(*extra):
+            result = subprocess.run([sys.executable, ROOT / "scripts" / "fish_audio_tts.py", "--text", "[excited] Hi.", "--output", "unused.mp3", "--env-file", "/nonexistent", "--dry-run", *extra], capture_output=True, text=True)
+            return json.loads(result.stdout)
+        preset = dry_run("--preset", "en-sawyer")
+        self.assertTrue(preset["ok"] and preset["reference_id_present"])
+        self.assertEqual(preset["model"], "s2.1-pro")
+        self.assertEqual(dry_run("--preset", "en-sawyer", "--model", "s2-pro")["model"], "s2-pro")
+        self.assertIn("drama-3", fish_audio_tts.MODELS)
+
     def test_fish_env_loads_without_overriding_existing_values(self):
         old_key = os.environ.get("FISH_AUDIO_API_KEY")
         old_voice = os.environ.get("FISH_AUDIO_REFERENCE_ID")
@@ -316,6 +326,18 @@ class StateAndUtilitiesTests(unittest.TestCase):
             "captions": [{"start_sec": 0, "end_sec": 5, "text": " ".join(["word"] * 20)}],
         }
         self.assertTrue(any("words/s" in error for error in timeline_validator.validate(data)))
+
+    def test_timeline_voice_may_add_tags_but_not_words(self):
+        data = {
+            "language": "en-US",
+            "duration_sec": 60,
+            "captions": [
+                {"start_sec": 0, "end_sec": 25, "text": " ".join(["work"] * 55), "voice": "[excited] " + " ".join(["work"] * 55)},
+                {"start_sec": 26.5, "end_sec": 58, "text": " ".join(["check"] * 55), "voice": "[calm] boom " + " ".join(["check"] * 55)},
+            ],
+        }
+        errors = timeline_validator.validate(data)
+        self.assertEqual(errors, ["caption 1 voice must match its text apart from [tags]"])
 
     def test_english_timeline(self):
         data = {
