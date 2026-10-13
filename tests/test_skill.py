@@ -356,6 +356,7 @@ class BuildCaptionsTests(unittest.TestCase):
                 output = Path(tmp) / "captions.json"
                 result = subprocess.run([sys.executable, ROOT / "scripts" / "build_captions.py", folder / "timeline.json", "--script", folder / "script-package.json", "--output", output], capture_output=True, text=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads(result.stdout), {"ok": True, "cues": len(timeline["captions"]), "output": str(output)})
                 captions = json.loads(output.read_text())
                 self.assertEqual(len(captions), len(timeline["captions"]))
                 for source, converted in zip(timeline["captions"], captions):
@@ -368,6 +369,25 @@ class BuildCaptionsTests(unittest.TestCase):
         self.assertEqual(result[0]["endMs"], 1235)
         for key in ("highlightCool", "highlightWarm"):
             self.assertEqual(result[0][key], timeline["captions"][0][key])
+
+    def test_invalid_highlights_fail_without_overwriting(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            timeline = folder / "timeline.json"
+            output = folder / "captions.json"
+            output.write_text("keep")
+            for key in ("highlightCool", "highlightWarm"):
+                for value in ("五份旧记录", None, 1, {}, ["valid", 1]):
+                    with self.subTest(key=key, value=value):
+                        timeline.write_text(json.dumps({"language": "zh-CN", "captions": [
+                            {"start_sec": 0, "end_sec": 1, "text": "第一条"},
+                            {"start_sec": 1, "end_sec": 2, "text": "五份旧记录", key: value},
+                        ]}, ensure_ascii=False))
+                        result = subprocess.run([sys.executable, ROOT / "scripts" / "build_captions.py", timeline], capture_output=True, text=True)
+                        self.assertEqual(result.returncode, 1)
+                        self.assertIn(f"caption 2 {key} must be a list of strings", result.stderr)
+                        self.assertEqual(result.stdout, "")
+                        self.assertEqual(output.read_text(), "keep")
 
     def test_mismatch_fails_without_overwriting(self):
         with tempfile.TemporaryDirectory() as tmp:

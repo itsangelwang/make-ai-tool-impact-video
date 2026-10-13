@@ -54,6 +54,8 @@ def build_captions(timeline: dict, script: dict | None = None) -> list[dict]:
         output = {"startMs": start_ms, "endMs": end_ms, "text": cue["text"], "language": language}
         for key in ("highlightCool", "highlightWarm"):
             if key in cue:
+                if not isinstance(cue[key], list) or not all(isinstance(term, str) for term in cue[key]):
+                    raise ValueError(f"caption {index} {key} must be a list of strings")
                 output[key] = cue[key]
         result.append(output)
         previous_end = end
@@ -77,7 +79,9 @@ def main() -> int:
         if not isinstance(timeline, dict) or (args.script and not isinstance(script, dict)):
             raise ValueError("timeline and script must be JSON objects")
         captions = build_captions(timeline, script)
-        atomic_write_json(args.output or args.timeline.with_name("captions.json"), captions)
+        output = args.output or args.timeline.with_name("captions.json")
+        atomic_write_json(output, captions)
+        print(json.dumps({"ok": True, "cues": len(captions), "output": str(output)}, ensure_ascii=False))
     except (OSError, ValueError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
