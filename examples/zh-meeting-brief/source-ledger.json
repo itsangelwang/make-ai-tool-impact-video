@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "path": "public/assets/summary-mock.png",
+      "origin": "code-native",
+      "rights": "cleared",
+      "role": "code-native",
+      "attribution": "本项目用代码绘制的示意界面，不是真实产品截图"
+    }
+  ]
+}

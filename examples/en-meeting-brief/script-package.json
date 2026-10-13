@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "language": "en-US",
+  "market": "US",
+  "tool": {
+    "name": "Example Notes AI",
+    "url": "https://example.com/notes-ai",
+    "one_line_capability": "Turns several meeting notes into a one-page summary"
+  },
+  "audience": "A project manager who runs a weekly team meeting",
+  "task": "Prepare a one-page meeting brief: past decisions, open action items, and owners",
+  "before_steps": [
+    "Open five old notes one by one",
+    "Copy each decision and action item",
+    "Compare by hand to find gaps"
+  ],
+  "friction": "Items are scattered across five notes, so unowned follow-ups slip through",
+  "ai_change": "The AI reads the same notes and drafts the brief first",
+  "after_steps": [
+    "Upload the same five notes",
+    "AI drafts the brief",
+    "Check dates and owners against the originals"
+  ],
+  "human_check": "Confirm open items such as the vendor quote have the right date and owner",
+  "readiness": "try-now",
+  "next_action": "Try it on one non-sensitive old note and compare with a manual summary",
+  "narration": "Thursday's project meeting. Five old notes. What did we decide, and what's still open? Before, you'd open each note, copy every item, and compare them by hand. Easy to miss one. Now you upload the same five notes to Example Notes AI. It drafts a one-page prep brief: decisions, open action items, and owners. Like this one: vendor quote, no reply yet, owner Maya. But it's a draft. Before you send it, check each date and owner against the original notes. If you run weekly meetings, try it on one old, non-sensitive note first, and see what it misses.",
+  "brand": {
+    "name": "ACEMODE",
+    "slogan": "10x Faster, Log Off Earlier.",
+    "start_sec": 56.5,
+    "end_sec": 60
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "type": "pain-hook",
+      "purpose": "Make the meeting-prep pain recognizable",
+      "start_sec": 0,
+      "end_sec": 6,
+      "headline": "Five old notes before Thursday",
+      "visual": "A stack of five notes; 'Who owns this?' highlighted",
+      "claim_ids": []
+    },
+    {
+      "id": "s2",
+      "type": "before-workflow",
+      "purpose": "Show the three manual actions",
+      "start_sec": 6,
+      "end_sec": 14,
+      "headline": "Before: open, copy, compare",
+      "visual": "Cursor opens each note and copies items into a blank brief",
+      "claim_ids": []
+    },
+    {
+      "id": "s3",
+      "type": "ai-handoff",
+      "purpose": "Show the exact upload of the same notes",
+      "start_sec": 14,
+      "end_sec": 21,
+      "headline": "Same five notes, one upload",
+      "visual": "Five files selected, Upload clicked, processing state",
+      "claim_ids": [
+        "c1"
+      ]
+    },
+    {
+      "id": "s4",
+      "type": "after-workflow",
+      "purpose": "Show the draft brief and the example item",
+      "start_sec": 21,
+      "end_sec": 32,
+      "headline": "A one-page draft brief",
+      "visual": "Zoom on 'Vendor quote | No reply | Maya'",
+      "claim_ids": [
+        "c1",
+        "c2"
+      ]
+    },
+    {
+      "id": "s5",
+      "type": "before-after",
+      "purpose": "Compare who does what for the same task",
+      "start_sec": 32,
+      "end_sec": 40,
+      "headline": "Same person, same brief",
+      "visual": "Left: three manual steps. Right: upload, draft, check",
+      "claim_ids": [
+        "c2"
+      ]
+    },
+    {
+      "id": "s6",
+      "type": "human-check",
+      "purpose": "Make the human responsibility explicit",
+      "start_sec": 40,
+      "end_sec": 49,
+      "headline": "It's a draft. You check it.",
+      "visual": "Original note beside the brief; date and owner verified",
+      "claim_ids": [
+        "c3"
+      ]
+    },
+    {
+      "id": "s7",
+      "type": "next-action",
+      "purpose": "Offer a small, reversible first try",
+      "start_sec": 49,
+      "end_sec": 56.5,
+      "headline": "Try one old note first",
+      "visual": "One non-sensitive note plus a comparison checklist",
+      "claim_ids": [
+        "c3"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "language": "en-US",
+  "duration_sec": 60,
+  "captions": [
+    {
+      "start_sec": 0.3,
+      "end_sec": 3.48,
+      "text": "Thursday's project meeting. Five old notes."
+    },
+    {
+      "start_sec": 3.63,
+      "end_sec": 7.72,
+      "text": "What did we decide, and what's still open?"
+    },
+    {
+      "start_sec": 7.87,
+      "end_sec": 11.96,
+      "text": "Before, you'd open each note, copy every item,"
+    },
+    {
+      "start_sec": 12.11,
+      "end_sec": 16.65,
+      "text": "and compare them by hand. Easy to miss one."
+    },
+    {
+      "start_sec": 18.35,
+      "end_sec": 23.8,
+      "text": "Now you upload the same five notes to Example Notes AI."
+    },
+    {
+      "start_sec": 23.95,
+      "end_sec": 27.13,
+      "text": "It drafts a one-page prep brief:"
+    },
+    {
+      "start_sec": 27.28,
+      "end_sec": 30.46,
+      "text": "decisions, open action items, and owners."
+    },
+    {
+      "start_sec": 30.61,
+      "end_sec": 35.61,
+      "text": "Like this one: vendor quote, no reply yet, owner Maya."
+    },
+    {
+      "start_sec": 37.31,
+      "end_sec": 41.4,
+      "text": "But it's a draft. Before you send it,"
+    },
+    {
+      "start_sec": 41.55,
+      "end_sec": 46.09,
+      "text": "check each date and owner against the original notes."
+    },
+    {
+      "start_sec": 46.24,
+      "end_sec": 51.24,
+      "text": "If you run weekly meetings, try it on one old,"
+    },
+    {
+      "start_sec": 51.39,
+      "end_sec": 55.48,
+      "text": "non-sensitive note first, and see what it misses."
+    }
+  ],
+  "transitions": [
+    {
+      "start_sec": 16.8,
+      "end_sec": 18.2,
+      "label": "Hand the same notes to AI",
+      "readable": true
+    },
+    {
+      "start_sec": 35.76,
+      "end_sec": 37.16,
+      "label": "You still own the check",
+      "readable": true
+    }
+  ]
+}

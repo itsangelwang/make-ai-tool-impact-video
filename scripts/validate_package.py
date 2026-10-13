@@ -9,6 +9,8 @@ import re
 import sys
 from pathlib import Path
 
+from limits import LIMITS, lang_key, max_duration
+
 SCENE_TYPES = {
     "pain-hook", "before-workflow", "ai-handoff", "after-workflow",
     "before-after", "human-check", "next-action",
@@ -47,24 +49,21 @@ def validate(package: dict, ledger: dict, duration_exception: str | None = None)
     tool = package["tool"]
     if not isinstance(tool, dict) or not all(tool.get(k) for k in ("name", "url", "one_line_capability")):
         errors.append("tool requires name, url, and one_line_capability")
-    if not isinstance(package["before_steps"], list) or not 2 <= len(package["before_steps"]) <= 3:
-        errors.append("before_steps must contain 2-3 steps")
-    if not isinstance(package["after_steps"], list) or not 2 <= len(package["after_steps"]) <= 4:
-        errors.append("after_steps must contain 2-4 steps")
+    for field in ("before_steps", "after_steps"):
+        low, high = LIMITS[field]["min"], LIMITS[field]["max"]
+        if not isinstance(package[field], list) or not low <= len(package[field]) <= high:
+            errors.append(f"{field} must contain {low}-{high} steps")
     if package["readiness"] not in READINESS:
         errors.append(f"readiness must be one of {sorted(READINESS)}")
     language = package["language"]
     if language not in {"zh-CN", "en-US", "en-GB", "en-AU"}:
         errors.append("language must be zh-CN, en-US, en-GB, or en-AU")
     narration = package["narration"]
-    if str(language).startswith("en"):
-        count = word_count(narration)
-        if not 90 <= count <= 135:
-            errors.append(f"English narration must contain 90-135 words; got {count}")
-    else:
-        count = han_count(narration)
-        if not 150 <= count <= 190:
-            errors.append(f"narration must contain 150-190 Han characters; got {count}")
+    key = lang_key(language)
+    bounds = LIMITS["narration"][key]
+    count = word_count(narration) if key == "en" else han_count(narration)
+    if not bounds["min"] <= count <= bounds["max"]:
+        errors.append(f"narration must contain {bounds['min']}-{bounds['max']} {bounds['unit']}; got {count}")
     if re.search(r"[（(](画面|镜头|转场|字幕|特效)|\[(画面|镜头|转场|字幕|特效)", narration):
         errors.append("narration contains stage directions")
     if re.match(r"^.{0,12}(公司|模型|发布了|推出了)", narration):
@@ -77,8 +76,8 @@ def validate(package: dict, ledger: dict, duration_exception: str | None = None)
         errors.append("English narration opens with a product release instead of the task pain")
 
     scenes = package["scenes"]
-    if not isinstance(scenes, list) or not 5 <= len(scenes) <= 7:
-        errors.append("scenes must contain 5-7 entries")
+    if not isinstance(scenes, list) or not LIMITS["scenes"]["min"] <= len(scenes) <= LIMITS["scenes"]["max"]:
+        errors.append(f"scenes must contain {LIMITS['scenes']['min']}-{LIMITS['scenes']['max']} entries")
         scenes = []
     seen_types, used_claims = set(), set()
     previous_end = 0.0
@@ -99,12 +98,23 @@ def validate(package: dict, ledger: dict, duration_exception: str | None = None)
         if not scene["purpose"] or not scene["visual"]:
             errors.append(f"scene {index} requires purpose and visual")
         used_claims.update(scene["claim_ids"])
+    brand = package.get("brand")
+    if scenes and brand:
+        start, end = float(brand.get("start_sec", -1)), float(brand.get("end_sec", -1))
+        low, high = LIMITS["brand_card_sec"]["min"], LIMITS["brand_card_sec"]["max"]
+        if not brand.get("name"):
+            errors.append("brand requires a name")
+        if abs(start - previous_end) > 0.01:
+            errors.append("brand card must start where the last scene ends")
+        if not low - 0.01 <= end - start <= high + 0.01:
+            errors.append(f"brand card must last {low}-{high} seconds")
+        previous_end = max(previous_end, end)
     if scenes and scenes[0].get("type") != "pain-hook":
         errors.append("first scene must be pain-hook")
-    max_sec = 75 if duration_exception else 65
-    if scenes and not 55 <= previous_end <= max_sec:
-        hint = "" if duration_exception else " (pass --duration-exception to allow up to 75)"
-        errors.append(f"story duration must be 55-{max_sec} seconds; got {previous_end:g}{hint}")
+    min_sec, max_sec = LIMITS["duration_sec"]["min"], max_duration(duration_exception)
+    if scenes and not min_sec <= previous_end <= max_sec:
+        hint = "" if duration_exception else f" (pass --duration-exception to allow up to {LIMITS['duration_sec']['extended_max']})"
+        errors.append(f"story duration must be {min_sec}-{max_sec} seconds; got {previous_end:g}{hint}")
     required_types = {"pain-hook", "before-workflow", "ai-handoff", "after-workflow", "human-check", "next-action"}
     if not required_types.issubset(seen_types):
         errors.append(f"missing required scene types: {', '.join(sorted(required_types - seen_types))}")
