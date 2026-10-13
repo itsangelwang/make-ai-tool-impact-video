@@ -75,6 +75,15 @@ python3 <skill-dir>/scripts/audit_timeline.py \
   <project-dir>/video/src/timeline.json
 ```
 
+Generate the template's `captions.json` from the canonical timeline after each timing or text change. The optional `--script` check ignores whitespace and punctuation and fails at the first narration difference before writing output. Times are rounded to integer milliseconds; language and optional `highlightCool` / `highlightWarm` come from the timeline. Without `--output`, the file is written beside the timeline.
+
+```bash
+python3 <skill-dir>/scripts/build_captions.py \
+  <project-dir>/video/src/timeline.json \
+  --script <project-dir>/script-package.json \
+  --output <project-dir>/video/src/captions.json
+```
+
 Register the review bundle with `project_state.py review`. Wait for explicit approval before final TTS or delivery render. Any registered script, claim, story, source, cover, voice, or opening change invalidates approval.
 
 ## 4. Iterate by communication purpose

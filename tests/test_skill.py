@@ -24,6 +24,7 @@ deepgram_tts = module("deepgram_tts")
 project_state = module("project_state")
 fish_audio_tts = module("fish_audio_tts")
 verify_video = module("verify_video")
+build_captions = module("build_captions")
 
 
 def package(task="整理会议纪要", audience="项目经理"):
@@ -344,6 +345,70 @@ class ExampleTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0)
                 for cue in timeline_data["captions"]:
                     self.assertFalse(verify_video.caption_too_long({**cue, "language": timeline_data["language"]}))
+
+
+class BuildCaptionsTests(unittest.TestCase):
+    def test_examples_convert_via_cli(self):
+        for name in ("en-meeting-brief", "zh-meeting-brief"):
+            with self.subTest(example=name), tempfile.TemporaryDirectory() as tmp:
+                folder = ROOT / "examples" / name
+                timeline = json.loads((folder / "timeline.json").read_text())
+                output = Path(tmp) / "captions.json"
+                result = subprocess.run([sys.executable, ROOT / "scripts" / "build_captions.py", folder / "timeline.json", "--script", folder / "script-package.json", "--output", output], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads(result.stdout), {"ok": True, "cues": len(timeline["captions"]), "output": str(output)})
+                captions = json.loads(output.read_text())
+                self.assertEqual(len(captions), len(timeline["captions"]))
+                for source, converted in zip(timeline["captions"], captions):
+                    self.assertEqual(converted, {"startMs": round(source["start_sec"] * 1000), "endMs": round(source["end_sec"] * 1000), "text": source["text"], "language": timeline["language"]})
+
+    def test_highlights_rounding_and_normalization(self):
+        timeline = {"language": "zh-CN", "captions": [{"start_sec": 0.1234, "end_sec": 1.2346, "text": "你好，世界！", "highlightCool": ["你好"], "highlightWarm": ["世界"]}]}
+        result = build_captions.build_captions(timeline, {"narration": "你 好。世界\n"})
+        self.assertEqual(result[0]["startMs"], 123)
+        self.assertEqual(result[0]["endMs"], 1235)
+        for key in ("highlightCool", "highlightWarm"):
+            self.assertEqual(result[0][key], timeline["captions"][0][key])
+
+    def test_invalid_highlights_fail_without_overwriting(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            timeline = folder / "timeline.json"
+            output = folder / "captions.json"
+            output.write_text("keep")
+            for key in ("highlightCool", "highlightWarm"):
+                for value in ("五份旧记录", None, 1, {}, ["valid", 1]):
+                    with self.subTest(key=key, value=value):
+                        timeline.write_text(json.dumps({"language": "zh-CN", "captions": [
+                            {"start_sec": 0, "end_sec": 1, "text": "第一条"},
+                            {"start_sec": 1, "end_sec": 2, "text": "五份旧记录", key: value},
+                        ]}, ensure_ascii=False))
+                        result = subprocess.run([sys.executable, ROOT / "scripts" / "build_captions.py", timeline], capture_output=True, text=True)
+                        self.assertEqual(result.returncode, 1)
+                        self.assertIn(f"caption 2 {key} must be a list of strings", result.stderr)
+                        self.assertEqual(result.stdout, "")
+                        self.assertEqual(output.read_text(), "keep")
+
+    def test_mismatch_fails_without_overwriting(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            timeline = folder / "timeline.json"
+            script = folder / "script.json"
+            output = folder / "captions.json"
+            timeline.write_text(json.dumps({"language": "en-US", "captions": [{"start_sec": 0, "end_sec": 1, "text": "abc"}]}))
+            output.write_text("keep")
+            for narration, location in (("axc", 2), ("ab", 3), ("abcd", 4)):
+                with self.subTest(narration=narration):
+                    script.write_text(json.dumps({"narration": narration}))
+                    result = subprocess.run([sys.executable, ROOT / "scripts" / "build_captions.py", timeline, "--script", script], capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 1)
+                    self.assertIn(f"narration mismatch at normalized character {location}", result.stderr)
+                    self.assertEqual(output.read_text(), "keep")
+
+    def test_invalid_timing_rejected(self):
+        for start, end in ((-1, 1), (1, 1), (0, float("nan")), (True, 1), (0, 0.0001)):
+            with self.subTest(start=start, end=end), self.assertRaises(ValueError):
+                build_captions.build_captions({"language": "en-US", "captions": [{"start_sec": start, "end_sec": end, "text": "hi"}]})
 
 
 class LimitsConsistencyTests(unittest.TestCase):
