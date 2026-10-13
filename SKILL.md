@@ -104,7 +104,7 @@ Render stills first for layout and 5–15 second local clips for disputed motion
 
 ## 5. Finish and verify
 
-Generate final TTS only after approval. Never use a voice the user has rejected. For English, use the provider for which the user has credentials. Store credentials only in provider-specific environment variables, never in JSON, source files, logs, or Git. Audition at least two 8–12 second samples before committing to a voice or generating the full narration.
+Generate final TTS only after approval. Never use a voice the user has rejected. For English, use Fish Audio with the `en-sawyer` preset and the expressive-delivery rules in `references/english-market.md`; fall back to another provider only when Fish Audio is unavailable. Store credentials only in provider-specific environment variables, never in JSON, source files, logs, or Git. When the user has an approved voice preset, reuse it without new auditions; otherwise audition at least two 8–12 second samples before committing to a voice or generating the full narration.
 
 For OpenRouter, use the dedicated `/api/v1/audio/speech` path through `scripts/openrouter_tts.py`. When available, start with `deepgram/flux-tts:free`; query the live OpenRouter model catalog before use because free aliases and availability can change. Do not confuse the generic `openrouter/free` text router with the speech-specific Flux model.
 
@@ -126,14 +126,13 @@ DEEPGRAM_API_KEY=... python3 <skill-dir>/scripts/deepgram_tts.py \
 
 Prefer a neural provider with timestamps; Deepgram batch audio does not itself supply word timestamps, so measure the final audio and generate phrase timing with `caption_pipeline.py`, then manually spot-check phrase boundaries against the waveform.
 
-For Fish Audio, keep credentials in a `.env` file outside the Skill directory and any Git repository (for example `~/.config/make-ai-tool-impact-video/.env`), and keep only placeholders in `.env.example`. Never read, print, or summarize the populated `.env` file. Use an original synthetic voice or a voice the user has permission to use; do not clone another provider's preset voice. Generate 8–12 second auditions before the full narration. Use `s2.1-pro-free` only when its current availability and the user's intended usage comply with Fish Audio's live terms.
+For Fish Audio, keep credentials in a `.env` file outside the Skill directory and any Git repository (for example `~/.config/make-ai-tool-impact-video/.env`), and keep only placeholders in `.env.example`. Never read, print, or summarize the populated `.env` file. Use an original synthetic voice or a voice the user has permission to use; do not clone another provider's preset voice. The default model is the paid `s2.1-pro`; use `s2.1-pro-free` only when its current availability and the user's intended usage comply with Fish Audio's live terms.
 
 ```bash
 python3 <skill-dir>/scripts/fish_audio_tts.py \
-  --env-file ~/.config/make-ai-tool-impact-video/.env \
-  --text "Tomorrow's meeting is coming up." \
-  --reference-id <fish-voice-model-id> \
-  --output <project-dir>/video/qa/fish-voice-sample.mp3
+  --preset en-sawyer \
+  --text "[excited] Now? You upload the same five notes." \
+  --output <project-dir>/video/public/audio/cue-05.mp3
 ```
 
 When the visuals are already approved, synthesize one clip per canonical timeline cue, place each clip at its cue start, normalize the final mix to approximately -16 LUFS with true peak at or below -1.5 dB, and remux it with the existing video stream. Do not rerender unchanged visuals solely to replace narration.

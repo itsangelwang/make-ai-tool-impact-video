@@ -95,9 +95,13 @@ AI 不会自动把视频发布到任何平台。
 
 | 服务 | 适合 | 需要的密钥 |
 |---|---|---|
+| [Fish Audio](https://fish.audio/)（**推荐，默认**） | 英语和中文，声音自然、有情绪起伏 | `FISH_AUDIO_API_KEY` |
 | [OpenRouter](https://openrouter.ai/) | 英语，有免费模型 | `OPENROUTER_API_KEY` |
 | [Deepgram](https://deepgram.com/) | 英语 | `DEEPGRAM_API_KEY` |
-| [Fish Audio](https://fish.audio/) | 中文和英语 | `FISH_AUDIO_API_KEY`、`FISH_AUDIO_REFERENCE_ID` |
+
+**默认英语声音**：Fish Audio 官方的 “Sawyer”（美式男声），使用付费模型 `s2.1-pro`，语气会跟着故事起伏：讲痛点时有点烦，讲到 AI 帮忙时兴奋，提醒人工检查时冷静。想换声音时直接告诉 AI，它会先给你几段试听。
+
+Fish Audio 的免费版一般只能个人使用。如果视频要商用，请在 Fish Audio 账户页面确认你的套餐包含商用权。
 
 **密钥要保管好：**
 - 放在 `~/.config/make-ai-tool-impact-video/.env`，格式参考 [`.env.example`](.env.example)

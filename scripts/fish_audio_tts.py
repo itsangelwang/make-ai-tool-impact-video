@@ -19,7 +19,17 @@ ENDPOINT = "https://api.fish.audio/v1/tts"
 SAFE_SECRET = re.compile(r"\A[^\s\x00-\x1f\x7f]{20,512}\Z")
 SAFE_REFERENCE_ID = re.compile(r"\A[A-Za-z0-9_-]{8,128}\Z")
 DEFAULT_ENV_FILE = Path("~/.config/make-ai-tool-impact-video/.env")
-MODELS = {"s1", "s2-pro", "s2.1-pro", "s2.1-pro-free", "drama-3-preview"}
+MODELS = {"s1", "s2-pro", "s2.1-pro", "s2.1-pro-free", "drama-3"}
+# Approved voice presets; explicit flags override any preset field.
+PRESETS = {
+    "en-sawyer": {
+        "reference_id": "fa4c9eb3dccc4806b382b40d61c6b10a",  # Fish Official "Sawyer", US male
+        "model": "s2.1-pro",
+        "temperature": 0.85,
+        "speed": 1.08,
+    },
+}
+DEFAULTS = {"model": "s2.1-pro", "temperature": 0.7, "speed": 1.0}
 
 
 def load_env(path: Path) -> None:
@@ -138,12 +148,19 @@ def main() -> int:
     source.add_argument("--script", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--env-file", type=Path, default=DEFAULT_ENV_FILE)
+    parser.add_argument("--preset", choices=sorted(PRESETS))
     parser.add_argument("--reference-id")
-    parser.add_argument("--model", default="s2.1-pro-free", choices=sorted(MODELS))
-    parser.add_argument("--speed", type=float, default=1.0)
-    parser.add_argument("--temperature", type=float, default=0.7)
+    parser.add_argument("--model", choices=sorted(MODELS))
+    parser.add_argument("--speed", type=float)
+    parser.add_argument("--temperature", type=float)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
+    preset = PRESETS.get(args.preset, {})
+    for key, value in DEFAULTS.items():
+        if getattr(args, key) is None:
+            setattr(args, key, preset.get(key, value))
+    if args.reference_id is None:
+        args.reference_id = preset.get("reference_id")
     try:
         load_env(args.env_file)
         text = narration(args)

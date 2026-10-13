@@ -4,75 +4,84 @@
   "captions": [
     {
       "start_sec": 0.3,
-      "end_sec": 3.48,
-      "text": "Thursday's project meeting. Five old notes."
+      "end_sec": 3.36,
+      "text": "Thursday's project meeting. Five old notes!",
+      "voice": "[frustrated] Thursday's project meeting. Five old notes!"
     },
     {
-      "start_sec": 3.63,
-      "end_sec": 7.72,
-      "text": "What did we decide, and what's still open?"
+      "start_sec": 3.51,
+      "end_sec": 7.44,
+      "text": "What did we decide, and what's still open?",
+      "voice": "[curious] What did we decide, and what's [emphasis] still open?"
     },
     {
-      "start_sec": 7.87,
-      "end_sec": 11.96,
+      "start_sec": 7.59,
+      "end_sec": 11.52,
       "text": "Before, you'd open each note, copy every item,"
     },
     {
-      "start_sec": 12.11,
-      "end_sec": 16.65,
-      "text": "and compare them by hand. Easy to miss one."
+      "start_sec": 11.67,
+      "end_sec": 16.03,
+      "text": "and compare them by hand. Easy to miss one.",
+      "voice": "and compare them by hand. [frustrated] Easy to miss one."
     },
     {
-      "start_sec": 18.35,
-      "end_sec": 23.8,
-      "text": "Now you upload the same five notes to Example Notes AI."
+      "start_sec": 17.73,
+      "end_sec": 22.96,
+      "text": "Now? You upload the same five notes to Example Notes AI.",
+      "voice": "[excited] Now? You upload the same five notes to Example Notes AI."
     },
     {
-      "start_sec": 23.95,
-      "end_sec": 27.13,
-      "text": "It drafts a one-page prep brief:"
+      "start_sec": 23.11,
+      "end_sec": 27.04,
+      "text": "And boom, it drafts a one-page prep brief:",
+      "voice": "[excited] And boom, it drafts a one-page prep brief:"
     },
     {
-      "start_sec": 27.28,
-      "end_sec": 30.46,
+      "start_sec": 27.19,
+      "end_sec": 30.25,
       "text": "decisions, open action items, and owners."
     },
     {
-      "start_sec": 30.61,
-      "end_sec": 35.61,
-      "text": "Like this one: vendor quote, no reply yet, owner Maya."
+      "start_sec": 30.4,
+      "end_sec": 35.2,
+      "text": "Like this one: vendor quote, no reply yet, owner Maya.",
+      "voice": "Like this one: [emphasis] vendor quote, no reply yet, owner Maya."
     },
     {
-      "start_sec": 37.31,
-      "end_sec": 41.4,
-      "text": "But it's a draft. Before you send it,"
+      "start_sec": 36.9,
+      "end_sec": 40.83,
+      "text": "But it's a draft. Before you send it,",
+      "voice": "[calm] But it's a draft. Before you send it,"
     },
     {
-      "start_sec": 41.55,
-      "end_sec": 46.09,
-      "text": "check each date and owner against the original notes."
+      "start_sec": 40.98,
+      "end_sec": 45.34,
+      "text": "check each date and owner against the original notes.",
+      "voice": "check each [emphasis] date and owner against the original notes."
     },
     {
-      "start_sec": 46.24,
-      "end_sec": 51.24,
-      "text": "If you run weekly meetings, try it on one old,"
+      "start_sec": 45.49,
+      "end_sec": 50.29,
+      "text": "If you run weekly meetings, try it on one old,",
+      "voice": "[confident] If you run weekly meetings, try it on one old,"
     },
     {
-      "start_sec": 51.39,
-      "end_sec": 55.48,
+      "start_sec": 50.44,
+      "end_sec": 54.37,
       "text": "non-sensitive note first, and see what it misses."
     }
   ],
   "transitions": [
     {
-      "start_sec": 16.8,
-      "end_sec": 18.2,
+      "start_sec": 16.18,
+      "end_sec": 17.58,
       "label": "Hand the same notes to AI",
       "readable": true
     },
     {
-      "start_sec": 35.76,
-      "end_sec": 37.16,
+      "start_sec": 35.35,
+      "end_sec": 36.75,
       "label": "You still own the check",
       "readable": true
     }

@@ -1,52 +1,52 @@
 [
   {
     "startMs": 300,
-    "endMs": 3480,
-    "text": "Thursday's project meeting. Five old notes.",
+    "endMs": 3360,
+    "text": "Thursday's project meeting. Five old notes!",
     "language": "en-US",
     "highlightWarm": [
-      "Five old notes."
+      "Five old notes!"
     ]
   },
   {
-    "startMs": 3630,
-    "endMs": 7720,
+    "startMs": 3510,
+    "endMs": 7440,
     "text": "What did we decide, and what's still open?",
     "language": "en-US"
   },
   {
-    "startMs": 7870,
-    "endMs": 11960,
+    "startMs": 7590,
+    "endMs": 11520,
     "text": "Before, you'd open each note, copy every item,",
     "language": "en-US"
   },
   {
-    "startMs": 12110,
-    "endMs": 16650,
+    "startMs": 11670,
+    "endMs": 16030,
     "text": "and compare them by hand. Easy to miss one.",
     "language": "en-US"
   },
   {
-    "startMs": 18350,
-    "endMs": 23800,
-    "text": "Now you upload the same five notes to Example Notes AI.",
+    "startMs": 17730,
+    "endMs": 22960,
+    "text": "Now? You upload the same five notes to Example Notes AI.",
     "language": "en-US"
   },
   {
-    "startMs": 23950,
-    "endMs": 27130,
-    "text": "It drafts a one-page prep brief:",
+    "startMs": 23110,
+    "endMs": 27040,
+    "text": "And boom, it drafts a one-page prep brief:",
     "language": "en-US"
   },
   {
-    "startMs": 27280,
-    "endMs": 30460,
+    "startMs": 27190,
+    "endMs": 30250,
     "text": "decisions, open action items, and owners.",
     "language": "en-US"
   },
   {
-    "startMs": 30610,
-    "endMs": 35610,
+    "startMs": 30400,
+    "endMs": 35200,
     "text": "Like this one: vendor quote, no reply yet, owner Maya.",
     "language": "en-US",
     "highlightCool": [
@@ -57,14 +57,14 @@
     ]
   },
   {
-    "startMs": 37310,
-    "endMs": 41400,
+    "startMs": 36900,
+    "endMs": 40830,
     "text": "But it's a draft. Before you send it,",
     "language": "en-US"
   },
   {
-    "startMs": 41550,
-    "endMs": 46090,
+    "startMs": 40980,
+    "endMs": 45340,
     "text": "check each date and owner against the original notes.",
     "language": "en-US",
     "highlightWarm": [
@@ -72,14 +72,14 @@
     ]
   },
   {
-    "startMs": 46240,
-    "endMs": 51240,
+    "startMs": 45490,
+    "endMs": 50290,
     "text": "If you run weekly meetings, try it on one old,",
     "language": "en-US"
   },
   {
-    "startMs": 51390,
-    "endMs": 55480,
+    "startMs": 50440,
+    "endMs": 54370,
     "text": "non-sensitive note first, and see what it misses.",
     "language": "en-US"
   }

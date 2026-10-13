@@ -7,8 +7,8 @@
   "before_steps": ["Open each old note", "Copy every action item", "Compare by hand"],
   "after_steps": ["Upload the same notes", "AI drafts the brief", "Check dates and owners"],
   "transitions": [
-    {"start_sec": 16.8, "end_sec": 18.2, "label": "Hand the same notes to AI", "symbol": "→", "color": "#6857F5"},
-    {"start_sec": 35.76, "end_sec": 37.16, "label": "You still own the check", "symbol": "→", "color": "#6857F5"}
+    {"start_sec": 16.18, "end_sec": 17.58, "label": "Hand the same notes to AI", "symbol": "→", "color": "#6857F5"},
+    {"start_sec": 35.35, "end_sec": 36.75, "label": "You still own the check", "symbol": "→", "color": "#6857F5"}
   ],
   "scenes": [
     {"id": "s1", "type": "pain-hook", "label": "The pain", "headline": "Five old notes before Thursday", "visual": "A stack of five notes; 'Who owns this?' highlighted", "start_sec": 0, "end_sec": 6},
