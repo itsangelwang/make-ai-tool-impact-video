@@ -10,7 +10,7 @@ const LABELS = {
   zh: {handoff: '交给 AI 处理这一步', humanCheck: '最后一步仍由人负责', nextAction: '今天可以这样试', before: '使用前', after: '使用后'},
   en: {handoff: 'AI takes this step', humanCheck: 'You still own the final check', nextAction: 'Try this today', before: 'Before', after: 'After'},
 };
-const localeOf = (story) => (String(story.language || 'zh-CN').startsWith('en') ? 'en' : 'zh');
+const localeOf = (story) => (String(story.language || 'en-US').startsWith('en') ? 'en' : 'zh');
 const FontContext = createContext(FONTS.zh.body);
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'};
 

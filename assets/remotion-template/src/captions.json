@@ -1,9 +1,86 @@
 [
   {
-    "text": "明天要开会，却要翻五份旧记录。",
-    "startMs": 0,
-    "endMs": 3500,
-    "highlightCool": [],
-    "highlightWarm": ["五份旧记录"]
+    "startMs": 300,
+    "endMs": 3480,
+    "text": "Thursday's project meeting. Five old notes.",
+    "language": "en-US",
+    "highlightWarm": [
+      "Five old notes."
+    ]
+  },
+  {
+    "startMs": 3630,
+    "endMs": 7720,
+    "text": "What did we decide, and what's still open?",
+    "language": "en-US"
+  },
+  {
+    "startMs": 7870,
+    "endMs": 11960,
+    "text": "Before, you'd open each note, copy every item,",
+    "language": "en-US"
+  },
+  {
+    "startMs": 12110,
+    "endMs": 16650,
+    "text": "and compare them by hand. Easy to miss one.",
+    "language": "en-US"
+  },
+  {
+    "startMs": 18350,
+    "endMs": 23800,
+    "text": "Now you upload the same five notes to Example Notes AI.",
+    "language": "en-US"
+  },
+  {
+    "startMs": 23950,
+    "endMs": 27130,
+    "text": "It drafts a one-page prep brief:",
+    "language": "en-US"
+  },
+  {
+    "startMs": 27280,
+    "endMs": 30460,
+    "text": "decisions, open action items, and owners.",
+    "language": "en-US"
+  },
+  {
+    "startMs": 30610,
+    "endMs": 35610,
+    "text": "Like this one: vendor quote, no reply yet, owner Maya.",
+    "language": "en-US",
+    "highlightCool": [
+      "vendor quote"
+    ],
+    "highlightWarm": [
+      "no reply yet"
+    ]
+  },
+  {
+    "startMs": 37310,
+    "endMs": 41400,
+    "text": "But it's a draft. Before you send it,",
+    "language": "en-US"
+  },
+  {
+    "startMs": 41550,
+    "endMs": 46090,
+    "text": "check each date and owner against the original notes.",
+    "language": "en-US",
+    "highlightWarm": [
+      "date and owner"
+    ]
+  },
+  {
+    "startMs": 46240,
+    "endMs": 51240,
+    "text": "If you run weekly meetings, try it on one old,",
+    "language": "en-US"
+  },
+  {
+    "startMs": 51390,
+    "endMs": 55480,
+    "text": "non-sensitive note first, and see what it misses.",
+    "language": "en-US"
   }
 ]

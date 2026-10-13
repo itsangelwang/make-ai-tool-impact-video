@@ -23,7 +23,7 @@ def word_count(text: str) -> int:
 def validate(data: dict, duration_exception: str | None = None) -> list[str]:
     errors: list[str] = []
     duration = float(data.get("duration_sec", 0))
-    key = lang_key(data.get("language", "zh-CN"))
+    key = lang_key(data.get("language", "en-US"))
     english = key == "en"
     min_sec, max_sec = LIMITS["duration_sec"]["min"], max_duration(duration_exception)
     if not min_sec <= duration <= max_sec:

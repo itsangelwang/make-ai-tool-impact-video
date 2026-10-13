@@ -25,7 +25,7 @@ def main() -> int:
     if args.duration_ms <= 0:
         raise SystemExit("duration-ms must be positive")
     package = json.loads(args.script.read_text(encoding="utf-8"))
-    language = str(package.get("language", "zh-CN"))
+    language = str(package.get("language", "en-US"))
     chunks = phrases(package["narration"])
     if language.startswith("en"):
         weights = [max(1, len(re.findall(r"\b[\w]+(?:[’'-][\w]+)*\b", chunk))) for chunk in chunks]

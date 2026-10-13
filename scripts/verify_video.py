@@ -14,7 +14,7 @@ from safe_io import atomic_write_json
 
 
 def caption_too_long(cue: dict) -> bool:
-    key = lang_key(cue.get("language", "zh-CN"))
+    key = lang_key(cue.get("language", "en-US"))
     size = len(cue["text"].split()) if key == "en" else len(cue["text"])
     return size > LIMITS["caption_length_max"][key]
 
