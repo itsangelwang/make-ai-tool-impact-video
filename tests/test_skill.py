@@ -286,6 +286,7 @@ class StateAndUtilitiesTests(unittest.TestCase):
 
     def test_timeline_accepts_speakable_captions(self):
         data = {
+            "language": "zh-CN",
             "duration_sec": 60,
             "captions": [
                 {"start_sec": 0, "end_sec": 30, "text": "你" * 90},
@@ -299,6 +300,7 @@ class StateAndUtilitiesTests(unittest.TestCase):
 
     def test_timeline_rejects_fast_caption_and_overlap(self):
         data = {
+            "language": "zh-CN",
             "duration_sec": 60,
             "captions": [{"start_sec": 0, "end_sec": 5, "text": "你" * 50}],
             "transitions": [{"start_sec": 4, "end_sec": 5, "readable": True}],
@@ -307,6 +309,13 @@ class StateAndUtilitiesTests(unittest.TestCase):
         self.assertTrue(any("too fast" in error for error in errors))
         self.assertTrue(any("overlaps" in error for error in errors))
         self.assertTrue(any("at least 1.2" in error for error in errors))
+
+    def test_timeline_defaults_to_english(self):
+        data = {
+            "duration_sec": 60,
+            "captions": [{"start_sec": 0, "end_sec": 5, "text": " ".join(["word"] * 20)}],
+        }
+        self.assertTrue(any("words/s" in error for error in timeline_validator.validate(data)))
 
     def test_english_timeline(self):
         data = {

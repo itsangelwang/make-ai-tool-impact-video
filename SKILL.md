@@ -9,7 +9,7 @@ Explain one workflow change for one person doing one task. Treat the tool as the
 
 ## Inputs
 
-Require a tool name or URL. Accept audience, task, platform, language, market, accent, voice, palette, and end-brand preferences. End with the ACEMODE brand card unless the user asks for no brand or supplies another brand. Default to `zh-CN` and the Chinese market unless the user requests English; default English work to `en-US` and a US audience. When audience or task is absent, research first and choose the clearest supported ordinary-person case.
+Require a tool name or URL. Accept audience, task, platform, language, market, accent, voice, palette, and end-brand preferences. End with the ACEMODE brand card unless the user asks for no brand or supplies another brand. Default to `en-US` and a US audience unless the user requests another English market or Chinese (`zh-CN`, Chinese market). When audience or task is absent, research first and choose the clearest supported ordinary-person case.
 
 Use `<skill-dir>` as this Skill directory and replace placeholders with absolute paths.
 
@@ -29,7 +29,7 @@ Choose exactly one audience, task, and example thread. Define `before_steps`, `a
 
 Read [references/story-contract.md](references/story-contract.md) and [references/visual-system.md](references/visual-system.md). For narration, audio, timing, or animated captions, also read [references/pacing-and-review.md](references/pacing-and-review.md). Read [references/brand-system.md](references/brand-system.md) for the brand ending.
 
-For an English-speaking audience, also read [references/english-market.md](references/english-market.md). Adapt the idea rather than translating Chinese copy line by line. Localize the hook, example names, dates, workplace vocabulary, fonts, caption units, voice, and call to action.
+For English work (the default), also read [references/english-market.md](references/english-market.md). Write natively in English rather than translating Chinese copy line by line. Localize the hook, example names, dates, workplace vocabulary, fonts, caption units, voice, and call to action.
 
 Use this order:
 
