@@ -14,6 +14,12 @@ This Skill is maintained with both Codex and Claude Code. These rules apply to e
 - Tool-specific metadata stays in its own file: `agents/openai.yaml` for Codex. Do not delete another tool's files.
 - Refer to paths as `<skill-dir>` and `<project-dir>`; never hard-code a personal path.
 
+## Shared limits and examples
+
+- Numeric limits live only in `scripts/limits.json`. Scripts read from it; docs repeat key numbers for readers, and a test fails if they disagree. Change both together.
+- `examples/` holds complete Chinese and English inputs that must pass every validator. Update them when a schema or limit changes.
+- The brand card defaults to ACEMODE. Do not remove or rename the ACEMODE preset.
+
 ## Before every commit
 
 ```bash

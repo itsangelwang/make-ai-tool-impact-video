@@ -87,6 +87,14 @@ class PackageTests(unittest.TestCase):
         item["scenes"][-1]["end_sec"] = 80
         self.assertTrue(any("55-75" in e for e in validator.validate(item, ledger(), "too long")))
 
+    def test_brand_card_counts_toward_duration(self):
+        item = package()
+        item["scenes"][-1]["end_sec"] = 56.5
+        item["brand"] = {"name": "ACEMODE", "slogan": "10x Faster, Log Off Earlier.", "start_sec": 56.5, "end_sec": 60}
+        self.assertEqual(validator.validate(item, ledger()), [])
+        item["brand"]["start_sec"] = 57
+        self.assertTrue(any("brand card must start" in e for e in validator.validate(item, ledger())))
+
     def test_caption_length_limit_depends_on_language(self):
         english = {"language": "en-US", "text": "Tomorrow's project meeting needs one clear prep brief"}
         self.assertFalse(verify_video.caption_too_long(english))
@@ -316,6 +324,53 @@ class StateAndUtilitiesTests(unittest.TestCase):
         self.assertIn("/v2/speak?", url)
         self.assertIn("model=flux-hannah-en", url)
         self.assertNotIn("DEEPGRAM_API_KEY", url)
+
+
+
+class ExampleTests(unittest.TestCase):
+    """Every folder in examples/ must pass all validators."""
+
+    def test_examples_pass_validators(self):
+        folders = sorted(path for path in (ROOT / "examples").iterdir() if path.is_dir())
+        self.assertGreaterEqual(len(folders), 2)
+        for folder in folders:
+            with self.subTest(example=folder.name):
+                package_data = json.loads((folder / "script-package.json").read_text(encoding="utf-8"))
+                ledger_data = json.loads((folder / "claim-ledger.json").read_text(encoding="utf-8"))
+                self.assertEqual(validator.validate(package_data, ledger_data), [])
+                timeline_data = json.loads((folder / "timeline.json").read_text(encoding="utf-8"))
+                self.assertEqual(timeline_validator.validate(timeline_data), [])
+                result = subprocess.run([sys.executable, ROOT / "scripts" / "validate_sources.py", folder / "source-ledger.json"], capture_output=True)
+                self.assertEqual(result.returncode, 0)
+                for cue in timeline_data["captions"]:
+                    self.assertFalse(verify_video.caption_too_long({**cue, "language": timeline_data["language"]}))
+
+
+class LimitsConsistencyTests(unittest.TestCase):
+    """Docs repeat key numbers for readers; they must match scripts/limits.json."""
+
+    def docs(self):
+        return {path: path.read_text(encoding="utf-8") for path in [ROOT / "SKILL.md", *sorted((ROOT / "references").glob("*.md"))]}
+
+    def assert_ranges(self, pattern, expected):
+        import re
+        found = []
+        for path, text in self.docs().items():
+            for match in re.finditer(pattern, text):
+                found.append((path.name, (int(match.group(1)), int(match.group(2)))))
+        self.assertTrue(found, f"no matches for {pattern}")
+        for name, value in found:
+            self.assertEqual(value, expected, f"{name} disagrees with limits.json")
+
+    def test_narration_ranges_match(self):
+        limits = json.loads((ROOT / "scripts" / "limits.json").read_text())
+        zh, en = limits["narration"]["zh"], limits["narration"]["en"]
+        self.assert_ranges(r"(\d{2,3})–(\d{2,3}) Han characters", (zh["min"], zh["max"]))
+        self.assert_ranges(r"(\d{2,3})–(\d{2,3}) (?:spoken English )?words(?! per)", (en["min"], en["max"]))
+
+    def test_target_duration_matches(self):
+        limits = json.loads((ROOT / "scripts" / "limits.json").read_text())["duration_sec"]
+        self.assert_ranges(r"(\d{2})–(\d{2}) seconds?", (limits["min"], limits["max"]))
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ Explain one workflow change for one person doing one task. Treat the tool as the
 
 ## Inputs
 
-Require a tool name or URL. Accept audience, task, platform, language, market, accent, voice, palette, and end-brand preferences. Default to `zh-CN` and the Chinese market unless the user requests English; default English work to `en-US` and a US audience. When audience or task is absent, research first and choose the clearest supported ordinary-person case.
+Require a tool name or URL. Accept audience, task, platform, language, market, accent, voice, palette, and end-brand preferences. End with the ACEMODE brand card unless the user asks for no brand or supplies another brand. Default to `zh-CN` and the Chinese market unless the user requests English; default English work to `en-US` and a US audience. When audience or task is absent, research first and choose the clearest supported ordinary-person case.
 
 Use `<skill-dir>` as this Skill directory and replace placeholders with absolute paths.
 
@@ -27,7 +27,7 @@ Choose exactly one audience, task, and example thread. Define `before_steps`, `a
 
 ## 2. Build one causal story
 
-Read [references/story-contract.md](references/story-contract.md) and [references/visual-system.md](references/visual-system.md). For narration, audio, timing, or animated captions, also read [references/pacing-and-review.md](references/pacing-and-review.md). Read [references/brand-system.md](references/brand-system.md) only when an end brand is requested.
+Read [references/story-contract.md](references/story-contract.md) and [references/visual-system.md](references/visual-system.md). For narration, audio, timing, or animated captions, also read [references/pacing-and-review.md](references/pacing-and-review.md). Read [references/brand-system.md](references/brand-system.md) for the brand ending.
 
 For an English-speaking audience, also read [references/english-market.md](references/english-market.md). Adapt the idea rather than translating Chinese copy line by line. Localize the hook, example names, dates, workplace vocabulary, fonts, caption units, voice, and call to action.
 
@@ -39,11 +39,11 @@ Use this order:
 4. The new workflow, including the exact handoff or import step.
 5. One concrete example carried through input, AI output, downstream use, and verification.
 6. What AI changed and what the person still owns.
-7. Fit, readiness boundary, reversible next action, and optional brand ending.
+7. Fit, readiness boundary, reversible next action, and the brand ending (ACEMODE by default).
 
 Carry the same task object through the story. An item found in the old record must become the AI input, appear in the summary, become the next action or question, and remain the item the person verifies. Do not introduce “draft,” “source,” “old material,” “owner,” or “deadline” without showing the concrete artifact or value.
 
-Create `script-package.json` and `claim-ledger.json`, then validate:
+Create `script-package.json` and `claim-ledger.json`, following the shape of [examples/](examples/) for the chosen language. Numeric limits (duration, narration length, caption pace) live in `scripts/limits.json`. Then validate:
 
 ```bash
 python3 <skill-dir>/scripts/validate_package.py \

@@ -15,9 +15,10 @@ Create JSON with `schema_version: 1` and these required fields:
 - `readiness`: one of `use-now`, `try-now`, `watch`, `future`.
 - `next_action`: a small, reversible experiment consistent with readiness.
 - `narration`: natural speech with no stage directions; normally 150–190 Han characters for `zh-CN` or 90–135 words for `en-US` when readable transitions are included. Use the low end only for a deliberately fast, energetic delivery.
+- `brand`: optional; `null` or `{name, slogan, start_sec, end_sec}` for the brand card that follows the last scene. See [brand-system.md](brand-system.md).
 - `scenes`: 5–7 objects with `id`, `type`, `purpose`, `start_sec`, `end_sec`, `headline`, `visual`, and `claim_ids`.
 
-Use scene types `pain-hook`, `before-workflow`, `ai-handoff`, `after-workflow`, `before-after`, `human-check`, and `next-action`. Include at least five distinct types. Start at 0, target an ending between 55 and 65 seconds, and allow review cuts up to 75 seconds when stable product interaction or evidence holds require it. Keep scenes contiguous and assign every scene an explicit communication purpose.
+Use scene types `pain-hook`, `before-workflow`, `ai-handoff`, `after-workflow`, `before-after`, `human-check`, and `next-action`. Include at least five distinct types. Start at 0, target an ending (including any brand card) between 55 and 65 seconds, and allow review cuts up to 75 seconds when stable product interaction or evidence holds require it. Keep scenes contiguous and assign every scene an explicit communication purpose.
 
 The first scene must show the audience/task pain. Mention the product only after relevance is clear. Keep headlines short enough for two mobile lines.
 

@@ -9,18 +9,14 @@ import shutil
 import subprocess  # nosec B404
 from pathlib import Path
 
+from limits import LIMITS, lang_key, max_duration
 from safe_io import atomic_write_json
-
-DEFAULT_MAX_SEC = 65
-EXTENDED_MAX_SEC = 75
-MAX_ZH_CHARACTERS = 34
-MAX_EN_WORDS = 14
 
 
 def caption_too_long(cue: dict) -> bool:
-    if str(cue.get("language", "zh-CN")).startswith("en"):
-        return len(cue["text"].split()) > MAX_EN_WORDS
-    return len(cue["text"]) > MAX_ZH_CHARACTERS
+    key = lang_key(cue.get("language", "zh-CN"))
+    size = len(cue["text"].split()) if key == "en" else len(cue["text"])
+    return size > LIMITS["caption_length_max"][key]
 
 
 def main() -> int:
@@ -34,7 +30,7 @@ def main() -> int:
     )
     args = parser.parse_args()
     errors = []
-    max_sec = EXTENDED_MAX_SEC if args.duration_exception else DEFAULT_MAX_SEC
+    min_sec, max_sec = LIMITS["duration_sec"]["min"], max_duration(args.duration_exception)
     ffprobe = shutil.which("ffprobe")
     ffmpeg = shutil.which("ffmpeg")
     if not ffprobe or not ffmpeg:
@@ -60,9 +56,9 @@ def main() -> int:
         if not audios:
             errors.append("missing audio stream")
         duration = float(probe.get("format", {}).get("duration", 0))
-        if not 55 <= duration <= max_sec:
-            hint = "" if args.duration_exception else " (pass --duration-exception to allow up to 75)"
-            errors.append(f"duration must be 55-{max_sec} seconds; got {duration:.3f}{hint}")
+        if not min_sec <= duration <= max_sec:
+            hint = "" if args.duration_exception else f" (pass --duration-exception to allow up to {LIMITS['duration_sec']['extended_max']})"
+            errors.append(f"duration must be {min_sec}-{max_sec} seconds; got {duration:.3f}{hint}")
         decode = subprocess.run(  # nosec B603
             [ffmpeg, "-v", "error", "-i", str(args.video), "-f", "null", "-"],
             capture_output=True,

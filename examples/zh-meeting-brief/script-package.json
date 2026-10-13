@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "language": "zh-CN",
+  "market": "CN",
+  "tool": {
+    "name": "示例笔记 AI",
+    "url": "https://example.com/notes-ai",
+    "one_line_capability": "把多份会议记录整理成一页摘要"
+  },
+  "audience": "每周要开项目例会的项目经理",
+  "task": "会前整理一页摘要：上次的决定、未完成任务和负责人",
+  "before_steps": [
+    "逐份打开五份旧记录",
+    "逐条复制决定和任务",
+    "手动对照找遗漏"
+  ],
+  "friction": "信息分散在五份记录里，手动对照容易漏掉没人跟进的事",
+  "ai_change": "AI 读取同一批记录，先生成一页会前摘要草稿",
+  "after_steps": [
+    "上传同样五份记录",
+    "AI 生成摘要草稿",
+    "回到原记录核对日期和负责人"
+  ],
+  "human_check": "核对“供应商报价”等未完成事项的日期和负责人是否与原记录一致",
+  "readiness": "try-now",
+  "next_action": "用一份不敏感的旧记录试一次，对照手工整理结果看有没有漏项",
+  "narration": "周四开项目会，你得翻五份旧记录，找出上次定了什么、还有哪件事没人跟进。以前要一份份打开，逐条复制，再手动对照，很容易漏。现在把五份记录一起交给示例笔记 AI，它先整理出一页会前摘要：已定的决定、没做完的任务和负责人。比如供应商报价这一条，它标出还没回复，负责人是小林。但这只是草稿。发出去之前，你要回到原记录，核对日期和负责人。如果你也常开周会，先拿一份不敏感的记录试一次，看看它有没有漏项。",
+  "brand": {
+    "name": "ACEMODE",
+    "slogan": "10x Faster, Log Off Earlier.",
+    "start_sec": 56.5,
+    "end_sec": 60
+  },
+  "scenes": [
+    {
+      "id": "s1",
+      "type": "pain-hook",
+      "purpose": "让观众认出会前翻记录的麻烦",
+      "start_sec": 0,
+      "end_sec": 6,
+      "headline": "明天开会，先翻五份旧记录",
+      "visual": "五份记录堆叠，‘谁在跟进？’高亮",
+      "claim_ids": []
+    },
+    {
+      "id": "s2",
+      "type": "before-workflow",
+      "purpose": "展示手动整理的三个动作",
+      "start_sec": 6,
+      "end_sec": 14,
+      "headline": "以前：打开、复制、对照",
+      "visual": "鼠标逐份打开记录，复制到空白摘要页",
+      "claim_ids": []
+    },
+    {
+      "id": "s3",
+      "type": "ai-handoff",
+      "purpose": "展示同一批记录如何交给 AI",
+      "start_sec": 14,
+      "end_sec": 21,
+      "headline": "同样五份记录，一次交给 AI",
+      "visual": "选中五个文件并上传，进入处理状态",
+      "claim_ids": [
+        "c1"
+      ]
+    },
+    {
+      "id": "s4",
+      "type": "after-workflow",
+      "purpose": "展示 AI 生成的摘要和具体例子",
+      "start_sec": 21,
+      "end_sec": 33,
+      "headline": "AI 先给出一页摘要",
+      "visual": "摘要里‘供应商报价｜未回复｜小林’被放大",
+      "claim_ids": [
+        "c1",
+        "c2"
+      ]
+    },
+    {
+      "id": "s5",
+      "type": "before-after",
+      "purpose": "对比同一任务前后的分工",
+      "start_sec": 33,
+      "end_sec": 41,
+      "headline": "同一个人，同一份摘要",
+      "visual": "左侧手动三步，右侧上传→草稿→核对",
+      "claim_ids": [
+        "c2"
+      ]
+    },
+    {
+      "id": "s6",
+      "type": "human-check",
+      "purpose": "强调人必须核对的内容",
+      "start_sec": 41,
+      "end_sec": 50,
+      "headline": "这只是草稿，你来核对",
+      "visual": "并排显示原记录和摘要，核对日期和负责人",
+      "claim_ids": [
+        "c3"
+      ]
+    },
+    {
+      "id": "s7",
+      "type": "next-action",
+      "purpose": "给出低风险的试用方式",
+      "start_sec": 50,
+      "end_sec": 56.5,
+      "headline": "先用一份旧记录试一次",
+      "visual": "一份非敏感记录 + 对照清单",
+      "claim_ids": [
+        "c3"
+      ]
+    }
+  ]
+}

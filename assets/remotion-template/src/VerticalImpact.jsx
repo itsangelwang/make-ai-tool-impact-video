@@ -31,6 +31,27 @@ const FullFrameTransition = ({transition, displayFont}) => {
   return <AbsoluteFill style={{background:transition.color||'#6857F5',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}><div style={{position:'absolute',width:760,height:760,borderRadius:'50%',background:'rgba(255,255,255,.08)',transform:`scale(${.72+enter*.35})`}}/><div style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:30,color:'#fff',opacity:enter,transform:`translateY(${(1-enter)*55}px) scale(${.72+enter*.32})`}}><div style={{width:118,height:118,borderRadius:34,background:'rgba(255,255,255,.20)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:66,fontWeight:950}}>{transition.symbol||'→'}</div><div style={{fontFamily:displayFont,fontSize:48,fontWeight:950,textAlign:'center',maxWidth:900}}>{transition.label}</div></div></AbsoluteFill>;
 };
 
+const BrandEnding = ({brand, palette, displayFont}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const glow = spring({frame, fps, config: {damping: 20, stiffness: 90}});
+  const letters = brand.name.split('');
+  const slogan = spring({frame: frame - letters.length * 2 - 6, fps, config: {damping: 16, stiffness: 140}});
+  return <AbsoluteFill style={{background: palette.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden'}}>
+    <div style={{position: 'absolute', width: 820, height: 820, borderRadius: '50%', background: `radial-gradient(circle, ${palette.cool}55 0%, ${palette.cool}00 70%)`, opacity: glow, transform: `scale(${.8 + glow * .25})`}} />
+    <div style={{position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 34, color: '#fff', textAlign: 'center', padding: '0 72px'}}>
+      <div style={{display: 'flex', fontFamily: 'Inter, Avenir Next, Arial, sans-serif', fontSize: 116, fontWeight: 950, letterSpacing: 4}}>
+        {letters.map((letter, i) => {
+          const p = spring({frame: frame - i * 2, fps, config: {damping: 9, stiffness: 180}});
+          return <span key={i} style={{display: 'inline-block', whiteSpace: 'pre', opacity: p, transform: `translateY(${(1 - p) * 60}px) scale(${.7 + p * .3})`}}>{letter}</span>;
+        })}
+      </div>
+      <div style={{fontFamily: 'Inter, Avenir Next, Arial, sans-serif', fontSize: 50, fontWeight: 800, opacity: slogan, transform: `translateY(${(1 - slogan) * 30}px)`}}>{brand.slogan}</div>
+      {brand.line ? <div style={{fontFamily: displayFont, fontSize: 40, fontWeight: 700, opacity: slogan * .75}}>{brand.line}</div> : null}
+    </div>
+  </AbsoluteFill>;
+};
+
 const Scene = ({scene, palette, labels}) => {
   const font = useContext(FontContext);
   const frame = useCurrentFrame();
@@ -72,6 +93,7 @@ export const VerticalImpact = ({story}) => {
       {story.audio ? <Audio src={staticFile(story.audio)} /> : null}
       <TimedCaptions />
       {(story.transitions||[]).map((transition) => <Sequence key={`${transition.start_sec}-${transition.label}`} from={Math.round(transition.start_sec*fps)} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}><FullFrameTransition transition={transition} displayFont={FONTS[locale].display}/></Sequence>)}
+      {story.brand ? <Sequence from={Math.round(story.brand.start_sec * fps)} durationInFrames={Math.round((story.brand.end_sec - story.brand.start_sec) * fps)}><BrandEnding brand={story.brand} palette={story.palette} displayFont={FONTS[locale].display} /></Sequence> : null}
     </AbsoluteFill>
     </FontContext.Provider>
   );

@@ -1,0 +1,34 @@
+{
+  "claims": [
+    {
+      "id": "c1",
+      "text": "Example Notes AI can summarize several documents at once",
+      "level": "vendor-claim",
+      "source_url": "https://example.com/notes-ai/docs/summaries",
+      "source_type": "official",
+      "accessed_at": "2026-10-13",
+      "support": "Official docs describe multi-file summaries",
+      "boundary": "Accuracy not independently tested; narration avoids 'accurate' or time-saved claims"
+    },
+    {
+      "id": "c2",
+      "text": "The summary can list decisions, action items, and owners",
+      "level": "inference",
+      "source_url": "https://example.com/notes-ai/docs/summaries",
+      "source_type": "official",
+      "accessed_at": "2026-10-13",
+      "support": "Official sample summary includes action items with owners",
+      "boundary": "Applying the documented capability to meeting prep is an inference"
+    },
+    {
+      "id": "c3",
+      "text": "AI summaries can miss or misstate items and need human review",
+      "level": "vendor-claim",
+      "source_url": "https://example.com/notes-ai/docs/limitations",
+      "source_type": "official",
+      "accessed_at": "2026-10-13",
+      "support": "Official limitations page asks users to review output",
+      "boundary": "No error rate implied"
+    }
+  ]
+}

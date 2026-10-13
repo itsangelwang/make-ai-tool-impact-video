@@ -1,0 +1,34 @@
+{
+  "claims": [
+    {
+      "id": "c1",
+      "text": "示例笔记 AI 可以一次读取多份文档并生成摘要",
+      "level": "vendor-claim",
+      "source_url": "https://example.com/notes-ai/docs/summaries",
+      "source_type": "official",
+      "accessed_at": "2026-10-13",
+      "support": "官方文档说明支持多文件摘要",
+      "boundary": "未独立测试准确率；旁白不说‘准确’或‘节省时间’"
+    },
+    {
+      "id": "c2",
+      "text": "摘要可以列出决定、未完成任务和负责人",
+      "level": "inference",
+      "source_url": "https://example.com/notes-ai/docs/summaries",
+      "source_type": "official",
+      "accessed_at": "2026-10-13",
+      "support": "官方示例中的摘要包含行动项和负责人",
+      "boundary": "这是把官方能力用到会前准备的推断"
+    },
+    {
+      "id": "c3",
+      "text": "AI 摘要可能漏项或出错，需要人工核对",
+      "level": "vendor-claim",
+      "source_url": "https://example.com/notes-ai/docs/limitations",
+      "source_type": "official",
+      "accessed_at": "2026-10-13",
+      "support": "官方限制说明提醒用户核对生成内容",
+      "boundary": "不暗示任何错误率"
+    }
+  ]
+}

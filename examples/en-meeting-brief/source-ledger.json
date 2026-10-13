@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "path": "public/assets/brief-mock.png",
+      "origin": "code-native",
+      "rights": "cleared",
+      "role": "code-native",
+      "attribution": "Code-drawn explanatory UI, not a real product screenshot"
+    }
+  ]
+}
