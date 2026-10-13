@@ -36,7 +36,7 @@ def word_count(text: str) -> int:
     return len(re.findall(r"\b[\w]+(?:[’'-][\w]+)*\b", text, flags=re.UNICODE))
 
 
-def validate(package: dict, ledger: dict) -> list[str]:
+def validate(package: dict, ledger: dict, duration_exception: str | None = None) -> list[str]:
     errors: list[str] = []
     missing = sorted(REQUIRED - package.keys())
     if missing:
@@ -101,8 +101,10 @@ def validate(package: dict, ledger: dict) -> list[str]:
         used_claims.update(scene["claim_ids"])
     if scenes and scenes[0].get("type") != "pain-hook":
         errors.append("first scene must be pain-hook")
-    if scenes and not 55 <= previous_end <= 65:
-        errors.append(f"story duration must be 55-65 seconds; got {previous_end:g}")
+    max_sec = 75 if duration_exception else 65
+    if scenes and not 55 <= previous_end <= max_sec:
+        hint = "" if duration_exception else " (pass --duration-exception to allow up to 75)"
+        errors.append(f"story duration must be 55-{max_sec} seconds; got {previous_end:g}{hint}")
     required_types = {"pain-hook", "before-workflow", "ai-handoff", "after-workflow", "human-check", "next-action"}
     if not required_types.issubset(seen_types):
         errors.append(f"missing required scene types: {', '.join(sorted(required_types - seen_types))}")
@@ -135,9 +137,13 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("package", type=Path)
     parser.add_argument("ledger", type=Path)
+    parser.add_argument(
+        "--duration-exception",
+        help="reason the review needs up to 75 seconds; echoed in the result",
+    )
     args = parser.parse_args()
-    errors = validate(load(args.package), load(args.ledger))
-    result = {"ok": not errors, "errors": errors}
+    errors = validate(load(args.package), load(args.ledger), args.duration_exception)
+    result = {"ok": not errors, "errors": errors, "duration_exception": args.duration_exception}
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if not errors else 1
 

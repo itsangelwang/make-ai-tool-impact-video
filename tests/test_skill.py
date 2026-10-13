@@ -23,6 +23,7 @@ timeline_validator = module("audit_timeline")
 deepgram_tts = module("deepgram_tts")
 project_state = module("project_state")
 fish_audio_tts = module("fish_audio_tts")
+verify_video = module("verify_video")
 
 
 def package(task="整理会议纪要", audience="项目经理"):
@@ -78,6 +79,20 @@ class PackageTests(unittest.TestCase):
         item = package()
         item["scenes"][-1]["end_sec"] = 70
         self.assertTrue(any("55-65" in e for e in validator.validate(item, ledger())))
+
+    def test_duration_exception_allows_up_to_75_seconds(self):
+        item = package()
+        item["scenes"][-1]["end_sec"] = 70
+        self.assertEqual(validator.validate(item, ledger(), "verified import flow needs stable holds"), [])
+        item["scenes"][-1]["end_sec"] = 80
+        self.assertTrue(any("55-75" in e for e in validator.validate(item, ledger(), "too long")))
+
+    def test_caption_length_limit_depends_on_language(self):
+        english = {"language": "en-US", "text": "Tomorrow's project meeting needs one clear prep brief"}
+        self.assertFalse(verify_video.caption_too_long(english))
+        english["text"] = " ".join(["word"] * 15)
+        self.assertTrue(verify_video.caption_too_long(english))
+        self.assertTrue(verify_video.caption_too_long({"language": "zh-CN", "text": "长" * 35}))
 
     def test_english_market_package(self):
         item = package("build a meeting prep brief", "project manager")

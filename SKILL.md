@@ -61,7 +61,7 @@ Scaffold the vertical project:
 python3 <skill-dir>/scripts/scaffold_project.py <project-dir>/video
 ```
 
-Populate `video/src/story.json`, add cleared assets under `video/public/assets/`, and validate sources:
+Populate `video/src/story.json` and set its `language` so built-in labels and fonts match the market (override any label with an optional `labels` object), add cleared assets under `video/public/assets/`, and validate sources:
 
 ```bash
 python3 <skill-dir>/scripts/validate_sources.py \
@@ -129,7 +129,7 @@ python3 <skill-dir>/scripts/fish_audio_tts.py \
 
 When the visuals are already approved, synthesize one clip per canonical timeline cue, place each clip at its cue start, normalize the final mix to approximately -16 LUFS with true peak at or below -1.5 dB, and remux it with the existing video stream. Do not rerender unchanged visuals solely to replace narration.
 
-Target 55–65 seconds. Permit a review up to 75 seconds when verified product interaction, stable result holds, or human-check evidence would otherwise become unreadable; report the extension and shorten later only by removing repetition. For a user-requested longer workflow, document a duration exception and validate timing/bounds independently rather than claiming the default validator passed. Do not time-stretch speech. Render `VerticalImpact`, then run:
+Target 55–65 seconds. Permit a review up to 75 seconds when verified product interaction, stable result holds, or human-check evidence would otherwise become unreadable; pass the reason as `--duration-exception "<reason>"` to `validate_package.py` and `verify_video.py` so it is recorded, report the extension, and shorten later only by removing repetition. For a user-requested longer workflow, document a duration exception and validate timing/bounds independently rather than claiming the default validator passed. Do not time-stretch speech. Render `VerticalImpact`, then run:
 
 ```bash
 python3 <skill-dir>/scripts/verify_video.py \
