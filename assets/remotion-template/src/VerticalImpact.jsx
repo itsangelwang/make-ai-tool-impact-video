@@ -24,14 +24,14 @@ const Card = ({children, index = 0, accent = '#6857F5'}) => {
 
 const Badge = ({children, color}) => <div style={{display: 'inline-block', padding: '12px 20px', borderRadius: 999, color: '#fff', background: color, fontFamily: useContext(FontContext), fontSize: 28, fontWeight: 850, letterSpacing: 1}}>{children}</div>;
 
-const FullFrameTransition = ({transition, displayFont}) => {
+export const FullFrameTransition = ({transition, displayFont}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const enter = spring({frame,fps,config:{damping:18,stiffness:170}});
   return <AbsoluteFill style={{background:transition.color||'#6857F5',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}><div style={{position:'absolute',width:760,height:760,borderRadius:'50%',background:'rgba(255,255,255,.08)',transform:`scale(${.72+enter*.35})`}}/><div style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:30,color:'#fff',opacity:enter,transform:`translateY(${(1-enter)*55}px) scale(${.72+enter*.32})`}}><div style={{width:118,height:118,borderRadius:34,background:'rgba(255,255,255,.20)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:66,fontWeight:950}}>{transition.symbol||'→'}</div><div style={{fontFamily:displayFont,fontSize:48,fontWeight:950,textAlign:'center',maxWidth:900}}>{transition.label}</div></div></AbsoluteFill>;
 };
 
-const BrandEnding = ({brand, palette, displayFont}) => {
+export const BrandEnding = ({brand, palette, displayFont}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const glow = spring({frame, fps, config: {damping: 20, stiffness: 90}});

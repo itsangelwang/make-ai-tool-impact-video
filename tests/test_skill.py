@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import re
 import os
 import subprocess
 import sys
@@ -25,6 +26,8 @@ project_state = module("project_state")
 fish_audio_tts = module("fish_audio_tts")
 verify_video = module("verify_video")
 build_captions = module("build_captions")
+fit_timeline = module("fit_timeline_to_audio")
+story_audio = module("generate_story_audio")
 
 
 def package(task="整理会议纪要", audience="项目经理"):
@@ -440,6 +443,63 @@ class BuildCaptionsTests(unittest.TestCase):
         for start, end in ((-1, 1), (1, 1), (0, float("nan")), (True, 1), (0, 0.0001)):
             with self.subTest(start=start, end=end), self.assertRaises(ValueError):
                 build_captions.build_captions({"language": "en-US", "captions": [{"start_sec": start, "end_sec": end, "text": "hi"}]})
+
+
+class FitTimelineTests(unittest.TestCase):
+    def timeline(self):
+        return {
+            "language": "en-US",
+            "captions": [
+                {"start_sec": 0.3, "end_sec": 3.0, "text": "Three quotes. Two hundred chairs."},
+                {"start_sec": 3.2, "end_sec": 6.0, "text": "Now paste them into ChatGPT."},
+                {"start_sec": 7.6, "end_sec": 10.0, "text": "It builds a calculator."},
+                {"start_sec": 0, "end_sec": 0, "text": "ACEMODE. 10x Faster, Log Off Earlier.", "brand": True},
+            ],
+            "transitions": [{"start_sec": 6.1, "end_sec": 7.5, "label": "Hand off", "readable": True}],
+        }
+
+    def test_fits_measured_audio_and_keeps_transition_order(self):
+        fitted = fit_timeline.fit(self.timeline(), [2.0, 4.5, 2.0, 3.6])
+        caps, tr = fitted["captions"], fitted["transitions"][0]
+        self.assertGreaterEqual(caps[1]["end_sec"] - caps[1]["start_sec"], 4.5)
+        self.assertLess(caps[1]["end_sec"], tr["start_sec"])
+        self.assertLess(tr["end_sec"], caps[2]["start_sec"])
+        self.assertAlmostEqual(caps[3]["start_sec"], fitted["brand"]["start_sec"] + 0.1, places=2)
+        self.assertLessEqual(fitted["brand"]["end_sec"] - fitted["brand"]["start_sec"], 4.0 + 1e-6)
+        cue_errors = [e for e in timeline_validator.validate({**fitted, "duration_sec": 60}) if re.match(r"(caption|transition) \d", e)]
+        self.assertEqual(cue_errors, [])
+
+    def test_rejects_brand_line_longer_than_card(self):
+        with self.assertRaises(ValueError):
+            fit_timeline.fit(self.timeline(), [2.0, 2.0, 2.0, 4.5])
+
+    def test_requires_one_audio_file_per_cue(self):
+        with self.assertRaises(ValueError):
+            fit_timeline.fit(self.timeline(), [2.0, 2.0])
+
+
+class StoryAudioTests(unittest.TestCase):
+    def test_music_follows_events_and_stops_on_reveal(self):
+        import wave
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "bgm.wav"
+            story_audio.music({"drop": 1.0, "stop": 2.0, "boom": 3.2, "end": 4.0}, out)
+            with wave.open(str(out)) as w:
+                frames = w.readframes(w.getnframes())
+                self.assertAlmostEqual(w.getnframes() / w.getframerate(), 4.0, places=2)
+                rate = w.getframerate()
+            silent = frames[int(2.2 * rate) * 2:int(2.8 * rate) * 2]
+            self.assertEqual(set(silent), {0})
+
+    def test_music_requires_end(self):
+        with self.assertRaises(ValueError):
+            story_audio.music({"drop": 1.0}, Path("unused.wav"))
+
+    def test_sfx_set_matches_component_defaults(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            story_audio.sfx(Path(tmp))
+            names = {p.stem for p in Path(tmp).glob("*.wav")}
+        self.assertTrue({"key-1", "key-2", "key-3", "pop", "swish", "coin", "notify", "stamp", "uhoh", "return", "tick"} <= names)
 
 
 class LimitsConsistencyTests(unittest.TestCase):

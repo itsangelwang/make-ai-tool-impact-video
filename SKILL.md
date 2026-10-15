@@ -137,6 +137,23 @@ python3 <skill-dir>/scripts/fish_audio_tts.py \
   --output <project-dir>/video/public/audio/cue-05.mp3
 ```
 
+Synthesize one clip per canonical timeline cue as `cue-00.mp3`, `cue-01.mp3`, … (from `voice` when present), then fit the timeline to the measured audio and rebuild captions:
+
+```bash
+python3 <skill-dir>/scripts/fit_timeline_to_audio.py <project-dir>/video/src/timeline.json \
+  --audio-dir <project-dir>/video/public/audio/cues
+python3 <skill-dir>/scripts/build_captions.py <project-dir>/video/src/timeline.json \
+  --script <project-dir>/script-package.json
+```
+
+Re-derive scene boundaries and the brand card from the printed cue starts. Score music and sound effects to the story with original synthesized audio (see `references/pacing-and-review.md`):
+
+```bash
+python3 <skill-dir>/scripts/generate_story_audio.py sfx --output <project-dir>/video/public/audio/sfx
+python3 <skill-dir>/scripts/generate_story_audio.py music --events <project-dir>/audio-events.json \
+  --output <project-dir>/video/public/audio/bgm.wav
+```
+
 When the visuals are already approved, synthesize one clip per canonical timeline cue, place each clip at its cue start, normalize the final mix to approximately -16 LUFS with true peak at or below -1.5 dB, and remux it with the existing video stream. Do not rerender unchanged visuals solely to replace narration.
 
 Target 55–65 seconds. Permit a review up to 75 seconds when verified product interaction, stable result holds, or human-check evidence would otherwise become unreadable; pass the reason as `--duration-exception "<reason>"` to `validate_package.py` and `verify_video.py` so it is recorded, report the extension, and shorten later only by removing repetition. For a user-requested longer workflow, document a duration exception and validate timing/bounds independently rather than claiming the default validator passed. Do not time-stretch speech. Render `VerticalImpact`, then run:
