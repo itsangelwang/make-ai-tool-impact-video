@@ -20,6 +20,12 @@ This Skill is maintained with both Codex and Claude Code. These rules apply to e
 - `examples/` holds complete Chinese and English inputs that must pass every validator. Update them when a schema or limit changes.
 - The brand card defaults to ACEMODE. Do not remove or rename the ACEMODE preset.
 
+## Keep README current and minimal
+
+- Update `README.md` in the same PR whenever a change affects installation, usage, defaults (language, voice, brand, duration), required keys, or outputs. Do not wait to be asked.
+- README is for users only: what it does, install, use, defaults and how to change them, key safety, outputs, credits. Keep process rules in `SKILL.md`, maintainer rules here, and details in `references/`.
+- `tests/test_skill.py` checks that README's stated defaults match the code; fix README rather than the test.
+
 ## Before every commit
 
 ```bash

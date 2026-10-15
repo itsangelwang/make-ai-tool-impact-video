@@ -502,6 +502,31 @@ class StoryAudioTests(unittest.TestCase):
         self.assertTrue({"key-1", "key-2", "key-3", "pop", "swish", "coin", "notify", "stamp", "uhoh", "return", "tick"} <= names)
 
 
+class ReadmeTests(unittest.TestCase):
+    """README states user-facing defaults; it must change when they change."""
+
+    MODEL_NAMES = {"drama-3": "Drama 3", "s2.1-pro": "s2.1-pro", "s2-pro": "s2-pro", "s1": "s1"}
+
+    def setUp(self):
+        self.readme = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    def test_default_voice_matches_preset(self):
+        preset = fish_audio_tts.PRESETS["en-sawyer"]
+        self.assertIn("Sawyer", self.readme)
+        self.assertIn(self.MODEL_NAMES[preset["model"]], self.readme)
+
+    def test_duration_matches_limits(self):
+        limits = json.loads((ROOT / "scripts" / "limits.json").read_text())["duration_sec"]
+        self.assertIn(f"{limits['min']}–{limits['max']} 秒", self.readme)
+        self.assertIn(f"最长 {limits['extended_max']} 秒", self.readme)
+
+    def test_default_brand_and_key_location(self):
+        brand = (ROOT / "references" / "brand-system.md").read_text(encoding="utf-8")
+        self.assertIn("`ACEMODE` (default)", brand)
+        self.assertIn("ACEMODE", self.readme)
+        self.assertIn(str(fish_audio_tts.DEFAULT_ENV_FILE), self.readme)
+
+
 class LimitsConsistencyTests(unittest.TestCase):
     """Docs repeat key numbers for readers; they must match scripts/limits.json."""
 
