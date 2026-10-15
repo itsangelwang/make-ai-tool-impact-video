@@ -29,7 +29,7 @@ Use this reference for English-speaking audiences. Default to US English unless 
 ## Voice
 
 - Prefer a conversational American voice that sounds like a capable coworker, not an ad read or customer-service bot.
-- Default to Fish Audio with the approved preset: `scripts/fish_audio_tts.py --preset en-sawyer` (Fish Official "Sawyer", US male, model `s2.1-pro`, temperature `0.85`, speed `1.08`). Skip auditions and reuse it unless the user asks for a different voice. To search for another voice, prefer Fish Official voices (author "Fish Official") and avoid community voices that imitate real people or characters.
+- Default to Fish Audio with the approved preset: `scripts/fish_audio_tts.py --preset en-sawyer` (Fish Official "Sawyer", US male, model `drama-3`, temperature `0.85`, speed `1.08`). Skip auditions and reuse it unless the user asks for a different voice. To search for another voice, prefer Fish Official voices (author "Fish Official") and avoid community voices that imitate real people or characters.
 - Use OpenRouter or Deepgram only when Fish Audio is unavailable, and require a fresh voice approval.
 
 ### Expressive delivery (Fish Audio S2 models)
@@ -40,7 +40,9 @@ The approved style follows the story's emotional arc instead of one flat or unif
 - Put one emotion tag at the start of the sentence it controls; at most one emotion change per cue. Put `[emphasis]` directly before the word to stress, at most once per cue.
 - Write spoken English: short beats ("Now?"), contractions, and the occasional natural interjection ("And boom,"). Any word that is spoken must also appear in the caption.
 - Put tags only in a cue's optional `voice` field in `timeline.json`; keep `text` clean for captions. `audit_timeline.py` fails if `voice`, minus its tags, does not match `text`. Synthesize each cue from `voice` when present, otherwise from `text`. See `examples/en-meeting-brief/timeline.json`.
-- Tags use square brackets on S2 models; parenthesis tags are for the retired S1 model.
+- Tags use square brackets on S2 and `drama-3` models; parenthesis tags are for the retired S1 model. `drama-3` honors the same tags without reading them aloud.
+- Synthesize one file per cue and measure each before final timing. `drama-3` is more theatrical than `s2.1-pro`: a long single take runs much slower, while per-cue takes stay close to the planned pace. Fit captions, scenes, and transitions to the measured audio rather than stretching speech.
+- Fix pronunciation in `voice`, not in `text`: the audit compares them case-insensitively and ignores punctuation, so `AceMode` in `voice` reads as "Ace Mode" while the caption keeps `ACEMODE`.
 
 ### Other providers
 

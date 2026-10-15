@@ -223,7 +223,7 @@ class StateAndUtilitiesTests(unittest.TestCase):
             return json.loads(result.stdout)
         preset = dry_run("--preset", "en-sawyer")
         self.assertTrue(preset["ok"] and preset["reference_id_present"])
-        self.assertEqual(preset["model"], "s2.1-pro")
+        self.assertEqual(preset["model"], "drama-3")
         self.assertEqual(dry_run("--preset", "en-sawyer", "--model", "s2-pro")["model"], "s2-pro")
         self.assertIn("drama-3", fish_audio_tts.MODELS)
 
