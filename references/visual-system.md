@@ -88,6 +88,17 @@ UI typing uses character entry and a caret. Captions reveal short semantic word 
 
 For mobile, show one question per page and distinguish section headings through hierarchy, spacing, icons, and background blocks. Never draw outlines over the text. Use a separate transition before explaining a product distinction. Prefer an animated same-document interaction over a dense competitor table. Verify competitor AI features before claiming a difference.
 
+## Introduce the tool or new feature
+
+Give the product promise its own visual beat; a small badge is not enough. When the narration first names the tool or new feature (see "Introduce what is new" in [story-contract.md](story-contract.md)):
+
+- Dim and soften the pain scene (about 15–20% opacity with a light blur) so the task stays visible behind the introduction.
+- Raise one feature card in the cool accent with a short spring and a single ring burst, synced to the product name. Contents, revealed top to bottom: a "NEW" label and the official announcement date (only when new), the product or feature name as the largest text, one plain-language capability line, two to four capability objects as icon tiles that pop in one by one, and one line connecting it to this task's object ("3 quotes → 1 paste").
+- Use the real logo or wordmark only when its rights are recorded; otherwise set the name in the video font. Keep the card inside the caption-safe area and hold it until the scene ends.
+- Sound: one swish on entry, one chime on the name, a soft pop per tile.
+
+Then echo the newness at most twice more, each tied to visible product evidence: a short rotated "NEW in <product>" stamp on the first real AI result, and a small "NEW" tag where a second new capability is requested. The rollout or access status appears as concrete chips (plans, regions, platforms) in the next-action scene. Never put a "NEW" mark on illustration-only UI.
+
 ## Collaboration, persistence, and navigation
 
 For collaborative AI documents, demonstrate access and causality: share the document, choose verified editing permissions, show the invited person entering, send a human request, then show the AI revision on that same document. Do not imply automatic team access or unsolicited continuous AI edits. Verify the actual product interaction before reconstructing it.
