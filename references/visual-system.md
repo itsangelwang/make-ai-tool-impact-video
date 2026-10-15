@@ -98,6 +98,20 @@ Use a thin, unlabeled segmented progress bar when chapter titles already exist. 
 
 Explain an important boundary through a readable action and result, not tiny footnotes. If the same-document workspace is the distinction, show saving, reopening, a requested revision and a direct human edit rather than claiming that competing editors lack AI.
 
+## Make each screen easy to follow
+
+Learned from review of the first English video; apply to every scene.
+
+- One focal point at a time. If a viewer could ask "where do I look?", remove or defer an element. Do not show a real screenshot, a summary card, and an explainer graphic that say the same thing at once.
+- Stack a consequential change as one column, top to bottom: cause (what the person typed or clicked) → effect (what the product showed, as a tight crop of the real UI) → why (one explainer, such as a break-even bar). Reveal each block when the narration reaches it.
+- Prefer one visual explainer over arithmetic. A labeled threshold ("C is cheaper below $1,030") with a marker for the typed value explains a flip better than equations.
+- Fill empty space with explanation, not decoration: a "who did what" strip (You: 1 paste → AI: table ✓ chart ✓), a callout on the exact detail, or the next object in the story.
+- Never repeat the caption as on-screen text. Late scenes (human check, next action) should use icons and small actions — an envelope sent and a stamped reply, checkmark tiles, keycaps, plan chips — rather than sentences.
+- Show differences as aligned rows. Compare options in a grid with one row per rule (price, shipping, discount) so the differences line up.
+- Replace generic transition cards with an object handoff that performs the step (quotes flying into the chat box; a field typing the number that decides).
+- Label any graphic you draw on or near real product UI as "Illustration" (loading states, emails, stamps) so it is never mistaken for a screenshot. Typed-value animations must reveal the exact values in the screenshot.
+- Crop screenshots to the region being discussed and scale them to mobile-readable text (about 40 px or larger) instead of shrinking a whole window.
+
 ## Reusable Remotion motion components
 
 Use the prop-driven building blocks in `<skill-dir>/assets/remotion-template/src/components/`; `ComponentsDemo` shows an eight-second English example at 1080×1920, 30 fps. They use only React and Remotion and derive all motion from frame numbers. Frames are local to the enclosing Sequence; coordinates are unscaled parent pixels.

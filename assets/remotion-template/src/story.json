@@ -19,5 +19,5 @@
     {"id": "s6", "type": "human-check", "label": "Your job", "headline": "It's a draft. You check it.", "visual": "Original note beside the brief; date and owner verified", "start_sec": 40, "end_sec": 49},
     {"id": "s7", "type": "next-action", "label": "Try it", "headline": "Try one old note first", "visual": "One non-sensitive note plus a comparison checklist", "start_sec": 49, "end_sec": 56.5}
   ],
-  "brand": {"name": "ACEMODE", "slogan": "10x Faster, Log Off Earlier.", "line": "Make time for work that matters.", "start_sec": 56.5, "end_sec": 60}
+  "brand": {"name": "ACEMODE", "slogan": "10x Faster, Log Off Earlier.", "start_sec": 56.5, "end_sec": 60}
 }

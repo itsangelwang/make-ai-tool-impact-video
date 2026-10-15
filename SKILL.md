@@ -128,7 +128,7 @@ DEEPGRAM_API_KEY=... python3 <skill-dir>/scripts/deepgram_tts.py \
 
 Prefer a neural provider with timestamps; Deepgram batch audio does not itself supply word timestamps, so measure the final audio and generate phrase timing with `caption_pipeline.py`, then manually spot-check phrase boundaries against the waveform.
 
-For Fish Audio, keep credentials in a `.env` file outside the Skill directory and any Git repository (for example `~/.config/make-ai-tool-impact-video/.env`), and keep only placeholders in `.env.example`. Never read, print, or summarize the populated `.env` file. Use an original synthetic voice or a voice the user has permission to use; do not clone another provider's preset voice. The default model is the paid `s2.1-pro`; use `s2.1-pro-free` only when its current availability and the user's intended usage comply with Fish Audio's live terms.
+For Fish Audio, keep credentials in a `.env` file outside the Skill directory and any Git repository (for example `~/.config/make-ai-tool-impact-video/.env`), and keep only placeholders in `.env.example`. Never read, print, or summarize the populated `.env` file. Use an original synthetic voice or a voice the user has permission to use; do not clone another provider's preset voice. The `en-sawyer` preset uses `drama-3`; other calls default to the paid `s2.1-pro`; use `s2.1-pro-free` only when its current availability and the user's intended usage comply with Fish Audio's live terms.
 
 ```bash
 python3 <skill-dir>/scripts/fish_audio_tts.py \
