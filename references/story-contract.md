@@ -22,6 +22,18 @@ Use scene types `pain-hook`, `before-workflow`, `ai-handoff`, `after-workflow`, 
 
 The first scene must show the audience/task pain. Mention the product only after relevance is clear. Keep headlines short enough for two mobile lines.
 
+## Introduce what is new
+
+Treat a tool or feature as new when its official announcement is within the last 90 days, or when the user asks to highlight it. Record the announcement date in the claim's `support`. Then make the newness visible at these points, and only these:
+
+1. **Right after the pain (first scene, within about three seconds of the pain line):** one sentence that says it is new and what it changes for this task, such as "ChatGPT's new update turns this into one paste." / 「ChatGPT 刚更新的功能，把这件事变成粘贴一次。」 Add a small on-screen label such as "NEW in <product>". Never open the video with the announcement itself.
+2. **At the AI handoff result:** name the new capability by what the viewer now sees, not by its marketing name alone, such as "New in GPT-6: not just text. A table, and a chart." Mark the reveal with a short "NEW" stamp and sound.
+3. **When a second new capability appears:** flag it once, such as "Here's the new trick: ask it to build a calculator."
+4. **In the next action:** state current access from the official source with its boundary ("rolling out to all plans", "beta, US only").
+5. **Cover and title:** include the product or feature name and one concrete change.
+
+Every "new" must be followed by what changed; never say "new" or "just launched" without it. Do not claim it is better than the previous version unless a source supports that comparison. When the feature is not new, skip this section rather than implying novelty.
+
 Choose one concrete example thread before writing scenes. Reuse its task object, decision, unfinished item, owner, date, and source artifact wherever those concepts appear. The new workflow must show the exact handoff: direct workspace search, file import, upload, connection, prompt, or capture action supported by evidence.
 
 The example is not an appendix. Introduce it in the old workflow, carry it through the AI output, turn it into a downstream action, and use the same item for human verification.

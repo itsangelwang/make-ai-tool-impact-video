@@ -34,7 +34,7 @@ For English work (the default), also read [references/english-market.md](referen
 Use this order:
 
 1. Background and concrete pain.
-2. One-sentence product promise after relevance is clear.
+2. One-sentence product promise after relevance is clear. When the tool or feature is new, name it as new here, right after the pain (see "Introduce what is new" in [references/story-contract.md](references/story-contract.md)).
 3. The previous workflow, shown as actions.
 4. The new workflow, including the exact handoff or import step.
 5. One concrete example carried through input, AI output, downstream use, and verification.
