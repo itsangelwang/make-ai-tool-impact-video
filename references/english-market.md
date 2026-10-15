@@ -8,7 +8,7 @@ Use this reference for English-speaking audiences. Default to US English unless 
 - Open with a recognizable task and consequence: “Tomorrow's project meeting. Five old notes. What still needs a follow-up?”
 - Use contractions, short clauses, and concrete workplace language. Prefer “prep brief,” “open action item,” “owner,” and “due Friday” over abstract productivity language.
 - Keep one named example throughout. Use locally natural names, month-first dates for the US, and English product UI labels.
-- Avoid announcer copy, startup hype, unexplained AI jargon, and unsupported time-saving claims.
+- Avoid announcer copy, startup hype, unexplained AI jargon, and unsupported time-saving claims. For a new feature, say it is new right after the pain, not as the opener ("OpenAI just dropped…"); see "Introduce what is new" in [story-contract.md](story-contract.md).
 
 ## Pace and captions
 
@@ -62,3 +62,4 @@ Ask a native-English review pass:
 4. Do the spoken words describe what is currently visible?
 5. Does the example use consistent names, dates, owners, and artifacts?
 6. Does the voice sound conversational at normal speed, without forced enthusiasm?
+7. For a new feature, does the viewer learn it is new within the first scene, and what exactly is new?
