@@ -5,7 +5,7 @@
 - **Vendor-only outcome claim:** attribute it and remove certainty, numbers, or before/after promises that lack comparison evidence.
 - **No licensed product visuals:** use labeled code-native explanatory graphics; do not reconstruct an interface and present it as real.
 - **No TTS timestamps:** measure final audio and distribute phrase cues, then visually inspect synchronization.
-- **No FFmpeg/FFprobe:** produce the review artifacts but do not describe the MP4 as QA-passed.
+- **No system FFmpeg/FFprobe:** `verify_video.py` falls back to the copy bundled with Remotion in the project's `node_modules` and records `"tools": "remotion-bundled"` in the report. That copy cannot measure LUFS, so estimate loudness as described in `pacing-and-review.md` and say so. If neither is available, produce the review artifacts but do not describe the MP4 as QA-passed.
 - **No Chromium/Remotion dependencies:** report the missing prerequisite; do not silently switch to a different visual system.
 - **Duration outside 55–65 seconds:** first remove repetition. If verified interaction or stable evidence still needs more time, allow a review up to 75 seconds and disclose it; do not speed up or stretch narration.
 - **Caption can display but cannot be spoken:** audit each cue by Han characters per second, cut redundant narration, and preserve pauses; do not treat character animation completion as speech timing.
