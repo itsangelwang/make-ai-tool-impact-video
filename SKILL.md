@@ -61,7 +61,7 @@ Scaffold the vertical project:
 python3 <skill-dir>/scripts/scaffold_project.py <project-dir>/video
 ```
 
-Populate `video/src/story.json` and set its `language` so built-in labels and fonts match the market (override any label with an optional `labels` object), add cleared assets under `video/public/assets/`, and validate sources:
+Populate `video/src/story.json` and set its `language` so built-in labels and fonts match the market (override any label with an optional `labels` object). Express the new-feature card, real screenshot clicks and reveals, the you/AI role strip, human checks, and access chips through the story beats in [references/visual-system.md](references/visual-system.md) instead of a custom composition, and check them with `scripts/check_story.py`. Add cleared assets under `video/public/assets/`, and validate sources:
 
 ```bash
 python3 <skill-dir>/scripts/validate_sources.py \

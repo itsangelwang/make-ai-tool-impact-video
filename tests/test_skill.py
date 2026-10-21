@@ -28,6 +28,7 @@ verify_video = module("verify_video")
 build_captions = module("build_captions")
 fit_timeline = module("fit_timeline_to_audio")
 story_audio = module("generate_story_audio")
+check_story = module("check_story")
 
 
 def package(task="整理会议纪要", audience="项目经理"):
@@ -360,6 +361,33 @@ class StateAndUtilitiesTests(unittest.TestCase):
         self.assertIn("model=flux-hannah-en", url)
         self.assertNotIn("DEEPGRAM_API_KEY", url)
 
+
+
+class StoryBeatTests(unittest.TestCase):
+    TEMPLATE = ROOT / "assets" / "remotion-template"
+
+    def story(self):
+        return json.loads((self.TEMPLATE / "src" / "story.json").read_text(encoding="utf-8"))
+
+    def test_template_story_uses_every_beat_and_passes(self):
+        story = self.story()
+        keys = {key for scene in story["scenes"] for key in scene}
+        self.assertTrue({"new_feature", "new_tag", "shot", "roles", "checks", "access"} <= keys)
+        self.assertEqual(check_story.check(story, self.TEMPLATE / "public", check_story.icon_names()), [])
+
+    def test_beat_mistakes_are_reported(self):
+        story = self.story()
+        scene = next(s for s in story["scenes"] if "shot" in s)
+        scene["shot"]["src"] = "assets/missing.png"
+        scene["shot"]["click"]["at_sec"] = 99
+        scene["roles"]["you"]["icon"] = "rocket"
+        errors = check_story.check(story, self.TEMPLATE / "public", check_story.icon_names())
+        self.assertTrue(any("not found" in e for e in errors))
+        self.assertTrue(any("click.at_sec" in e for e in errors))
+        self.assertTrue(any("rocket" in e for e in errors))
+
+    def test_icon_names_match_component(self):
+        self.assertTrue({"doc", "table", "user", "calendar", "slides"} <= check_story.icon_names())
 
 
 class ExampleTests(unittest.TestCase):

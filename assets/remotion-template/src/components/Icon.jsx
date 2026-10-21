@@ -9,6 +9,11 @@ const PATHS = {
   lock: <><rect x="12" y="28" width="40" height="28" rx="5" /><path d="M20 28v-8a12 12 0 0 1 24 0v8" /></>,
   doc: <><path d="M16 6h22l12 12v40H16z" /><path d="M38 6v12h12M22 30h22M22 39h22M22 48h14" /></>,
   sliders: <><path d="M10 18h44M10 32h44M10 46h44" /><circle cx="22" cy="18" r="6" fill="#fff" /><circle cx="42" cy="32" r="6" fill="#fff" /><circle cx="30" cy="46" r="6" fill="#fff" /></>,
+  calendar: <><rect x="8" y="12" width="48" height="44" rx="5" /><path d="M8 26h48M20 6v12M44 6v12M18 36h8M30 36h8M18 46h8" /></>,
+  search: <><circle cx="27" cy="27" r="16" /><path d="M39 39l15 15" /></>,
+  user: <><circle cx="32" cy="22" r="11" /><path d="M12 56c2-12 10-18 20-18s18 6 20 18" /></>,
+  slides: <><rect x="6" y="10" width="52" height="34" rx="4" /><path d="M32 44v10M22 56h20M16 22h20M16 31h14" /></>,
+  mic: <><rect x="24" y="6" width="16" height="30" rx="8" /><path d="M14 30a18 18 0 0 0 36 0M32 48v8M24 56h16" /></>,
   mail: <><rect x="6" y="14" width="52" height="36" rx="5" /><path d="M8 18l24 18 24-18" /></>,
 };
 

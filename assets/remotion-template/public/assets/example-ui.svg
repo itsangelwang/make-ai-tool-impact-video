@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" font-family="Inter, Arial, sans-serif">
+  <!-- Placeholder product UI for the template only. Replace with cleared real screenshots. -->
+  <rect width="1600" height="1000" fill="#FFFFFF"/>
+  <rect width="1600" height="90" fill="#F2F3F6"/>
+  <text x="48" y="58" font-size="34" font-weight="700" fill="#171923">Example Notes AI</text>
+  <text x="1300" y="58" font-size="26" fill="#687080">Placeholder UI</text>
+  <rect x="60" y="130" width="1480" height="130" rx="24" fill="#F7F7FA" stroke="#D5D8DE" stroke-width="3"/>
+  <text x="100" y="208" font-size="50" fill="#171923">Turn these 5 notes into a brief</text>
+  <circle cx="1460" cy="195" r="40" fill="#171923"/>
+  <path d="M1460 215 V175 M1444 190 L1460 174 L1476 190" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <text x="60" y="340" font-size="52" font-weight="800" fill="#171923">Prep brief · Thursday</text>
+  <rect x="60" y="380" width="1480" height="80" fill="#F2F0FF"/>
+  <text x="90" y="432" font-size="44" font-weight="700" fill="#171923">Item</text><text x="760" y="432" font-size="44" font-weight="700" fill="#171923">Status</text><text x="1240" y="432" font-size="44" font-weight="700" fill="#171923">Owner</text>
+  <text x="90" y="530" font-size="50" fill="#171923">Launch date</text><text x="760" y="530" font-size="50" fill="#2E8B57">Decided: Nov 4</text><text x="1240" y="530" font-size="50" fill="#171923">Sam</text>
+  <text x="90" y="630" font-size="50" fill="#171923">Vendor quote</text><text x="760" y="630" font-size="50" fill="#F06449">No reply yet</text><text x="1240" y="630" font-size="50" fill="#171923">Maya</text>
+  <text x="90" y="730" font-size="50" fill="#171923">Budget review</text><text x="760" y="730" font-size="50" fill="#687080">Open</text><text x="1240" y="730" font-size="50" fill="#F06449">?</text>
+  <path d="M60 570 H1540 M60 670 H1540 M60 770 H1540" stroke="#ECEDF1" stroke-width="3"/>
+</svg>
