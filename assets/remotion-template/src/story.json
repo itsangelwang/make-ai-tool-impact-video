@@ -22,18 +22,18 @@
   ],
   "transitions": [
     {
-      "start_sec": 16.18,
-      "end_sec": 17.58,
+      "start_sec": 12.6,
+      "end_sec": 14.0,
       "label": "Hand the same notes to AI",
       "symbol": "→",
       "color": "#6857F5"
     },
     {
-      "start_sec": 35.35,
-      "end_sec": 36.75,
+      "start_sec": 38.6,
+      "end_sec": 40.0,
       "label": "You still own the check",
-      "symbol": "→",
-      "color": "#6857F5"
+      "symbol": "✓",
+      "color": "#F06449"
     }
   ],
   "scenes": [

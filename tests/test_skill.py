@@ -662,5 +662,14 @@ class StoryBeatTests(unittest.TestCase):
         story["scenes"][6].pop("access")
         self.assertTrue(check_story.variety_notes(story))
 
+    def test_before_to_after_needs_a_chapter_transition(self):
+        story = self.story()
+        story["scenes"][1]["type"], story["scenes"][2]["type"] = "before-workflow", "ai-handoff"
+        story["transitions"] = []
+        self.assertTrue(any("chapter transition" in e for e in check_story.transition_errors(story)))
+        boundary = story["scenes"][2]["start_sec"]
+        story["transitions"] = [{"start_sec": boundary - 1.4, "end_sec": boundary, "label": "Hand it over", "symbol": "→", "color": "#6857F5"}]
+        self.assertEqual(check_story.transition_errors(story), [])
+
     def test_icon_names_match_component(self):
         self.assertTrue({"doc", "table", "user", "calendar", "slides"} <= check_story.icon_names())

@@ -31,11 +31,13 @@ const Card = ({children, index = 0, delay = null, accent = '#6857F5'}) => {
 
 const Badge = ({children, color}) => <div style={{display: 'inline-block', padding: '12px 20px', borderRadius: 999, color: '#fff', background: color, fontFamily: useContext(FontContext), fontSize: 28, fontWeight: 850, letterSpacing: 1}}>{children}</div>;
 
-export const FullFrameTransition = ({transition, displayFont}) => {
+export const FullFrameTransition = ({transition, displayFont, durationInFrames = 42}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const enter = spring({frame,fps,config:{damping:18,stiffness:170}});
-  return <AbsoluteFill style={{background:transition.color||'#6857F5',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}><div style={{position:'absolute',width:760,height:760,borderRadius:'50%',background:'rgba(255,255,255,.08)',transform:`scale(${.72+enter*.35})`}}/><div style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:30,color:'#fff',opacity:enter,transform:`translateY(${(1-enter)*55}px) scale(${.72+enter*.32})`}}><div style={{width:118,height:118,borderRadius:34,background:'rgba(255,255,255,.20)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:66,fontWeight:950}}>{transition.symbol||'→'}</div><div style={{textWrap:'balance',fontFamily:displayFont,fontSize:48,fontWeight:950,textAlign:'center',maxWidth:900}}>{transition.label}</div></div></AbsoluteFill>;
+  // Leave by shrinking into a circle so the next scene is revealed, not cut to.
+  const leave = interpolate(frame, [durationInFrames - 8, durationInFrames], [0, 1], clamp);
+  return <AbsoluteFill style={{clipPath:`circle(${(1 - leave) * 120}% at 50% 50%)`,background:transition.color||'#6857F5',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}><div style={{position:'absolute',width:760,height:760,borderRadius:'50%',background:'rgba(255,255,255,.08)',transform:`scale(${.72+enter*.35})`}}/><div style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:30,color:'#fff',opacity:enter,transform:`translateY(${(1-enter)*55}px) scale(${.72+enter*.32})`}}><div style={{width:118,height:118,borderRadius:34,background:'rgba(255,255,255,.20)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:66,fontWeight:950}}>{transition.symbol||'→'}</div><div style={{textWrap:'balance',fontFamily:displayFont,fontSize:48,fontWeight:950,textAlign:'center',maxWidth:900}}>{transition.label}</div></div></AbsoluteFill>;
 };
 
 export const BrandEnding = ({brand, palette, displayFont}) => {
@@ -104,17 +106,36 @@ const Scene = ({scene, palette, labels, sound}) => {
   );
 };
 
+// Every scene change gets a short nonverbal transition: the next scene enters over the
+// previous one (which stays underneath for ENTER_FRAMES). Readable chapter transitions
+// from story.transitions still play as full-frame cards on top.
+const ENTER_FRAMES = 12;
+const ENTER_CYCLE = ['slide', 'wipe', 'rise'];
+const SceneEnter = ({type, children}) => {
+  const frame = useCurrentFrame();
+  const t = interpolate(frame, [0, ENTER_FRAMES], [0, 1], {...clamp, easing: (x) => 1 - (1 - x) ** 3});
+  // isolation keeps each scene's layers together, so the next scene fully covers this one.
+  const base = {isolation: 'isolate'};
+  if (type === 'none' || t >= 1) return <AbsoluteFill style={base}>{children}</AbsoluteFill>;
+  if (type === 'wipe') return <AbsoluteFill style={{...base, clipPath: `circle(${t * 120}% at 50% 60%)`}}>{children}</AbsoluteFill>;
+  if (type === 'rise') return <AbsoluteFill style={{...base, transform: `translateY(${(1 - t) * 100}%)`, boxShadow: '0 -30px 60px rgba(23,25,35,.18)'}}>{children}</AbsoluteFill>;
+  return <AbsoluteFill style={{...base, transform: `translateX(${(1 - t) * 100}%)`, boxShadow: '-30px 0 60px rgba(23,25,35,.18)'}}>{children}</AbsoluteFill>;
+};
+
 export const VerticalImpact = ({story}) => {
   const fps = 30;
   const locale = localeOf(story);
   const labels = {...LABELS[locale], ...(story.labels || {})};
   return (
     <FontContext.Provider value={FONTS[locale].body}>
-    <AbsoluteFill>
-      {story.scenes.map((scene) => {
+    <AbsoluteFill style={{background: story.palette.paper}}>
+      {story.scenes.map((scene, index) => {
         const start = Math.round(scene.start_sec * fps);
-        const duration = Math.round((scene.end_sec - scene.start_sec) * fps);
-        return <Sequence key={scene.id} from={start} durationInFrames={duration}><Scene scene={{...scene, before: story.before_steps, after: story.after_steps}} palette={story.palette} labels={labels} sound={Boolean(story.sfx)} /></Sequence>;
+        const last = index === story.scenes.length - 1;
+        // Stay on screen a little past the end so the next scene can enter over it.
+        const duration = Math.round((scene.end_sec - scene.start_sec) * fps) + (last ? 0 : ENTER_FRAMES);
+        const enter = index === 0 ? 'none' : scene.enter || ENTER_CYCLE[(index - 1) % ENTER_CYCLE.length];
+        return <Sequence key={scene.id} from={start} durationInFrames={duration}><SceneEnter type={enter}><Scene scene={{...scene, before: story.before_steps, after: story.after_steps}} palette={story.palette} labels={labels} sound={Boolean(story.sfx)} /></SceneEnter></Sequence>;
       })}
       {story.progress !== false && story.scenes.length ? (() => {
         // Thin chapter bar at the top: one segment per scene, hidden on the brand card.
@@ -125,7 +146,7 @@ export const VerticalImpact = ({story}) => {
       })() : null}
       {story.audio ? <Audio src={staticFile(story.audio)} /> : null}
       <TimedCaptions />
-      {(story.transitions||[]).map((transition) => <Sequence key={`${transition.start_sec}-${transition.label}`} from={Math.round(transition.start_sec*fps)} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}><FullFrameTransition transition={transition} displayFont={FONTS[locale].display}/></Sequence>)}
+      {(story.transitions||[]).map((transition) => <Sequence key={`${transition.start_sec}-${transition.label}`} from={Math.round(transition.start_sec*fps)} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}><FullFrameTransition transition={transition} displayFont={FONTS[locale].display} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}/></Sequence>)}
       {story.brand ? <Sequence from={Math.round(story.brand.start_sec * fps)} durationInFrames={Math.round((story.brand.end_sec - story.brand.start_sec) * fps)}><BrandEnding brand={story.brand} palette={story.palette} displayFont={FONTS[locale].display} /></Sequence> : null}
     </AbsoluteFill>
     </FontContext.Provider>

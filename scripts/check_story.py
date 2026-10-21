@@ -176,6 +176,24 @@ def check(story: dict, public_dir: Path, icons: set[str]) -> list[str]:
     return errors
 
 
+CHAPTER_CHANGES = {("before-workflow", "ai-handoff"), ("before-workflow", "after-workflow"), ("after-workflow", "human-check"), ("ai-handoff", "human-check")}
+
+
+def transition_errors(story: dict) -> list[str]:
+    """Before -> after needs a readable chapter transition at the boundary; two chapter
+    cards in a row must not look the same."""
+    errors, scenes, cards = [], story.get("scenes", []), story.get("transitions", [])
+    for a, b in zip(scenes, scenes[1:]):
+        if a.get("type") == "before-workflow" and b.get("type") in {"ai-handoff", "after-workflow"}:
+            boundary = float(b.get("start_sec", 0))
+            if not any(float(t.get("start_sec", -9)) - 0.01 <= boundary <= float(t.get("end_sec", -9)) + 0.01 for t in cards):
+                errors.append(f"{a.get('id')} -> {b.get('id')}: add a readable chapter transition that ends at {boundary:g}s (before -> after)")
+    for a, b in zip(cards, cards[1:]):
+        if a.get("label") == b.get("label") or (a.get("color") == b.get("color") and a.get("symbol") == b.get("symbol")):
+            errors.append(f"transitions at {a.get('start_sec')}s and {b.get('start_sec')}s look the same; change color, symbol, or wording")
+    return errors
+
+
 def variety_notes(story: dict) -> list[str]:
     scenes = story.get("scenes", [])
     return [
@@ -189,7 +207,7 @@ def main() -> int:
     parser.add_argument("story", type=Path, help="video/src/story.json")
     args = parser.parse_args()
     story = json.loads(args.story.read_text(encoding="utf-8"))
-    errors = check(story, args.story.resolve().parent.parent / "public", icon_names())
+    errors = check(story, args.story.resolve().parent.parent / "public", icon_names()) + transition_errors(story)
     report = {"ok": not errors, "errors": errors, "variety": variety_notes(story),
               "screen_words": {s.get("id"): screen_words(s, story) for s in story.get("scenes", [])}}
     print(json.dumps(report, ensure_ascii=False, indent=2))
