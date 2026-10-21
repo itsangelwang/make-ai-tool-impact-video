@@ -53,6 +53,7 @@ def package(task="整理会议纪要", audience="项目经理"):
         "readiness": "try-now",
         "next_action": "用一份非敏感材料对照测试",
         "narration": "你" * 180,
+        "coverage": {"checked_at": "2026-10-21", "existing": [{"by": "official", "url": "https://example.com/launch", "shows": "功能总览"}], "our_angle": "一个人完成一件具体任务", "decision": "make"},
         "scenes": scenes,
     }
 
@@ -77,6 +78,20 @@ class PackageTests(unittest.TestCase):
     def test_waitlist_is_explicit(self):
         item = package()
         item["readiness"] = "watch"
+        self.assertEqual(validator.validate(item, ledger()), [])
+
+    def test_coverage_check_is_required_and_skip_stops(self):
+        item = package()
+        del item["coverage"]
+        self.assertTrue(any("coverage" in e for e in validator.validate(item, ledger())))
+        item = package()
+        item["coverage"]["decision"] = "skip"
+        self.assertTrue(any("skip" in e for e in validator.validate(item, ledger())))
+        item = package()
+        item["coverage"]["existing"] = [{"by": "someone", "url": ""}]
+        self.assertTrue(any("existing 0" in e for e in validator.validate(item, ledger())))
+        item = package()
+        item["coverage"]["decision"] = "change-angle"
         self.assertEqual(validator.validate(item, ledger()), [])
 
     def test_bad_duration_fails(self):

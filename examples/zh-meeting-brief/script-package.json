@@ -31,6 +31,18 @@
     "start_sec": 56.5,
     "end_sec": 60
   },
+  "coverage": {
+    "checked_at": "2026-10-13",
+    "existing": [
+      {
+        "by": "official",
+        "url": "https://example.com/notes-ai/launch",
+        "shows": "功能总览演示，没有展示人工核对"
+      }
+    ],
+    "our_angle": "项目经理用旧会议记录准备一页会前简报，并在发出前核对负责人和日期",
+    "decision": "make"
+  },
   "scenes": [
     {
       "id": "s1",

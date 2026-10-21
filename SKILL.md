@@ -23,9 +23,13 @@ Read [references/fact-rules.md](references/fact-rules.md).
 - Write every narrated factual claim to `claim-ledger.json`; separate observation, vendor claim, inference, and hypothesis.
 - Never convert vendor outcomes into measured results. Never invent time saved or efficiency multipliers.
 
+## 2. Check the topic is worth making
+
+Read [references/topic-check.md](references/topic-check.md). When the user asks what to make, propose candidates from recent official announcements first. For the chosen tool, find the official launch material and the most visible creator videos on the same feature, then record `coverage` (what exists, this video's different angle, and `make` / `change-angle` / `skip`) in `script-package.json`. If the honest answer is `skip`, stop and tell the user why with a better candidate; never skip silently.
+
 Choose exactly one audience, task, and example thread. Define `before_steps`, `ai_change`, `after_steps`, `human_check`, `readiness`, and `next_action`.
 
-## 2. Build one causal story
+## 3. Build one causal story
 
 Read [references/story-contract.md](references/story-contract.md) and [references/visual-system.md](references/visual-system.md). For narration, audio, timing, or animated captions, also read [references/pacing-and-review.md](references/pacing-and-review.md). Read [references/brand-system.md](references/brand-system.md) for the brand ending.
 
@@ -53,7 +57,7 @@ python3 <skill-dir>/scripts/validate_package.py \
 
 Keep `video/src/timeline.json` as the canonical timed narration. Render captions from it and generate TTS from the same cue text; do not maintain a separate hard-coded caption list. Keep `script-package.json` narration equivalent to the concatenated cues and validate both before rendering.
 
-## 3. Create the combined review
+## 4. Create the combined review
 
 Scaffold the vertical project:
 
@@ -68,7 +72,7 @@ python3 <skill-dir>/scripts/validate_sources.py \
   <project-dir>/video/source-ledger.json
 ```
 
-Produce one review containing the narration, factual boundaries, scene plan, cover, first-three-second preview, target voice/palette, and blockers. For silent review captions, create `timeline.json` and run:
+Produce one review containing the coverage check and chosen angle, the narration, factual boundaries, scene plan, cover, first-three-second preview, target voice/palette, and blockers. For silent review captions, create `timeline.json` and run:
 
 ```bash
 python3 <skill-dir>/scripts/audit_timeline.py \
@@ -86,7 +90,7 @@ python3 <skill-dir>/scripts/build_captions.py \
 
 Register the review bundle with `project_state.py review`. Wait for explicit approval before final TTS or delivery render. Any registered script, claim, story, source, cover, voice, or opening change invalidates approval.
 
-## 4. Iterate by communication purpose
+## 5. Iterate by communication purpose
 
 When feedback reveals confusion, repair the causal chain rather than polishing the isolated page.
 
@@ -104,7 +108,7 @@ Reuse `Cursor`, `TypingText`, `FocusZoom`, and `ProgressBar` from the Remotion t
 
 Render stills first for layout and 5–15 second local clips for disputed motion or pacing. Render the full review only after local direction is established, or after a global timeline change requires continuity review. Avoid re-rendering or re-analyzing unchanged full compositions.
 
-## 5. Finish and verify
+## 6. Finish and verify
 
 Generate final TTS only after approval. Never use a voice the user has rejected. For English, use Fish Audio with the `en-sawyer` preset and the expressive-delivery rules in `references/english-market.md`; fall back to another provider only when Fish Audio is unavailable. Store credentials only in provider-specific environment variables, never in JSON, source files, logs, or Git. When the user has an approved voice preset, reuse it without new auditions; otherwise audition at least two 8–12 second samples before committing to a voice or generating the full narration.
 
@@ -167,7 +171,7 @@ python3 <skill-dir>/scripts/verify_video.py \
 
 Visually inspect the full video and representative frames. Confirm native 1080×1920, complete decoding, safe captions, natural speech pace, semantic highlighting, readable transitions, real product evidence, and a viewer-recountable before → change → after → human responsibility chain.
 
-## 6. Deliver
+## 7. Deliver
 
 Deliver the MP4, cover, captions, source ledger, claim ledger, QA report, and `social-titles.md`. State actual duration and publication blockers. Do not publish automatically.
 
