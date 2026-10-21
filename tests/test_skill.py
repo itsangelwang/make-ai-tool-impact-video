@@ -29,6 +29,7 @@ verify_video = module("verify_video")
 build_captions = module("build_captions")
 fit_timeline = module("fit_timeline_to_audio")
 story_audio = module("generate_story_audio")
+snapshot_version = module("snapshot_version")
 
 
 def package(task="整理会议纪要", audience="项目经理"):
@@ -376,6 +377,26 @@ class StateAndUtilitiesTests(unittest.TestCase):
         self.assertIn("model=flux-hannah-en", url)
         self.assertNotIn("DEEPGRAM_API_KEY", url)
 
+
+
+class SnapshotVersionTests(unittest.TestCase):
+    def test_snapshots_number_up_and_skip_renders(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            (project / "script-package.json").write_text("{}")
+            src = project / "video" / "src"
+            (src / "components").mkdir(parents=True)
+            (src / "timeline.json").write_text("{}")
+            (src / "components" / "Shot.jsx").write_text("")
+            (project / "video" / "renders").mkdir()
+            (project / "video" / "renders" / "review-v1.mp4").write_text("")
+            first, copied = snapshot_version.snapshot(project, "first review")
+            second, _ = snapshot_version.snapshot(project)
+            self.assertEqual((first.name, second.name), ("v1", "v2"))
+            self.assertIn("video/src/timeline.json", copied)
+            self.assertTrue((first / "video" / "src" / "components" / "Shot.jsx").is_file())
+            self.assertFalse(any(p.suffix == ".mp4" for p in first.rglob("*")))
+            self.assertEqual((first / "NOTE.txt").read_text().strip(), "first review")
 
 
 class VerifyVideoToolTests(unittest.TestCase):

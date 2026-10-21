@@ -55,7 +55,7 @@ python3 <skill-dir>/scripts/validate_package.py \
   <project-dir>/claim-ledger.json
 ```
 
-Keep `video/src/timeline.json` as the canonical timed narration. Render captions from it and generate TTS from the same cue text; do not maintain a separate hard-coded caption list. Keep `script-package.json` narration equivalent to the concatenated cues and validate both before rendering.
+Keep `video/src/timeline.json` as the canonical timed narration and keep no other copy of it in the project. Render captions from it and generate TTS from the same cue text; do not maintain a separate hard-coded caption list. Keep `script-package.json` narration equivalent to the concatenated cues and validate both before rendering.
 
 ## 4. Create the combined review
 
@@ -107,6 +107,14 @@ When feedback reveals confusion, repair the causal chain rather than polishing t
 Reuse `Cursor`, `TypingText`, `FocusZoom`, and `ProgressBar` from the Remotion template for visible UI actions; see [references/visual-system.md](references/visual-system.md) and the English `ComponentsDemo` composition for props and click choreography.
 
 Render stills first for layout and 5–15 second local clips for disputed motion or pacing. Render the full review only after local direction is established, or after a global timeline change requires continuity review. Avoid re-rendering or re-analyzing unchanged full compositions.
+
+Keep one working copy of every file. Before changing an already-reviewed version, save it with:
+
+```bash
+python3 <skill-dir>/scripts/snapshot_version.py <project-dir> --note "<what this version was>"
+```
+
+It copies the editable inputs (packages, ledgers, `video/src`) into `<project-dir>/versions/vN/`. Do not leave `*.v5.json` or `*.v5.jsx` copies beside the working files. Name review renders `video/renders/review-vN.mp4` with the same N, and when the project is delivered, keep only the final render and the latest review there.
 
 ## 6. Finish and verify
 
