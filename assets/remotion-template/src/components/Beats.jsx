@@ -150,7 +150,7 @@ const FocusBands = ({focus, crop, k, palette}) => {
   return <>
     <div style={{...shade, top: 0, height: Math.max(0, top)}} />
     <div style={{...shade, top: top + height, bottom: 0}} />
-    <div style={{position: 'absolute', left: -6, right: -6, top: top - 4, height: height + 8, border: `5px solid ${palette.cool}`, borderRadius: 16, opacity: fade, pointerEvents: 'none'}} />
+    <div style={{position: 'absolute', left: -6, right: -6, top: top - 4, height: height + 8, border: `5px solid ${palette.accent || palette.cool}`, borderRadius: 16, opacity: fade, pointerEvents: 'none'}} />
   </>;
 };
 
@@ -268,12 +268,13 @@ export const Flow = ({items, palette, font, sound = false, accent}) => {
     {items.map((item, i) => {
       const t = frame < item.at ? 0 : spring({frame: frame - item.at, fps, config: {damping: 11, stiffness: 190}});
       const tint = objectColor(item.icon, palette, item.color);
+      const grow = Math.min(1, t * 1.4); // a tile takes space as it appears, so the row stays centred
       return <React.Fragment key={`${item.label}-${i}`}>
-        {i ? <div style={{fontSize: 54, fontWeight: 900, color, opacity: Math.min(1, t * 2)}}>→</div> : null}
-        <div style={card({width: size, height: size, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, fontFamily: font, opacity: Math.min(1, t * 2), transform: `scale(${0.6 + t * 0.4})`, background: `linear-gradient(180deg, ${tint}1F, #fff 70%)`, border: `5px solid ${tint}`})}>
+        {i ? <div style={{width: 54 * grow, overflow: 'hidden', fontSize: 54, fontWeight: 900, color, opacity: Math.min(1, t * 2), textAlign: 'center'}}>→</div> : null}
+        <div style={{width: size * grow, height: size, display: 'flex', justifyContent: 'center'}}><div style={card({width: size, height: size, flex: '0 0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, fontFamily: font, opacity: Math.min(1, t * 2), transform: `scale(${0.6 + t * 0.4})`, background: `linear-gradient(180deg, ${tint}1F, #fff 70%)`, border: `5px solid ${tint}`})}>
           <Icon name={item.icon} size={size * 0.42} color={tint} />
           <span style={{fontSize: 34, fontWeight: 700, color: palette.ink, textAlign: 'center', lineHeight: 1.1, textWrap: 'balance'}}>{item.label}</span>
-        </div>
+        </div></div>
         {sound ? <Sfx at={item.at} name="pop" volume={0.4} /> : null}
       </React.Fragment>;
     })}
@@ -288,7 +289,7 @@ export const Correction = ({fix, palette, font, sound = false}) => {
   const enter = fix.at > frame ? 0 : spring({frame: frame - fix.at, fps, config: {damping: 14, stiffness: 160}});
   const strike = interpolate(frame, [fix.at + 12, fix.at + 22], [0, 1], clamp);
   const right = frame < fix.at + 24 ? 0 : spring({frame: frame - fix.at - 24, fps, config: {damping: 9, stiffness: 200}});
-  return <div style={card({padding: '30px 36px', fontFamily: font, opacity: enter, transform: `translateY(${(1 - enter) * 40}px)`, border: `5px solid ${palette.warm}`})}>
+  return <div style={card({padding: '30px 36px', fontFamily: font, opacity: enter, transform: `translateY(${(1 - enter) * 40}px)`, boxShadow: '0 20px 50px rgba(23,25,35,.12)'})}>
     {fix.label ? <div style={{fontSize: 34, fontWeight: 500, color: palette.muted}}>{fix.label}</div> : null}
     <div style={{display: 'flex', alignItems: 'center', gap: 26, marginTop: 14, flexWrap: 'wrap'}}>
       <span style={{position: 'relative', fontSize: 54, fontWeight: 600, color: palette.muted}}>
@@ -335,5 +336,81 @@ export const Scrub = ({scrub, palette, font, sound = false}) => {
       </div>
     </div>
     {sound ? [0, 1, 2, 3, 4, 5].map((n) => <Sfx key={n} at={scrub.at + 8 + n * 22} name="tick" volume={0.3} />) : null}
+  </div>;
+};
+
+/** A system-style notification that slides down, e.g. "Call ended · Recording saved". Use it as an
+ * opening hook so the first frame already shows the situation. toast: {at, icon, title, note, until}. */
+export const Toast = ({toast, palette, font, sound = false}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const enter = frame < toast.at ? 0 : spring({frame: frame - toast.at, fps, config: {damping: 14, stiffness: 170}});
+  const leave = Number.isFinite(toast.until) ? interpolate(frame, [toast.until, toast.until + 8], [0, 1], clamp) : 0;
+  const color = objectColor(toast.icon, palette, toast.color);
+  return <div style={{opacity: enter * (1 - leave), transform: `translateY(${(1 - enter) * -60 - leave * 30}px)`}}>
+    <div style={card({display: 'flex', alignItems: 'center', gap: 22, padding: '22px 26px', borderRadius: 30, fontFamily: font, boxShadow: '0 20px 50px rgba(23,25,35,.14)'})}>
+      <div style={{width: 76, height: 76, borderRadius: 20, background: `${color}1F`, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto'}}><Icon name={toast.icon} size={48} color={color} /></div>
+      <div style={{flex: 1}}>
+        <div style={{fontSize: 34, fontWeight: 700, color: palette.ink}}>{toast.title}</div>
+        {toast.note ? <div style={{fontSize: 28, fontWeight: 500, color: palette.muted, marginTop: 4}}>{toast.note}</div> : null}
+      </div>
+      <div style={{fontSize: 24, fontWeight: 500, color: palette.muted, alignSelf: 'flex-start'}}>now</div>
+    </div>
+    {sound ? <Sfx at={toast.at} name="notify" volume={0.55} /> : null}
+  </div>;
+};
+
+/** A generic video call that ends: two participants, a running timer, a hang-up click, then the
+ * saved recording slides out. Not any real product's UI. call: {at, people: [name, name],
+ * timer: "30:12", end_at, file}; the hang-up click happens at end_at. */
+export const CallEnd = ({call, palette, font, sound = false}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  // Already on screen at its first frame (it is often the cover), so the spring starts early.
+  const enter = spring({frame: frame - call.at + 10, fps, config: {damping: 16, stiffness: 220}});
+  const tilesOut = interpolate(frame, [call.end_at + 4, call.end_at + 10], [0, 1], clamp);
+  const ended = interpolate(frame, [call.end_at + 10, call.end_at + 16], [0, 1], clamp);
+  const fileIn = frame < call.end_at + 16 ? 0 : spring({frame: frame - call.end_at - 16, fps, config: {damping: 12, stiffness: 170}});
+  const [mm, ss] = String(call.timer || '30:12').split(':').map(Number);
+  const total = mm * 60 + ss;
+  const elapsed = Math.min(total, total - 3 + Math.floor(Math.max(0, frame - call.at) / fps));
+  const clock = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, '0')}`;
+  const tones = [palette.cool, '#0E9F8E'];
+  const W = 936, H = 420;
+  const hang = {x: W / 2 + 94, y: H - 62}; // centre of the red button, third in the control row
+  const press = getClickState(frame, call.end_at);
+  return <div style={{position: 'relative', opacity: enter, transform: `scale(${0.94 + 0.06 * enter})`}}>
+    <div style={{position: 'relative', width: W, height: H, borderRadius: 36, background: '#1E2230', overflow: 'hidden', boxShadow: '0 30px 70px rgba(23,25,35,.28)', fontFamily: font}}>
+      <div style={{position: 'absolute', left: 28, top: 22, display: 'flex', alignItems: 'center', gap: 12, color: '#fff', fontSize: 26, fontWeight: 600}}>
+        <span style={{width: 14, height: 14, borderRadius: '50%', background: ended ? '#8A90A2' : '#FF4D4D', opacity: ended ? 1 : 0.6 + 0.4 * Math.abs(Math.sin(frame / 8))}} />
+        <span style={{fontVariantNumeric: 'tabular-nums'}}>{ended > 0.5 ? clock : `REC  ${clock}`}</span>
+      </div>
+      <div style={{position: 'absolute', left: 28, right: 28, top: 70, height: 230, display: 'flex', gap: 20, opacity: 1 - tilesOut, transform: `scale(${1 - tilesOut * 0.06})`}}>
+        {(call.people || ['A', 'B']).map((name, i) => {
+          const talking = i === 1 && !ended;
+          const ring = talking ? 6 + 5 * Math.abs(Math.sin(frame / 5)) : 0;
+          return <div key={name} style={{flex: 1, borderRadius: 26, background: '#2B3042', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14}}>
+            <div style={{width: 112, height: 112, borderRadius: '50%', background: tones[i % 2], color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 52, fontWeight: 700, boxShadow: `0 0 0 ${ring}px ${tones[i % 2]}55`}}>{name[0]}</div>
+            <div style={{color: '#C9CDDA', fontSize: 26, fontWeight: 500}}>{name}</div>
+          </div>;
+        })}
+      </div>
+      {ended > 0 ? <div style={{position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: ended}}>
+        <div style={{display: 'flex', alignItems: 'center', gap: 18, color: '#fff', fontSize: 44, fontWeight: 700}}><Icon name="phone" size={56} color="#FF5A5A" />Call ended</div>
+      </div> : null}
+      <div style={{position: 'absolute', left: 0, right: 0, bottom: 26, display: 'flex', justifyContent: 'center', gap: 22, opacity: 1 - ended * 0.6}}>
+        {['mic', 'play'].map((name) => <div key={name} style={{width: 72, height: 72, borderRadius: '50%', background: '#3A4055', display: 'flex', alignItems: 'center', justifyContent: 'center'}}><Icon name={name} size={40} color="#C9CDDA" /></div>)}
+        <div style={{width: 96, height: 72, borderRadius: 36, background: '#FF4D4D', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${press.targetScale})`, boxShadow: frame > call.end_at - 12 && frame < call.end_at + 10 ? '0 0 0 8px rgba(255,77,77,.35)' : 'none'}}><Icon name="phone" size={46} color="#fff" /></div>
+      </div>
+      <Cursor path={[{frame: Math.max(0, call.end_at - 30), x: W * 0.78, y: H * 0.55}, {frame: call.end_at - 6, x: hang.x + 6, y: hang.y}, {frame: call.end_at + 12, x: hang.x + 6, y: hang.y}, {frame: call.end_at + 34, x: W + 80, y: H + 60}]} clicks={[call.end_at]} hand={[[call.end_at - 12, call.end_at + 12]]} color="#ffffff" rippleColor="#FF8A8A" />
+    </div>
+    <div style={{display: 'flex', justifyContent: 'center', marginTop: -24, opacity: Math.min(1, fileIn * 2), transform: `translateY(${(1 - fileIn) * -40}px)`}}>
+      <div style={card({display: 'flex', alignItems: 'center', gap: 16, padding: '18px 26px', borderRadius: 24, fontFamily: font, boxShadow: '0 20px 50px rgba(23,25,35,.18)'})}>
+        <Icon name="mic" size={44} color={objectColor('mic', palette)} />
+        <span style={{fontSize: 30, fontWeight: 700, color: palette.ink}}>{call.file}</span>
+        <span style={{fontSize: 28, fontWeight: 500, color: palette.muted}}>{call.timer}</span>
+      </div>
+    </div>
+    {sound ? <><Sfx at={call.end_at} name="key-2" volume={0.5} /><Sfx at={call.end_at + 8} name="uhoh" volume={0.4} /><Sfx at={call.end_at + 16} name="pop" volume={0.5} /></> : null}
   </div>;
 };

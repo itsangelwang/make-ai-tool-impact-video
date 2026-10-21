@@ -14,7 +14,7 @@ from limits import LIMITS
 ICON_FILE = Path(__file__).resolve().parent.parent / "assets" / "remotion-template" / "src" / "components" / "Icon.jsx"
 # Scene types whose `visual` text the template shows in a box (an empty visual hides the box).
 VISUAL_BOX = {"human-check", "next-action", "ai-handoff"}
-BEATS = ("new_feature", "shot", "flow", "scrub", "roles", "checks", "access", "fix")
+BEATS = ("call_end", "toast", "new_feature", "shot", "flow", "scrub", "roles", "checks", "access", "fix")
 
 
 def icon_names(icon_file: Path = ICON_FILE) -> set[str]:
@@ -26,7 +26,14 @@ def words(*texts) -> int:
 
 
 def screen_words(scene: dict, story: dict) -> int:
-    """Authored words a viewer may read on this scene, excluding captions and real UI."""
+    """Authored words a viewer may read at once in this scene, excluding captions and real UI.
+    A pain-hook's opening beats fade out when its new-feature card appears, so only the larger
+    of the two groups counts."""
+    feature = scene.get("new_feature") or {}
+    if scene.get("type") == "pain-hook" and feature:
+        card = words(feature.get("date"), feature.get("name"), feature.get("accent"), feature.get("capability"), *[i.get("label") for i in feature.get("items", [])])
+        rest = screen_words({**scene, "new_feature": None, "label": None, "headline": None}, story)
+        return words(scene.get("label"), scene.get("headline")) + max(card, rest)
     texts = [scene.get("label"), scene.get("headline"), scene.get("new_tag")]
     if scene.get("type") in VISUAL_BOX and not (scene.get("type") == "ai-handoff" and scene.get("shot")):
         texts.append(scene.get("visual"))
@@ -46,6 +53,10 @@ def screen_words(scene: dict, story: dict) -> int:
     fix = scene.get("fix") or {}
     texts += [fix.get("label"), fix.get("wrong"), fix.get("right")]
     texts.append((scene.get("scrub") or {}).get("ask"))
+    toast = scene.get("toast") or {}
+    texts += [toast.get("title"), toast.get("note")]
+    call = scene.get("call_end") or {}
+    texts += ["Call ended"] + [name[:1] for name in call.get("people", [])] if call else []
     custom = any(scene.get(key) for key in ("shot", "flow", "scrub", "fix"))
     if scene.get("type") in {"pain-hook", "before-workflow"} and not custom:
         texts += story.get("before_steps", []) if scene.get("type") == "before-workflow" or not feature else []
@@ -57,7 +68,7 @@ def screen_words(scene: dict, story: dict) -> int:
 def change_times(scene: dict) -> list[float]:
     """Seconds (from scene start) at which something new appears on screen."""
     times = [0.0]
-    for key in ("new_feature", "roles", "access", "fix", "scrub"):
+    for key in ("new_feature", "roles", "access", "fix", "scrub", "toast", "call_end"):
         item = scene.get(key)
         if isinstance(item, dict) and isinstance(item.get("at_sec"), (int, float)):
             times.append(item["at_sec"])
@@ -67,6 +78,9 @@ def change_times(scene: dict) -> list[float]:
         times += [scrub["at_sec"] + (8 + 22 * n) / 30 for n in range(1, 7)]
     if isinstance(scrub.get("ask_at_sec"), (int, float)):
         times.append(scrub["ask_at_sec"])
+    call = scene.get("call_end") or {}
+    if isinstance(call.get("end_at_sec"), (int, float)):
+        times += [call["end_at_sec"], call["end_at_sec"] + 16 / 30]
     fix = scene.get("fix") or {}
     if isinstance(fix.get("at_sec"), (int, float)):
         times.append(fix["at_sec"] + 24 / 30)  # the right value pops in
@@ -163,6 +177,17 @@ def check(story: dict, public_dir: Path, icons: set[str]) -> list[str]:
             timed(f"{sid}.scrub", scrub, length)
             if "ask_at_sec" in scrub:
                 timed(f"{sid}.scrub", scrub, length, keys=("ask_at_sec",))
+        call = scene.get("call_end")
+        if call is not None:
+            timed(f"{sid}.call_end", call, length, keys=("at_sec", "end_at_sec"))
+            if not call.get("file") or len(call.get("people", [])) != 2:
+                errors.append(f"{sid}.call_end requires file and two people")
+        toast = scene.get("toast")
+        if toast is not None:
+            timed(f"{sid}.toast", toast, length)
+            icon(f"{sid}.toast", toast.get("icon"))
+            if not toast.get("title"):
+                errors.append(f"{sid}.toast requires title")
         fix = scene.get("fix")
         if fix is not None:
             timed(f"{sid}.fix", fix, length)

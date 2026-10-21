@@ -5,7 +5,7 @@
   "scripts": {
     "studio": "remotion studio src/index.jsx",
     "render": "remotion render src/index.jsx VerticalImpact renders/final.mp4 --codec h264 --crf 18",
-    "cover": "remotion still src/index.jsx VerticalImpact qa/cover.png --frame 0",
+    "cover": "remotion still src/index.jsx VerticalImpact qa/cover.png --frame 60",
     "opening": "remotion render src/index.jsx VerticalImpact qa/opening.mp4 --frames 0-89 --codec h264 --crf 20"
   },
   "dependencies": {

@@ -3,7 +3,7 @@ import {AbsoluteFill, Audio, Img, Sequence, interpolate, spring, staticFile, use
 import {TimedCaptions} from './TimedCaptions';
 import {ProgressBar} from './components/ProgressBar';
 import {Icon, objectColor} from './components/Icon';
-import {AccessChips, CheckCards, Correction, FeatureIntro, Flow, NewTag, ProductShot, RoleStrip, Scrub} from './components/Beats';
+import {AccessChips, CheckCards, Correction, FeatureIntro, Flow, NewTag, ProductShot, RoleStrip, Scrub, Toast, CallEnd} from './components/Beats';
 
 const FONTS = {
   zh: {body: 'PingFang SC, Noto Sans CJK SC, Arial, sans-serif', display: 'Hannotate SC, Kaiti SC, PingFang SC, sans-serif'},
@@ -14,12 +14,12 @@ const LABELS = {
   en: {handoff: 'AI takes this step', humanCheck: 'You still own the final check', nextAction: 'Try this today', before: 'Before', after: 'After', you: 'YOU'},
 };
 // Each phase of the story has its own look so viewers always know where they are:
-// the problem (warm), what AI changes (violet), the person's job (amber), and the try-it (green).
+// the problem (coral), what AI changes (violet), the person's job (blue, like the person icon), and the try-it (green).
 const PHASES = {
   problem: {types: ['pain-hook', 'before-workflow'], paper: '#FBEDE7', accent: '#E8553A'},
   ai: {types: ['ai-handoff', 'after-workflow', 'before-after'], paper: '#EFECFF', accent: '#6857F5'},
-  human: {types: ['human-check'], paper: '#FFF4D6', accent: '#B7791F'},
-  next: {types: ['next-action'], paper: '#E5F4EA', accent: '#2E8B57'},
+  human: {types: ['human-check'], paper: '#EAF2FE', accent: '#2F6FE0'},
+  next: {types: ['next-action'], paper: '#E6F6EE', accent: '#1F9D63'},
 };
 export const phaseOf = (type, palette = {}) => {
   const [name, phase] = Object.entries(PHASES).find(([, item]) => item.types.includes(type)) || ['ai', PHASES.ai];
@@ -50,10 +50,14 @@ const Headline = ({text, accent}) => String(text || '').split(/(\*[^*]+\*)/).map
 // Full-frame chapter card. Optional `from` / `to` icon lists turn it into an object handoff:
 // the previous phase's objects slide in, converge, and become the next phase's objects.
 // `kicker` is a short tag above the label (e.g. "NOW", "YOUR TURN").
+// Mix toward white (amount > 0) or toward a deep, saturated version of the color (amount < 0).
 const shade = (hex, amount) => {
   const n = parseInt(hex.slice(1), 16);
-  const ch = (v) => Math.max(0, Math.min(255, Math.round(v * (1 - amount))));
-  return `rgb(${ch(n >> 16)}, ${ch((n >> 8) & 255)}, ${ch(n & 255)})`;
+  const rgb = [n >> 16, (n >> 8) & 255, n & 255];
+  const max = Math.max(...rgb);
+  const mix = (v) => (amount > 0 ? v + (255 - v) * amount : v * (1 + amount) + (v === max ? 0 : -v * 0.15 * -amount));
+  const [r, g, b] = rgb.map((v) => Math.max(0, Math.min(255, Math.round(mix(v)))));
+  return `rgb(${r}, ${g}, ${b})`;
 };
 export const FullFrameTransition = ({transition, displayFont, palette = {}, durationInFrames = 42}) => {
   const frame = useCurrentFrame();
@@ -72,7 +76,7 @@ export const FullFrameTransition = ({transition, displayFont, palette = {}, dura
     const p = side === 'from' ? Math.min(1, enter * 1.4) * (1 - merge) : t;
     return <div key={`${side}-${name}-${i}`} style={{position: 'absolute', left: '50%', top: '50%', width: 130, height: 130, marginLeft: -65 + x, marginTop: -65, borderRadius: 32, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 18px 40px rgba(0,0,0,.22)', opacity: p, transform: `scale(${0.6 + 0.4 * p}) rotate(${(1 - p) * (side === 'from' ? -8 : 8)}deg)`}}><Icon name={name} size={78} color={objectColor(name, palette)} /></div>;
   };
-  return <AbsoluteFill style={{clipPath: `circle(${(1 - leave) * 120}% at 50% 50%)`, background: `linear-gradient(160deg, ${color} 0%, ${shade(color, 0.32)} 100%)`, overflow: 'hidden'}}>
+  return <AbsoluteFill style={{clipPath: `circle(${(1 - leave) * 120}% at 50% 50%)`, background: `linear-gradient(160deg, ${shade(color, 0.18)} 0%, ${color} 45%, ${shade(color, -0.22)} 100%)`, overflow: 'hidden'}}>
     <AbsoluteFill style={{backgroundImage: 'radial-gradient(rgba(255,255,255,.16) 2.5px, transparent 2.5px)', backgroundSize: '38px 38px', opacity: 0.8}} />
     <div style={{position: 'absolute', width: 820, height: 820, borderRadius: '50%', left: -260 + frame * 3, top: 180, background: 'rgba(255,255,255,.10)', filter: 'blur(30px)'}} />
     <div style={{position: 'absolute', width: 620, height: 620, borderRadius: '50%', right: -200 + frame * 2, bottom: 260, background: 'rgba(0,0,0,.12)', filter: 'blur(40px)'}} />
@@ -120,7 +124,7 @@ const Scene = ({scene, palette: base, labels, sound}) => {
   const font = useContext(FontContext);
   const phase = phaseOf(scene.type, base);
   // Beats keep the story palette for warm/cool meaning; the scene paper follows the phase.
-  const palette = {...base, paper: phase.paper};
+  const palette = {...base, paper: phase.paper, accent: phase.accent};
   const frame = useCurrentFrame();
   const local = frame;
   const pulse = interpolate(local, [0, 18, 45], [.96, 1.03, 1], clamp);
@@ -134,7 +138,7 @@ const Scene = ({scene, palette: base, labels, sound}) => {
   const stepAt = (i) => (scene.steps_at_sec ? at(scene.steps_at_sec[i]) : null);
   const showBox = Boolean(scene.visual);
   // An animated beat replaces the default text cards for this scene.
-  const custom = Boolean(shot || flow || scene.scrub || scene.fix);
+  const custom = Boolean(shot || flow || scene.scrub || scene.fix || scene.call_end || scene.toast);
   const introAt = scene.new_feature ? at(scene.new_feature.at_sec) : null;
   const stackOpacity = introAt === null ? 1 : interpolate(local, [introAt - 6, introAt], [1, 0], clamp);
   return (
@@ -146,6 +150,8 @@ const Scene = ({scene, palette: base, labels, sound}) => {
         <h1 style={{textWrap: 'balance', fontWeight: 800, fontFamily: font, fontSize: scene.type === 'pain-hook' ? 92 : 72, lineHeight: 1.08, margin: '38px 0 20px', letterSpacing: -2}}><Headline text={scene.headline} accent={phase.accent} /></h1>
         {/* The body sits centered between the headline and the caption zone. */}
         <div style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', paddingBottom: 40}}>
+        {scene.call_end ? <div style={{marginBottom: 30, opacity: scene.new_feature ? stackOpacity : 1}}><CallEnd call={{...withFrames(scene.call_end), end_at: at(scene.call_end.end_at_sec)}} {...beat} /></div> : null}
+        {scene.toast ? <div style={{marginBottom: 30, opacity: scene.new_feature ? stackOpacity : 1}}><Toast toast={until(scene.toast)} {...beat} /></div> : null}
         {shot ? <div style={{marginBottom: 38}}><ProductShot {...shot} {...beat} /></div> : null}
         {scene.asset ? <Img src={staticFile(scene.asset)} style={{width: '100%', height: 600, objectFit: 'cover', borderRadius: 34, boxShadow: '0 24px 70px rgba(31,35,48,.14)', marginBottom: 38}} /> : null}
         {scene.new_feature ? <div style={{position: 'absolute', left: 0, right: 0, top: '50%', transform: 'translateY(-55%)'}}><FeatureIntro at={introAt} feature={scene.new_feature} {...beat} /></div> : null}

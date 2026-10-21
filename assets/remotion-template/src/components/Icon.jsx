@@ -17,6 +17,7 @@ const PATHS = {
   play: <><circle cx="32" cy="32" r="24" /><path d="M27 22l14 10-14 10z" /></>,
   pause: <><circle cx="32" cy="32" r="24" /><path d="M27 22v20M37 22v20" /></>,
   keyboard: <><rect x="6" y="16" width="52" height="32" rx="5" /><path d="M14 26h4M24 26h4M34 26h4M44 26h6M14 35h4M24 35h4M34 35h4M44 35h6M20 42h24" /></>,
+  phone: <><path d="M8 36c14-12 34-12 48 0l-5 9-11-4v-7c-5-2-11-2-16 0v7l-11 4z" /></>,
   mail: <><rect x="6" y="14" width="52" height="36" rx="5" /><path d="M8 18l24 18 24-18" /></>,
 };
 
@@ -30,7 +31,7 @@ const OBJECT_HUES = {violet: '#6857F5', teal: '#0E9F8E', amber: '#D98A00', pink:
 const OBJECT_COLORS = {
   table: 'violet', chart: 'violet', slides: 'violet',
   mic: 'teal', play: 'teal', pause: 'teal', keyboard: 'teal',
-  mail: 'amber', paste: 'amber',
+  mail: 'amber', paste: 'amber', phone: 'pink',
   calendar: 'pink', percent: 'pink',
   user: 'blue', search: 'blue',
   doc: 'green', truck: 'green', lock: 'green', sliders: 'green',
