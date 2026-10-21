@@ -75,7 +75,11 @@ def change_times(scene: dict) -> list[float]:
 
 
 def main_form(scene: dict) -> str:
-    present = [key for key in BEATS if scene.get(key)]
+    present = []
+    for key in BEATS:
+        if scene.get(key):
+            parts = [sub for sub in ("click", "focus", "callout", "stamp") if key == "shot" and scene["shot"].get(sub)]
+            present.append(f"{key}({','.join(parts)})" if parts else key)
     return "+".join(present) or scene.get("type", "?")
 
 
@@ -169,7 +173,9 @@ def check(story: dict, public_dir: Path, icons: set[str]) -> list[str]:
         count = screen_words(scene, story)
         if count > LIMITS["screen_words_max"]:
             errors.append(f"{sid}: {count} words on screen (max {LIMITS['screen_words_max']}); cut text or split it into beats")
-        times = change_times(scene) + [length]
+        start = float(scene.get("start_sec", 0))
+        cards = [float(t["start_sec"]) - start for t in story.get("transitions", []) if 0 < float(t.get("start_sec", -1)) - start < length]
+        times = sorted(change_times(scene) + cards) + [length]
         gaps = [later - earlier for earlier, later in zip(times, times[1:])]
         if gaps and max(gaps) > LIMITS["static_hold_max_sec"] + 0.01:
             errors.append(f"{sid}: screen stays unchanged for {max(gaps):.1f}s (max {LIMITS['static_hold_max_sec']}); add a beat or shorten the scene")

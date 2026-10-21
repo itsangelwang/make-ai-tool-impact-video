@@ -26,14 +26,31 @@
       "end_sec": 14.0,
       "label": "Hand the same notes to AI",
       "symbol": "→",
-      "color": "#6857F5"
+      "color": "#6857F5",
+      "kicker": "NOW",
+      "from": [
+        "doc",
+        "doc",
+        "doc"
+      ],
+      "to": [
+        "table"
+      ]
     },
     {
       "start_sec": 38.6,
       "end_sec": 40.0,
       "label": "You still own the check",
       "symbol": "✓",
-      "color": "#F06449"
+      "color": "#F06449",
+      "kicker": "YOUR TURN",
+      "from": [
+        "table"
+      ],
+      "to": [
+        "calendar",
+        "user"
+      ]
     }
   ],
   "scenes": [

@@ -2,6 +2,7 @@ import React, {createContext, useContext} from 'react';
 import {AbsoluteFill, Audio, Img, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {TimedCaptions} from './TimedCaptions';
 import {ProgressBar} from './components/ProgressBar';
+import {Icon, objectColor} from './components/Icon';
 import {AccessChips, CheckCards, Correction, FeatureIntro, Flow, NewTag, ProductShot, RoleStrip, Scrub} from './components/Beats';
 
 const FONTS = {
@@ -31,13 +32,52 @@ const Card = ({children, index = 0, delay = null, accent = '#6857F5'}) => {
 
 const Badge = ({children, color}) => <div style={{display: 'inline-block', padding: '12px 20px', borderRadius: 999, color: '#fff', background: color, fontFamily: useContext(FontContext), fontSize: 28, fontWeight: 850, letterSpacing: 1}}>{children}</div>;
 
-export const FullFrameTransition = ({transition, displayFont, durationInFrames = 42}) => {
+// Full-frame chapter card. Optional `from` / `to` icon lists turn it into an object handoff:
+// the previous phase's objects slide in, converge, and become the next phase's objects.
+// `kicker` is a short tag above the label (e.g. "NOW", "YOUR TURN").
+const shade = (hex, amount) => {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = (v) => Math.max(0, Math.min(255, Math.round(v * (1 - amount))));
+  return `rgb(${ch(n >> 16)}, ${ch((n >> 8) & 255)}, ${ch(n & 255)})`;
+};
+export const FullFrameTransition = ({transition, displayFont, palette = {}, durationInFrames = 42}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
-  const enter = spring({frame,fps,config:{damping:18,stiffness:170}});
-  // Leave by shrinking into a circle so the next scene is revealed, not cut to.
+  const color = transition.color || '#6857F5';
+  const enter = spring({frame, fps, config: {damping: 18, stiffness: 170}});
   const leave = interpolate(frame, [durationInFrames - 8, durationInFrames], [0, 1], clamp);
-  return <AbsoluteFill style={{clipPath:`circle(${(1 - leave) * 120}% at 50% 50%)`,background:transition.color||'#6857F5',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}><div style={{position:'absolute',width:760,height:760,borderRadius:'50%',background:'rgba(255,255,255,.08)',transform:`scale(${.72+enter*.35})`}}/><div style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:30,color:'#fff',opacity:enter,transform:`translateY(${(1-enter)*55}px) scale(${.72+enter*.32})`}}><div style={{width:118,height:118,borderRadius:34,background:'rgba(255,255,255,.20)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:66,fontWeight:950}}>{transition.symbol||'→'}</div><div style={{textWrap:'balance',fontFamily:displayFont,fontSize:48,fontWeight:950,textAlign:'center',maxWidth:900}}>{transition.label}</div></div></AbsoluteFill>;
+  const from = transition.from || [];
+  const to = transition.to || [];
+  const handoff = from.length && to.length;
+  const merge = interpolate(frame, [8, 20], [0, 1], {...clamp, easing: (x) => x * x * (3 - 2 * x)});
+  const words = String(transition.label || '').split(' ');
+  const tile = (name, i, total, t, side) => {
+    const spread = (i - (total - 1) / 2) * 150;
+    const x = side === 'from' ? -230 + spread * (1 - merge) + merge * 140 : 230 + spread;
+    const p = side === 'from' ? Math.min(1, enter * 1.4) * (1 - merge) : t;
+    return <div key={`${side}-${name}-${i}`} style={{position: 'absolute', left: '50%', top: '50%', width: 130, height: 130, marginLeft: -65 + x, marginTop: -65, borderRadius: 32, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 18px 40px rgba(0,0,0,.22)', opacity: p, transform: `scale(${0.6 + 0.4 * p}) rotate(${(1 - p) * (side === 'from' ? -8 : 8)}deg)`}}><Icon name={name} size={78} color={objectColor(name, palette)} /></div>;
+  };
+  return <AbsoluteFill style={{clipPath: `circle(${(1 - leave) * 120}% at 50% 50%)`, background: `linear-gradient(160deg, ${color} 0%, ${shade(color, 0.32)} 100%)`, overflow: 'hidden'}}>
+    <AbsoluteFill style={{backgroundImage: 'radial-gradient(rgba(255,255,255,.16) 2.5px, transparent 2.5px)', backgroundSize: '38px 38px', opacity: 0.8}} />
+    <div style={{position: 'absolute', width: 820, height: 820, borderRadius: '50%', left: -260 + frame * 3, top: 180, background: 'rgba(255,255,255,.10)', filter: 'blur(30px)'}} />
+    <div style={{position: 'absolute', width: 620, height: 620, borderRadius: '50%', right: -200 + frame * 2, bottom: 260, background: 'rgba(0,0,0,.12)', filter: 'blur(40px)'}} />
+    <div style={{position: 'absolute', left: 0, right: 0, top: 620, height: 260}}>
+      {handoff ? <>
+        {from.map((name, i) => tile(name, i, from.length, 0, 'from'))}
+        <div style={{position: 'absolute', left: '50%', top: '50%', marginLeft: -40, marginTop: -40, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 48, fontWeight: 900, transform: `scale(${0.5 + merge})`}}>{transition.symbol || '→'}</div>
+        {to.map((name, i) => tile(name, i, to.length, frame < 18 + i * 4 ? 0 : spring({frame: frame - 18 - i * 4, fps, config: {damping: 10, stiffness: 200}}), 'to'))}
+      </> : <div style={{position: 'absolute', left: '50%', top: '50%', marginLeft: -75, marginTop: -75, width: 150, height: 150, borderRadius: 40, background: 'rgba(255,255,255,.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 84, fontWeight: 950, transform: `scale(${0.6 + enter * 0.4})`}}>{transition.symbol || '→'}</div>}
+    </div>
+    <div style={{position: 'absolute', left: 80, right: 80, top: 960, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, color: '#fff', textAlign: 'center'}}>
+      {transition.kicker ? <div style={{padding: '10px 22px', borderRadius: 999, background: 'rgba(255,255,255,.2)', fontFamily: displayFont, fontSize: 30, fontWeight: 900, letterSpacing: 3, opacity: enter}}>{transition.kicker}</div> : null}
+      <div style={{textWrap: 'balance', fontFamily: displayFont, fontSize: 64, fontWeight: 950, lineHeight: 1.1, maxWidth: 900}}>
+        {words.map((word, i) => {
+          const w = frame < 4 + i * 3 ? 0 : spring({frame: frame - 4 - i * 3, fps, config: {damping: 13, stiffness: 190}});
+          return <span key={i} style={{display: 'inline-block', marginRight: '0.28em', opacity: w, transform: `translateY(${(1 - w) * 30}px)`}}>{word}</span>;
+        })}
+      </div>
+    </div>
+  </AbsoluteFill>;
 };
 
 export const BrandEnding = ({brand, palette, displayFont}) => {
@@ -146,7 +186,7 @@ export const VerticalImpact = ({story}) => {
       })() : null}
       {story.audio ? <Audio src={staticFile(story.audio)} /> : null}
       <TimedCaptions />
-      {(story.transitions||[]).map((transition) => <Sequence key={`${transition.start_sec}-${transition.label}`} from={Math.round(transition.start_sec*fps)} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}><FullFrameTransition transition={transition} displayFont={FONTS[locale].display} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}/></Sequence>)}
+      {(story.transitions||[]).map((transition) => <Sequence key={`${transition.start_sec}-${transition.label}`} from={Math.round(transition.start_sec*fps)} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}><FullFrameTransition transition={transition} palette={story.palette} displayFont={FONTS[locale].display} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}/></Sequence>)}
       {story.brand ? <Sequence from={Math.round(story.brand.start_sec * fps)} durationInFrames={Math.round((story.brand.end_sec - story.brand.start_sec) * fps)}><BrandEnding brand={story.brand} palette={story.palette} displayFont={FONTS[locale].display} /></Sequence> : null}
     </AbsoluteFill>
     </FontContext.Provider>
