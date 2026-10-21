@@ -3,21 +3,225 @@
   "market": "US",
   "duration_sec": 60,
   "audio": "",
-  "palette": {"paper": "#F7F4EE", "ink": "#171923", "muted": "#687080", "cool": "#6857F5", "warm": "#F06449"},
-  "before_steps": ["Open each old note", "Copy every action item", "Compare by hand"],
-  "after_steps": ["Upload the same notes", "AI drafts the brief", "Check dates and owners"],
+  "palette": {
+    "paper": "#F7F4EE",
+    "ink": "#171923",
+    "muted": "#687080",
+    "cool": "#6857F5",
+    "warm": "#F06449"
+  },
+  "before_steps": [
+    "Open each old note",
+    "Copy every action item",
+    "Compare by hand"
+  ],
+  "after_steps": [
+    "Upload the same notes",
+    "AI drafts the brief",
+    "Check dates and owners"
+  ],
   "transitions": [
-    {"start_sec": 16.18, "end_sec": 17.58, "label": "Hand the same notes to AI", "symbol": "→", "color": "#6857F5"},
-    {"start_sec": 35.35, "end_sec": 36.75, "label": "You still own the check", "symbol": "→", "color": "#6857F5"}
+    {
+      "start_sec": 16.18,
+      "end_sec": 17.58,
+      "label": "Hand the same notes to AI",
+      "symbol": "→",
+      "color": "#6857F5"
+    },
+    {
+      "start_sec": 35.35,
+      "end_sec": 36.75,
+      "label": "You still own the check",
+      "symbol": "→",
+      "color": "#6857F5"
+    }
   ],
   "scenes": [
-    {"id": "s1", "type": "pain-hook", "label": "The pain", "headline": "Five old notes before Thursday", "visual": "A stack of five notes; 'Who owns this?' highlighted", "start_sec": 0, "end_sec": 6},
-    {"id": "s2", "type": "before-workflow", "label": "Before", "headline": "Before: open, copy, compare", "visual": "Cursor opens each note and copies items into a blank brief", "start_sec": 6, "end_sec": 14},
-    {"id": "s3", "type": "ai-handoff", "label": "What changes", "headline": "Same five notes, one upload", "visual": "Five files selected, Upload clicked, processing state", "start_sec": 14, "end_sec": 21},
-    {"id": "s4", "type": "after-workflow", "label": "After", "headline": "A one-page draft brief", "visual": "Zoom on 'Vendor quote | No reply | Maya'", "start_sec": 21, "end_sec": 32},
-    {"id": "s5", "type": "before-after", "label": "Side by side", "headline": "Same person, same brief", "visual": "Left: three manual steps. Right: upload, draft, check", "start_sec": 32, "end_sec": 40},
-    {"id": "s6", "type": "human-check", "label": "Your job", "headline": "It's a draft. You check it.", "visual": "Original note beside the brief; date and owner verified", "start_sec": 40, "end_sec": 49},
-    {"id": "s7", "type": "next-action", "label": "Try it", "headline": "Try one old note first", "visual": "One non-sensitive note plus a comparison checklist", "start_sec": 49, "end_sec": 56.5}
+    {
+      "id": "s1",
+      "type": "pain-hook",
+      "label": "The pain",
+      "headline": "Five old notes before Thursday",
+      "visual": "A stack of five notes; 'Who owns this?' highlighted",
+      "start_sec": 0,
+      "end_sec": 6,
+      "new_feature": {
+        "at_sec": 2.5,
+        "date": "Oct 13, 2026",
+        "name": "Example Notes AI",
+        "accent": "briefs",
+        "capability": "Reads your notes, drafts the brief",
+        "items": [
+          {
+            "icon": "doc",
+            "label": "Notes"
+          },
+          {
+            "icon": "table",
+            "label": "Brief"
+          },
+          {
+            "icon": "user",
+            "label": "Owners"
+          }
+        ]
+      }
+    },
+    {
+      "id": "s2",
+      "type": "before-workflow",
+      "label": "Before",
+      "headline": "Before: open, copy, compare",
+      "visual": "Cursor opens each note and copies items into a blank brief",
+      "start_sec": 6,
+      "end_sec": 14
+    },
+    {
+      "id": "s3",
+      "type": "ai-handoff",
+      "label": "What changes",
+      "headline": "Same five notes, one upload",
+      "visual": "Five files selected, Upload clicked, processing state",
+      "start_sec": 14,
+      "end_sec": 21,
+      "new_tag": "New in Example Notes AI",
+      "shot": {
+        "src": "assets/example-ui.svg",
+        "source_width": 1600,
+        "crop": {
+          "x": 40,
+          "y": 110,
+          "w": 1520,
+          "h": 170
+        },
+        "evidence": "PLACEHOLDER UI · REPLACE WITH REAL SCREENSHOT",
+        "click": {
+          "at_sec": 1.2,
+          "x": 1460,
+          "y": 195
+        }
+      },
+      "roles": {
+        "at_sec": 2.2,
+        "you": {
+          "icon": "doc",
+          "label": "5 notes"
+        },
+        "ai": {
+          "name": "Example Notes AI",
+          "outputs": [
+            {
+              "icon": "table",
+              "label": "Brief"
+            },
+            {
+              "icon": "user",
+              "label": "Owners"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "s4",
+      "type": "after-workflow",
+      "label": "After",
+      "headline": "A one-page draft brief",
+      "visual": "Zoom on 'Vendor quote | No reply | Maya'",
+      "start_sec": 21,
+      "end_sec": 32,
+      "shot": {
+        "src": "assets/example-ui.svg",
+        "source_width": 1600,
+        "crop": {
+          "x": 40,
+          "y": 300,
+          "w": 1520,
+          "h": 480
+        },
+        "reveal": {
+          "at_sec": 0.3,
+          "frames": 30
+        },
+        "stamp": {
+          "at_sec": 1.4,
+          "label": "NEW"
+        },
+        "callout": {
+          "at_sec": 2.4,
+          "x": 860,
+          "y": 610,
+          "title": "Still open",
+          "note": "owner Maya"
+        }
+      }
+    },
+    {
+      "id": "s5",
+      "type": "before-after",
+      "label": "Side by side",
+      "headline": "Same person, same brief",
+      "visual": "Left: three manual steps. Right: upload, draft, check",
+      "start_sec": 32,
+      "end_sec": 40
+    },
+    {
+      "id": "s6",
+      "type": "human-check",
+      "label": "Your job",
+      "headline": "It's a draft. You check it.",
+      "visual": "Original note beside the brief; date and owner verified",
+      "start_sec": 40,
+      "end_sec": 49,
+      "checks": [
+        {
+          "icon": "calendar",
+          "label": "Dates match"
+        },
+        {
+          "icon": "user",
+          "label": "Owners right"
+        }
+      ],
+      "checks_at_sec": 1.5
+    },
+    {
+      "id": "s7",
+      "type": "next-action",
+      "label": "Try it",
+      "headline": "Try one old note first",
+      "visual": "One non-sensitive note plus a comparison checklist",
+      "start_sec": 49,
+      "end_sec": 56.5,
+      "access": {
+        "at_sec": 1.2,
+        "label": "AVAILABLE ON",
+        "plans": [
+          {
+            "name": "Free",
+            "on": false
+          },
+          {
+            "name": "Plus",
+            "on": true
+          },
+          {
+            "name": "Pro",
+            "on": true
+          },
+          {
+            "name": "Team",
+            "on": true
+          }
+        ]
+      }
+    }
   ],
-  "brand": {"name": "ACEMODE", "slogan": "10x Faster, Log Off Earlier.", "start_sec": 56.5, "end_sec": 60}
+  "brand": {
+    "name": "ACEMODE",
+    "slogan": "10x Faster, Log Off Earlier.",
+    "start_sec": 56.5,
+    "end_sec": 60
+  },
+  "sfx": false
 }

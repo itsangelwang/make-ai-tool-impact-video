@@ -1,18 +1,23 @@
 import React, {createContext, useContext} from 'react';
 import {AbsoluteFill, Audio, Img, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {TimedCaptions} from './TimedCaptions';
+import {AccessChips, CheckCards, FeatureIntro, NewTag, ProductShot, RoleStrip} from './components/Beats';
 
 const FONTS = {
   zh: {body: 'PingFang SC, Noto Sans CJK SC, Arial, sans-serif', display: 'Hannotate SC, Kaiti SC, PingFang SC, sans-serif'},
   en: {body: 'Inter, Avenir Next, SF Pro Display, Arial, sans-serif', display: 'Inter, Avenir Next, SF Pro Display, Arial, sans-serif'},
 };
 const LABELS = {
-  zh: {handoff: '交给 AI 处理这一步', humanCheck: '最后一步仍由人负责', nextAction: '今天可以这样试', before: '使用前', after: '使用后'},
-  en: {handoff: 'AI takes this step', humanCheck: 'You still own the final check', nextAction: 'Try this today', before: 'Before', after: 'After'},
+  zh: {handoff: '交给 AI 处理这一步', humanCheck: '最后一步仍由人负责', nextAction: '今天可以这样试', before: '使用前', after: '使用后', you: '你'},
+  en: {handoff: 'AI takes this step', humanCheck: 'You still own the final check', nextAction: 'Try this today', before: 'Before', after: 'After', you: 'YOU'},
 };
 const localeOf = (story) => (String(story.language || 'en-US').startsWith('en') ? 'en' : 'zh');
 const FontContext = createContext(FONTS.zh.body);
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'};
+const FPS = 30;
+// Beat times in story.json are seconds from the scene start.
+const at = (sec) => Math.round((Number(sec) || 0) * FPS);
+const withFrames = (item) => (item ? {...item, at: at(item.at_sec)} : item);
 
 const Card = ({children, index = 0, accent = '#6857F5'}) => {
   const font = useContext(FontContext);
@@ -52,7 +57,7 @@ export const BrandEnding = ({brand, palette, displayFont}) => {
   </AbsoluteFill>;
 };
 
-const Scene = ({scene, palette, labels}) => {
+const Scene = ({scene, palette, labels, sound}) => {
   const font = useContext(FontContext);
   const frame = useCurrentFrame();
   const local = frame;
@@ -60,19 +65,29 @@ const Scene = ({scene, palette, labels}) => {
   const before = scene.before || [];
   const after = scene.after || [];
   const steps = scene.type === 'after-workflow' ? after : before;
+  const beat = {palette, font, sound};
+  const shot = scene.shot ? {shot: scene.shot, evidence: scene.shot.evidence, click: withFrames(scene.shot.click), reveal: withFrames(scene.shot.reveal), stamp: withFrames(scene.shot.stamp), callout: withFrames(scene.shot.callout)} : null;
+  const introAt = scene.new_feature ? at(scene.new_feature.at_sec) : null;
+  const stackOpacity = introAt === null ? 1 : interpolate(local, [introAt - 6, introAt], [1, 0], clamp);
   return (
     <AbsoluteFill style={{padding: '112px 72px 360px', background: palette.paper, color: palette.ink, overflow: 'hidden'}}>
       <div style={{position: 'absolute', width: 650, height: 650, right: -350, top: -260, borderRadius: '50%', background: `${palette.cool}16`, transform: `scale(${pulse})`}} />
       <div style={{position: 'relative', zIndex: 2}}>
         <Badge color={scene.type === 'before-workflow' ? palette.warm : palette.cool}>{scene.label}</Badge>
+        {scene.new_tag ? <div style={{marginTop: 22}}><NewTag at={0} {...beat}>{scene.new_tag}</NewTag></div> : null}
         <h1 style={{fontFamily: font, fontSize: scene.type === 'pain-hook' ? 92 : 72, lineHeight: 1.08, margin: '38px 0 52px', letterSpacing: -3}}>{scene.headline}</h1>
+        {shot ? <div style={{marginBottom: 38}}><ProductShot {...shot} {...beat} /></div> : null}
         {scene.asset ? <Img src={staticFile(scene.asset)} style={{width: '100%', height: 600, objectFit: 'cover', borderRadius: 34, boxShadow: '0 24px 70px rgba(31,35,48,.14)', marginBottom: 38}} /> : null}
-        {scene.type === 'pain-hook' ? <div style={{marginTop: 120, transform: `rotate(${interpolate(local, [0, 45], [-3, 0], clamp)}deg)`}}>{before.map((step, i) => <div key={step} style={{padding: '28px 30px', marginBottom: 20, marginLeft: i * 34, borderRadius: 28, background: '#fff', borderLeft: `10px solid ${i === before.length - 1 ? palette.warm : palette.cool}`, boxShadow: '0 16px 45px rgba(31,35,48,.12)', fontFamily: font, fontSize: 44, fontWeight: 800}}>{step}</div>)}</div> : null}
-        {['before-workflow', 'after-workflow'].includes(scene.type) ? steps.map((step, i) => <Card key={step} index={i} accent={scene.type === 'after-workflow' ? palette.cool : palette.warm}>{step}</Card>) : null}
-        {scene.type === 'ai-handoff' ? <div style={{marginTop: 120, textAlign: 'center', transform: `scale(${pulse})`}}><div style={{fontFamily: font, fontWeight: 900, fontSize: 56, padding: 42, background: palette.ink, color: '#fff', borderRadius: 36}}>{scene.visual}</div><div style={{height: 100, width: 10, background: palette.cool, margin: '0 auto'}} /><div style={{fontFamily: font, fontSize: 44, fontWeight: 850, color: palette.cool}}>{labels.handoff}</div></div> : null}
+        {scene.new_feature ? <div style={{position: 'absolute', left: 0, right: 0, top: 360}}><FeatureIntro at={introAt} feature={scene.new_feature} {...beat} /></div> : null}
+        {scene.type === 'pain-hook' ? <div style={{marginTop: 120, opacity: stackOpacity, transform: `rotate(${interpolate(local, [0, 45], [-3, 0], clamp)}deg)`}}>{before.map((step, i) => <div key={step} style={{padding: '28px 30px', marginBottom: 20, marginLeft: i * 34, borderRadius: 28, background: '#fff', borderLeft: `10px solid ${i === before.length - 1 ? palette.warm : palette.cool}`, boxShadow: '0 16px 45px rgba(31,35,48,.12)', fontFamily: font, fontSize: 44, fontWeight: 800}}>{step}</div>)}</div> : null}
+        {['before-workflow', 'after-workflow'].includes(scene.type) && !shot ? steps.map((step, i) => <Card key={step} index={i} accent={scene.type === 'after-workflow' ? palette.cool : palette.warm}>{step}</Card>) : null}
+        {scene.type === 'ai-handoff' && !shot ? <div style={{marginTop: 120, textAlign: 'center', transform: `scale(${pulse})`}}><div style={{fontFamily: font, fontWeight: 900, fontSize: 56, padding: 42, background: palette.ink, color: '#fff', borderRadius: 36}}>{scene.visual}</div><div style={{height: 100, width: 10, background: palette.cool, margin: '0 auto'}} /><div style={{fontFamily: font, fontSize: 44, fontWeight: 850, color: palette.cool}}>{labels.handoff}</div></div> : null}
         {scene.type === 'before-after' ? <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24}}><div><Badge color={palette.warm}>{labels.before}</Badge>{before.map((x,i)=><Card key={x} index={i} accent={palette.warm}>{x}</Card>)}</div><div><Badge color={palette.cool}>{labels.after}</Badge>{after.map((x,i)=><Card key={x} index={i} accent={palette.cool}>{x}</Card>)}</div></div> : null}
         {scene.type === 'human-check' ? <div style={{padding: 46, border: `5px solid ${palette.warm}`, borderRadius: 36, background: '#fff'}}><div style={{fontFamily: font, fontSize: 40, color: palette.muted}}>{labels.humanCheck}</div><div style={{fontFamily: font, fontSize: 60, lineHeight: 1.2, fontWeight: 900, marginTop: 18}}>{scene.visual}</div></div> : null}
         {scene.type === 'next-action' ? <div style={{padding: 48, background: palette.cool, color: '#fff', borderRadius: 40}}><div style={{fontFamily: font, fontSize: 34, opacity: .8}}>{labels.nextAction}</div><div style={{fontFamily: font, fontSize: 62, lineHeight: 1.2, fontWeight: 900, marginTop: 18}}>{scene.visual}</div></div> : null}
+        {scene.roles ? <div style={{marginTop: 30}}><RoleStrip at={at(scene.roles.at_sec)} you={scene.roles.you} ai={scene.roles.ai} youLabel={labels.you} {...beat} /></div> : null}
+        {scene.checks ? <div style={{marginTop: 30}}><CheckCards at={at(scene.checks_at_sec)} checks={scene.checks} {...beat} /></div> : null}
+        {scene.access ? <div style={{marginTop: 30}}><AccessChips at={at(scene.access.at_sec)} label={scene.access.label} plans={scene.access.plans} {...beat} /></div> : null}
       </div>
     </AbsoluteFill>
   );
@@ -88,7 +103,7 @@ export const VerticalImpact = ({story}) => {
       {story.scenes.map((scene) => {
         const start = Math.round(scene.start_sec * fps);
         const duration = Math.round((scene.end_sec - scene.start_sec) * fps);
-        return <Sequence key={scene.id} from={start} durationInFrames={duration}><Scene scene={{...scene, before: story.before_steps, after: story.after_steps}} palette={story.palette} labels={labels} /></Sequence>;
+        return <Sequence key={scene.id} from={start} durationInFrames={duration}><Scene scene={{...scene, before: story.before_steps, after: story.after_steps}} palette={story.palette} labels={labels} sound={Boolean(story.sfx)} /></Sequence>;
       })}
       {story.audio ? <Audio src={staticFile(story.audio)} /> : null}
       <TimedCaptions />

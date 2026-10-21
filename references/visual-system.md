@@ -12,6 +12,21 @@ Build natively at 1080×1920 and 30 fps. Use a warm near-white background, near-
 - `human-check`: pause motion and foreground the approval, correction, privacy, or judgment step.
 - `next-action`: resolve into one reversible experiment and readiness label.
 
+## Story beats in story.json
+
+The template turns these optional scene fields into the beats proven in the first English video. Times (`at_sec`) are seconds from the scene start; place them on the matching narration words after fitting the timeline to the audio. Run `scripts/check_story.py <project-dir>/video/src/story.json` before rendering.
+
+- `new_feature` (pain hook): `{at_sec, date, name, accent, capability, items: [{icon, label}]}`. The pain stack yields to a card naming what is new, its official date, and up to three objects it produces.
+- `new_tag`: short text such as `"New in ChatGPT"` shown as a NEW pill under the scene label.
+- `shot`: a real screenshot region, `{src, source_width, crop: {x, y, w, h}, evidence, click, reveal, stamp, callout}`. Coordinates are source pixels. `click: {at_sec, x, y}` moves the cursor to the control and presses it; `reveal: {at_sec, frames}` wipes the result in; `stamp: {at_sec, label}` marks the new capability; `callout: {at_sec, x, y, title, note}` points at the detail to check, with (x, y) just above it. Crop so product text reaches about 40 px. `evidence` labels the source, e.g. "REAL CHATGPT TEST".
+- `roles`: `{at_sec, you: {icon, label}, ai: {name, outputs: [{icon, label}]}}`. One action from the person, outputs ticking off for the AI.
+- `checks` with `checks_at_sec`: up to three `{icon, label}` items the person verifies.
+- `access`: `{at_sec, label, plans: [{name, on}]}` from the official source; unavailable plans are struck through.
+
+Set `"sfx": true` in story.json after generating `public/audio/sfx` with `generate_story_audio.py sfx`; each beat then plays its matching swish, pop, stamp, or return. Icons come from `components/Icon.jsx`; add a new icon there rather than inlining SVG in a scene.
+
+Write a custom scene component only for a beat these fields cannot express, such as a bespoke object handoff, and reuse the components in `components/Beats.jsx` inside it. `public/assets/example-ui.svg` is placeholder UI for the template; never ship it in a video.
+
 ## Motion grammar
 
 Give every transition a cause: stack, sort, compress, hand off, verify, or complete. Change hierarchy, scale, density, direction, or media every 2–4 seconds while preserving at least 1.2 seconds for important reading. Animate in the order task object → explanatory label → evidence → caption. Use one primary movement per beat.
