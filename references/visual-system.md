@@ -115,7 +115,7 @@ Use camera-scale motion as attention guidance. Push in toward the clicked contro
 
 Use restrained interface sound when it makes an on-screen action easier to understand. Synchronize a light click with button depression, subtle key taps with visible typing, a short rising cue with upload or processing, and a quiet confirmation tone with a completed state. Keep sounds dry, brief, and lower than narration. Do not add decorative beeps to static text or play a sound without a visible cause.
 
-Prefer source-safe generated sounds or cleared product recordings. Use `scripts/generate_ui_sfx.mjs` to create a small reusable UI set when licensed recordings are unavailable. Align each sound to the exact action frame and leave the following visual result stable; sound does not justify a faster cut.
+Prefer recorded, licensed sounds the user has previewed (`references/sound-library.md`); fall back to `scripts/generate_story_audio.py sfx` only when none can be used. Align each sound to the exact action frame and leave the following visual result stable; sound does not justify a faster cut.
 
 ## Establish the task before the actions
 

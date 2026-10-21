@@ -102,7 +102,7 @@ When feedback reveals confusion, repair the causal chain rather than polishing t
 - If AI and human roles blur, use separate regions and animate the artifact handoff.
 - If a visible product action can be demonstrated truthfully, use cleared real UI or a faithful reconstructed interaction before using step cards or an abstract diagram. Show cursor approach, click feedback, resulting modal/state, and a stable result hold.
 - Structure consequential actions as enter → act → stable result. Use semantic push-ins and gentle pull-backs to focus attention on clicks, generated results, evidence, and human checks.
-- Add restrained, frame-synced UI sound when it clarifies a visible click, typing action, upload, processing state, or completion. Keep narration dominant and never use sound to disguise an unreadably fast cut. Generate source-safe sounds with `scripts/generate_ui_sfx.mjs` when needed.
+- Add restrained, frame-synced UI sound when it clarifies a visible click, typing action, upload, processing state, or completion. Keep narration dominant and never use sound to disguise an unreadably fast cut. Use recorded sounds the user has previewed (`references/sound-library.md`).
 
 Reuse `Cursor`, `TypingText`, `FocusZoom`, and `ProgressBar` from the Remotion template for visible UI actions; see [references/visual-system.md](references/visual-system.md) and the English `ComponentsDemo` composition for props and click choreography.
 
@@ -118,35 +118,45 @@ It copies the editable inputs (packages, ledgers, `video/src`) into `<project-di
 
 ## 6. Finish and verify
 
-Generate final TTS only after approval. Never use a voice the user has rejected. For English, use Fish Audio with the `en-sawyer` preset and the expressive-delivery rules in `references/english-market.md`; fall back to OpenRouter or Deepgram only when Fish Audio is unavailable, following "Other providers" in `references/english-market.md`. Store credentials only in provider-specific environment variables, never in JSON, source files, logs, or Git. When the user has an approved voice preset, reuse it without new auditions; otherwise audition at least two 8–12 second samples before committing to a voice or generating the full narration.
+Generate final TTS only after approval. Never use a voice the user has rejected. For English, use Fish Audio with the `en-sawyer` preset and the natural-delivery rules in `references/english-market.md`; fall back to OpenRouter or Deepgram only when Fish Audio is unavailable, following "Other providers" in `references/english-market.md`. Store credentials only in provider-specific environment variables, never in JSON, source files, logs, or Git. When the user has an approved voice preset, reuse it without new auditions; otherwise audition at least two 8–12 second samples before committing to a voice or generating the full narration.
 
 For Fish Audio, keep credentials in a `.env` file outside the Skill directory and any Git repository (for example `~/.config/make-ai-tool-impact-video/.env`), and keep only placeholders in `.env.example`. Never read, print, or summarize the populated `.env` file. Use an original synthetic voice or a voice the user has permission to use; do not clone another provider's preset voice. The `en-sawyer` preset uses `drama-3`; other calls default to the paid `s2.1-pro`; use `s2.1-pro-free` only when its current availability and the user's intended usage comply with Fish Audio's live terms.
 
+Read each scene as one continuous take of its cue texts, without emotion tags (see "Natural delivery" in `references/english-market.md`), then split it into per-cue clips:
+
 ```bash
-python3 <skill-dir>/scripts/fish_audio_tts.py \
-  --preset en-sawyer \
-  --text "[excited] Now? You upload the same five notes." \
-  --output <project-dir>/video/public/audio/cue-05.mp3
+python3 <skill-dir>/scripts/fish_audio_tts.py --preset en-sawyer \
+  --text "Now? Drop the same recording into ChatGPT. Ask for action items, owners, and dates." \
+  --output <project-dir>/video/public/audio/takes/s3.mp3
+python3 <skill-dir>/scripts/split_scene_takes.py --timeline <project-dir>/video/src/timeline.json \
+  --take <project-dir>/video/public/audio/takes/s3.mp3 --cues 5,6 --out-dir <project-dir>/video/public/audio/cues
 ```
 
-Synthesize one clip per canonical timeline cue as `cue-00.mp3`, `cue-01.mp3`, … (from `voice` when present), then fit the timeline to the measured audio and rebuild captions:
+Fit the timeline to the measured clips, rebuild captions, and move every scene, transition and beat with its words:
 
 ```bash
+cp <project-dir>/video/src/timeline.json <project-dir>/timeline.before.json
 python3 <skill-dir>/scripts/fit_timeline_to_audio.py <project-dir>/video/src/timeline.json \
-  --audio-dir <project-dir>/video/public/audio/cues
+  --audio-dir <project-dir>/video/public/audio/cues --ext wav --gap 0.05
 python3 <skill-dir>/scripts/build_captions.py <project-dir>/video/src/timeline.json \
   --script <project-dir>/script-package.json
+python3 <skill-dir>/scripts/retime_story.py <project-dir>/video/src/story.json \
+  --old <project-dir>/timeline.before.json --new <project-dir>/video/src/timeline.json
 ```
 
-Re-derive scene boundaries and the brand card from the printed cue starts. Score music and sound effects to the story with original synthesized audio (see `references/pacing-and-review.md`):
+Render stills across the retimed video before the full render to confirm that each action still finishes before the next one starts.
+
+Music and sound effects follow `references/pacing-and-review.md`: a real royalty-free track the user picks from 2–3 previewed candidates, and recorded sound effects from `references/sound-library.md`, each downloaded only with the user's permission and recorded in the project's `SOURCE.md`. Convert the sounds, mix narration with the ducked music, then set `"audio": "audio/mix.wav"` and `"sfx": true` (or a list of sound kinds) in `story.json`:
 
 ```bash
-python3 <skill-dir>/scripts/generate_story_audio.py sfx --output <project-dir>/video/public/audio/sfx
-python3 <skill-dir>/scripts/generate_story_audio.py music --events <project-dir>/audio-events.json \
-  --output <project-dir>/video/public/audio/bgm.wav
+python3 <skill-dir>/scripts/prepare_sfx.py --out <project-dir>/video/public/audio/sfx \
+  swish=<project-dir>/sfx-source/swoosh.mp3:0.08:1.12 pop=<project-dir>/sfx-source/pop.mp3:0.03:0.45
+python3 <skill-dir>/scripts/mix_story_audio.py --timeline <project-dir>/video/src/timeline.json \
+  --cues <project-dir>/video/public/audio/cues --music <project-dir>/music/track.mp3 \
+  --output <project-dir>/video/public/audio/mix.wav --ending-jump 60
 ```
 
-When the visuals are already approved, synthesize one clip per canonical timeline cue, place each clip at its cue start, normalize the final mix to approximately -16 LUFS with true peak at or below -1.5 dB, and remux it with the existing video stream. Do not rerender unchanged visuals solely to replace narration.
+Without a usable track or recorded sounds, fall back to `generate_story_audio.py music|sfx` and say so. After rendering, measure loudness (`-af loudnorm=print_format=json`), correct it with a `volume` remux to about -16 LUFS and a true peak at or below -1.5 dB, and do not rerender unchanged visuals solely to replace narration.
 
 Target 55–65 seconds. Permit a review up to 75 seconds when verified product interaction, stable result holds, or human-check evidence would otherwise become unreadable; pass the reason as `--duration-exception "<reason>"` to `validate_package.py` and `verify_video.py` so it is recorded, report the extension, and shorten later only by removing repetition. For a user-requested longer workflow, document a duration exception and validate timing/bounds independently rather than claiming the default validator passed. Do not time-stretch speech. Render `VerticalImpact`, then run:
 

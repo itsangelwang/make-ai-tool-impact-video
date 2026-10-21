@@ -31,6 +31,10 @@ build_captions = module("build_captions")
 fit_timeline = module("fit_timeline_to_audio")
 story_audio = module("generate_story_audio")
 snapshot_version = module("snapshot_version")
+split_takes = module("split_scene_takes")
+retime_story = module("retime_story")
+mix_audio = module("mix_story_audio")
+prepare_sfx = module("prepare_sfx")
 
 
 def package(task="整理会议纪要", audience="项目经理"):
@@ -567,7 +571,7 @@ class StoryAudioTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             story_audio.sfx(Path(tmp))
             names = {p.stem for p in Path(tmp).glob("*.wav")}
-        self.assertTrue({"key-1", "key-2", "key-3", "pop", "swish", "coin", "notify", "stamp", "uhoh", "return", "tick"} <= names)
+        self.assertTrue({"key-1", "key-2", "key-3", "pop", "swish", "coin", "notify", "stamp", "uhoh", "return", "tick", "typing", "callend"} <= names)
 
 
 class ReadmeTests(unittest.TestCase):
@@ -582,6 +586,9 @@ class ReadmeTests(unittest.TestCase):
         preset = fish_audio_tts.PRESETS["en-sawyer"]
         self.assertIn("Sawyer", self.readme)
         self.assertIn(self.MODEL_NAMES[preset["model"]], self.readme)
+        self.assertIn(f"语速 {preset['speed']} 倍", self.readme)
+        market = (ROOT / "references" / "english-market.md").read_text(encoding="utf-8")
+        self.assertIn(f"speed `{preset['speed']}`", market)
 
     def test_duration_matches_limits(self):
         limits = json.loads((ROOT / "scripts" / "limits.json").read_text())["duration_sec"]
@@ -682,3 +689,89 @@ class StoryBeatTests(unittest.TestCase):
 
     def test_icon_names_match_component(self):
         self.assertTrue({"doc", "table", "user", "calendar", "slides"} <= check_story.icon_names())
+
+
+class NarrationTakeTests(unittest.TestCase):
+    def test_cuts_land_in_the_pause_nearest_each_sentence_end(self):
+        log = "silence_start: 0\nsilence_end: 0.2\nsilence_start: 1.1\nsilence_end: 1.15\nsilence_start: 2.9\nsilence_end: 3.2\nsilence_start: 6.0\nsilence_end: 6.4\n"
+        spans = split_takes.silences(log, 6.4)
+        cuts = split_takes.boundaries(spans, 6.4, ["The call's over. Now, the email.", "Who promised what, and by when?"])
+        self.assertAlmostEqual(cuts[0], 0.17, places=2)
+        self.assertAlmostEqual(cuts[1], 3.05, places=2)  # the long pause, not the short breath at 1.1 s
+        self.assertAlmostEqual(cuts[2], 6.08, places=2)
+
+    def test_too_few_pauses_is_an_error(self):
+        with self.assertRaises(ValueError):
+            split_takes.boundaries([(0, 0.2), (3.0, 3.4)], 3.4, ["One.", "Two.", "Three."])
+
+
+class RetimeStoryTests(unittest.TestCase):
+    def test_beats_follow_their_words(self):
+        old = {"captions": [{"start_sec": 0.3, "end_sec": 4.0}, {"start_sec": 4.2, "end_sec": 8.0}], "duration_sec": 12.0}
+        new = {"captions": [{"start_sec": 0.3, "end_sec": 3.0}, {"start_sec": 3.1, "end_sec": 6.0}], "duration_sec": 9.0,
+               "brand": {"start_sec": 6.2, "end_sec": 9.0}}
+        story = {"duration_sec": 12.0, "brand": {"start_sec": 8.4, "end_sec": 12.0},
+                 "scenes": [{"id": "s1", "start_sec": 0.0, "end_sec": 4.1, "flow": [{"at_sec": 0.3}]},
+                            {"id": "s2", "start_sec": 4.1, "end_sec": 8.4, "shot": {"click": {"at_sec": 0.1}}, "steps_at_sec": [3.9]}]}
+        out = retime_story.retime(story, old, new)
+        s1, s2 = out["scenes"]
+        self.assertEqual(s1["flow"][0]["at_sec"], 0.3)
+        self.assertAlmostEqual(s2["start_sec"], 3.05, places=2)
+        self.assertAlmostEqual(s2["start_sec"] + s2["shot"]["click"]["at_sec"], 3.1, places=1)  # still on cue 2's first word
+        self.assertAlmostEqual(s2["start_sec"] + s2["steps_at_sec"][0], 6.0, places=1)       # still on cue 2's end
+        self.assertEqual(out["duration_sec"], 9.0)
+        self.assertEqual(out["brand"]["start_sec"], 6.2)
+
+    def test_reordering_is_rejected(self):
+        old = {"captions": [{"start_sec": 0.3, "end_sec": 2.0}, {"start_sec": 2.2, "end_sec": 4.0}], "duration_sec": 5}
+        new = {"captions": [{"start_sec": 3.0, "end_sec": 4.0}, {"start_sec": 0.3, "end_sec": 2.0}], "duration_sec": 5}
+        with self.assertRaises(ValueError):
+            retime_story.retime({"duration_sec": 5, "scenes": []}, old, new)
+
+
+class MixStoryAudioTests(unittest.TestCase):
+    SR = mix_audio.SR
+
+    def test_music_ducks_under_speech_and_rises_in_gaps(self):
+        import math
+        tone = [0.3 * math.sin(2 * math.pi * 220 * k / self.SR) for k in range(self.SR)]
+        music = [0.5] * (4 * self.SR)
+        out = mix_audio.mix([(0.5, tone)], music, 4.0)
+        during = sum(abs(out[k]) for k in range(int(0.9 * self.SR), int(1.1 * self.SR), 5))
+        speech_only = sum(abs(tone[k - int(0.5 * self.SR)]) * 1 for k in range(int(0.9 * self.SR), int(1.1 * self.SR), 5))
+        self.assertGreater(during, 0)
+        gap = abs(out[int(3.5 * self.SR)])
+        self.assertAlmostEqual(gap, 0.5 * 10 ** (-11 / 20), places=3)
+        ducked = abs(out[int(1.0 * self.SR)] - mix_audio.mix([(0.5, tone)], [0.0] * (4 * self.SR), 4.0)[int(1.0 * self.SR)])
+        self.assertAlmostEqual(ducked, 0.5 * 10 ** (-21 / 20), places=3)
+        self.assertLess(max(abs(v) for v in out), 1.0)
+        self.assertGreater(speech_only, 0)
+
+    def test_ending_jump_plays_the_later_part_on_the_brand_card(self):
+        music = [0.1] * (2 * self.SR) + [0.4] * (2 * self.SR)
+        out = mix_audio.mix([], music, 2.0, ending_at=1.0, ending_jump=2.0, gap_db=0.0)
+        self.assertAlmostEqual(out[int(0.5 * self.SR)], 0.1, places=3)
+        self.assertAlmostEqual(out[int(1.5 * self.SR)], 0.4, places=3)
+
+    def test_short_pauses_count_as_speech(self):
+        self.assertEqual(mix_audio.speech_spans([0.0, 1.2, 3.0], [1.0, 1.0, 1.0]), [(0.0, 2.2), (3.0, 4.0)])
+
+
+class SoundEffectTests(unittest.TestCase):
+    def test_spec_parsing_and_leveling(self):
+        import array
+        self.assertEqual(prepare_sfx.parse("pop=a/pop.mp3:0.03:0.45"), ("pop", Path("a/pop.mp3"), 0.03, 0.45))
+        self.assertEqual(prepare_sfx.parse("swish=b.mp3"), ("swish", Path("b.mp3"), None, None))
+        with self.assertRaises(ValueError):
+            prepare_sfx.parse("../x=b.mp3")
+        leveled = prepare_sfx.level(array.array("h", [1000] * 4800))
+        self.assertAlmostEqual(max(leveled) / 32767, 10 ** (-3 / 20), places=2)
+        self.assertLess(abs(leveled[-1]), 100)  # faded out, no click at the end
+
+    def test_template_tags_clicks_and_filters_sounds(self):
+        src = ROOT / "assets" / "remotion-template" / "src"
+        beats = (src / "components" / "Beats.jsx").read_text(encoding="utf-8")
+        self.assertEqual(beats.count('kind="click"'), 2)
+        self.assertIn('name="callend"', beats)
+        self.assertIn("SfxFilter.Provider", (src / "VerticalImpact.jsx").read_text(encoding="utf-8"))
+        self.assertIn("typing.wav", (src / "components" / "Sfx.jsx").read_text(encoding="utf-8"))
