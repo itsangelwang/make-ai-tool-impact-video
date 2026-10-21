@@ -31,6 +31,18 @@
     "start_sec": 56.5,
     "end_sec": 60
   },
+  "coverage": {
+    "checked_at": "2026-10-13",
+    "existing": [
+      {
+        "by": "official",
+        "url": "https://example.com/notes-ai/launch",
+        "shows": "Feature tour of summaries for a sales team, no human check"
+      }
+    ],
+    "our_angle": "A project manager preps one weekly meeting brief and checks owners and dates before sending",
+    "decision": "make"
+  },
   "scenes": [
     {
       "id": "s1",
