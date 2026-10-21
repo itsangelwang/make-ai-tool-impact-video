@@ -12,6 +12,20 @@ Build natively at 1080×1920 and 30 fps. Use a warm near-white background, near-
 - `human-check`: pause motion and foreground the approval, correction, privacy, or judgment step.
 - `next-action`: resolve into one reversible experiment and readiness label.
 
+## Every screen: reading load, pacing, and variety
+
+Check every scene, not only the whole video. Render a still at each scene's busiest moment and read it at phone size.
+
+- **One idea per screen.** Keep authored on-screen text (label, headline, card and beat labels; captions and real UI excluded) at or under 18 words per scene. If a screen needs more, split it into beats that appear one at a time, in sync with the words that name them.
+- **Animate instead of writing.** Turn a list into a `flow` of icons, a changed value into a `fix` (strike and replace), a long screenshot into `focus` bands that light one row at a time, a "find it in the recording" step into a `scrub`. Hide the human-check and next-action text boxes by leaving `visual` empty when beats already carry the point.
+- **Keep the screen moving, but readable.** Something visible should change at least every 4 seconds; a scene that sits still longer loses the viewer. Keep each new state up for at least 1.2 seconds so it can be read.
+- **Vary the form.** Mix real UI, icon flows, audio scrubbing, corrections, role strips, focus bands, stamps, and chips. Do not use the same form in two neighboring scenes.
+- **One color per object.** Icons in the same row must not share a color. The template gives each kind of object a fixed color for the whole video (recording teal, table violet, email amber, date pink, person blue, document green); keep it when the object reappears so the viewer can follow it. Override with `palette.objects` or an item's `color`.
+- **No lonely words.** Never leave one word alone on a line in a headline, card, or caption. The template balances headline and caption lines automatically; rewrite a headline if it still breaks badly.
+- **Progress bar.** The template draws a thin chapter progress bar at the top (one segment per scene, hidden on the brand card). Set `"progress": false` in story.json only when the platform already shows one.
+
+`scripts/check_story.py` enforces the word limit and the 4-second rule (both in `scripts/limits.json`) and lists neighboring scenes that share a form.
+
 ## Story beats in story.json
 
 The template turns these optional scene fields into the beats proven in the first English video. Times (`at_sec`) are seconds from the scene start; place them on the matching narration words after fitting the timeline to the audio. Run `scripts/check_story.py <project-dir>/video/src/story.json` before rendering.
@@ -22,6 +36,11 @@ The template turns these optional scene fields into the beats proven in the firs
 - `roles`: `{at_sec, you: {icon, label}, ai: {name, outputs: [{icon, label}]}}`. One action from the person, outputs ticking off for the AI.
 - `checks` with `checks_at_sec`: up to three `{icon, label}` items the person verifies.
 - `access`: `{at_sec, label, plans: [{name, on}]}` from the official source; unavailable plans are struck through.
+- `flow`: 2–4 `{icon, label, at_sec}` tiles with arrows, each appearing at its own time; labels are 1–2 words. Replaces text cards in any scene.
+- `fix`: `{at_sec, label, wrong, right}`. The wrong value is struck through and the right one pops in.
+- `scrub`: `{at_sec, length, ask, ask_at_sec}`. An audio player whose playhead jumps back and forth; `ask` pops above it (e.g. "Who said Thursday?").
+- `shot.focus`: `[{at_sec, y, h}]` source-pixel bands; everything else in the screenshot dims so one row is read at a time.
+- `steps_at_sec`: times at which before/after step cards appear, instead of all at once.
 
 Set `"sfx": true` in story.json after generating `public/audio/sfx` with `generate_story_audio.py sfx`; each beat then plays its matching swish, pop, stamp, or return. Icons come from `components/Icon.jsx`; add a new icon there rather than inlining SVG in a scene.
 

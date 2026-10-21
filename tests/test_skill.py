@@ -632,7 +632,7 @@ class StoryBeatTests(unittest.TestCase):
     def test_template_story_uses_every_beat_and_passes(self):
         story = self.story()
         keys = {key for scene in story["scenes"] for key in scene}
-        self.assertTrue({"new_feature", "new_tag", "shot", "roles", "checks", "access"} <= keys)
+        self.assertTrue({"new_feature", "shot", "roles", "checks", "access", "flow", "fix"} <= keys)
         self.assertEqual(check_story.check(story, self.TEMPLATE / "public", check_story.icon_names()), [])
 
     def test_beat_mistakes_are_reported(self):
@@ -645,6 +645,22 @@ class StoryBeatTests(unittest.TestCase):
         self.assertTrue(any("not found" in e for e in errors))
         self.assertTrue(any("click.at_sec" in e for e in errors))
         self.assertTrue(any("rocket" in e for e in errors))
+
+    def test_reading_load_and_static_screens_are_flagged(self):
+        story = self.story()
+        scene = next(s for s in story["scenes"] if s["id"] == "s2")
+        scene["headline"] = "A very long headline that keeps going and asks the viewer to read far too much text"
+        scene["flow"] = scene["flow"][:2]
+        errors = check_story.check(story, self.TEMPLATE / "public", check_story.icon_names())
+        self.assertTrue(any("words on screen" in e for e in errors))
+        self.assertTrue(any("unchanged for" in e for e in errors))
+
+    def test_neighboring_scenes_with_the_same_form_are_listed(self):
+        story = self.story()
+        story["scenes"][4]["flow"], story["scenes"][5]["flow"] = story["scenes"][6]["flow"], story["scenes"][6]["flow"]
+        story["scenes"][5].pop("fix"); story["scenes"][5].pop("checks", None)
+        story["scenes"][6].pop("access")
+        self.assertTrue(check_story.variety_notes(story))
 
     def test_icon_names_match_component(self):
         self.assertTrue({"doc", "table", "user", "calendar", "slides"} <= check_story.icon_names())

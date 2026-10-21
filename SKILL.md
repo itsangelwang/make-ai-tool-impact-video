@@ -106,7 +106,7 @@ When feedback reveals confusion, repair the causal chain rather than polishing t
 
 Reuse `Cursor`, `TypingText`, `FocusZoom`, and `ProgressBar` from the Remotion template for visible UI actions; see [references/visual-system.md](references/visual-system.md) and the English `ComponentsDemo` composition for props and click choreography.
 
-Render stills first for layout and 5–15 second local clips for disputed motion or pacing. Render the full review only after local direction is established, or after a global timeline change requires continuity review. Avoid re-rendering or re-analyzing unchanged full compositions.
+Before any review, check every scene for reading load, pacing, and variety (see "Every screen" in [references/visual-system.md](references/visual-system.md)): at most 18 authored words on screen, a visible change at least every 4 seconds, no lonely word on a line, and different forms in neighboring scenes. Render stills first for layout and 5–15 second local clips for disputed motion or pacing. Render the full review only after local direction is established, or after a global timeline change requires continuity review. Avoid re-rendering or re-analyzing unchanged full compositions.
 
 Keep one working copy of every file. Before changing an already-reviewed version, save it with:
 

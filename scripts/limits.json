@@ -11,5 +11,7 @@
   "scenes": {"min": 5, "max": 7},
   "before_steps": {"min": 2, "max": 3},
   "after_steps": {"min": 2, "max": 4},
-  "brand_card_sec": {"min": 3, "max": 4}
+  "brand_card_sec": {"min": 3, "max": 4},
+  "screen_words_max": 18,
+  "static_hold_max_sec": 4.0
 }

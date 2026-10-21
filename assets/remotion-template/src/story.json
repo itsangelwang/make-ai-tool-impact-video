@@ -50,7 +50,6 @@
         "date": "Oct 13, 2026",
         "name": "Example Notes AI",
         "accent": "briefs",
-        "capability": "Reads your notes, drafts the brief",
         "items": [
           {
             "icon": "doc",
@@ -71,10 +70,27 @@
       "id": "s2",
       "type": "before-workflow",
       "label": "Before",
-      "headline": "Before: open, copy, compare",
+      "headline": "The old way",
       "visual": "Cursor opens each note and copies items into a blank brief",
       "start_sec": 6,
-      "end_sec": 14
+      "end_sec": 14,
+      "flow": [
+        {
+          "icon": "doc",
+          "label": "Open",
+          "at_sec": 0.5
+        },
+        {
+          "icon": "paste",
+          "label": "Copy",
+          "at_sec": 2.5
+        },
+        {
+          "icon": "search",
+          "label": "Compare",
+          "at_sec": 4.5
+        }
+      ]
     },
     {
       "id": "s3",
@@ -84,7 +100,6 @@
       "visual": "Five files selected, Upload clicked, processing state",
       "start_sec": 14,
       "end_sec": 21,
-      "new_tag": "New in Example Notes AI",
       "shot": {
         "src": "assets/example-ui.svg",
         "source_width": 1600,
@@ -99,10 +114,14 @@
           "at_sec": 1.2,
           "x": 1460,
           "y": 195
+        },
+        "reveal": {
+          "at_sec": 0.3,
+          "frames": 18
         }
       },
       "roles": {
-        "at_sec": 2.2,
+        "at_sec": 3.0,
         "you": {
           "icon": "doc",
           "label": "5 notes"
@@ -153,7 +172,19 @@
           "y": 610,
           "title": "Still open",
           "note": "owner Maya"
-        }
+        },
+        "focus": [
+          {
+            "at_sec": 4.5,
+            "y": 585,
+            "h": 85
+          },
+          {
+            "at_sec": 7.5,
+            "y": 685,
+            "h": 85
+          }
+        ]
       }
     },
     {
@@ -163,14 +194,31 @@
       "headline": "Same person, same brief",
       "visual": "Left: three manual steps. Right: upload, draft, check",
       "start_sec": 32,
-      "end_sec": 40
+      "end_sec": 40,
+      "flow": [
+        {
+          "icon": "doc",
+          "label": "5 notes",
+          "at_sec": 0.5
+        },
+        {
+          "icon": "table",
+          "label": "1 brief",
+          "at_sec": 2.5
+        },
+        {
+          "icon": "user",
+          "label": "You check",
+          "at_sec": 4.5
+        }
+      ]
     },
     {
       "id": "s6",
       "type": "human-check",
       "label": "Your job",
-      "headline": "It's a draft. You check it.",
-      "visual": "Original note beside the brief; date and owner verified",
+      "headline": "You check it",
+      "visual": "",
       "start_sec": 40,
       "end_sec": 49,
       "checks": [
@@ -183,18 +231,24 @@
           "label": "Owners right"
         }
       ],
-      "checks_at_sec": 1.5
+      "checks_at_sec": 5.0,
+      "fix": {
+        "at_sec": 1.0,
+        "label": "Original note",
+        "wrong": "Nov 4",
+        "right": "Nov 11"
+      }
     },
     {
       "id": "s7",
       "type": "next-action",
       "label": "Try it",
       "headline": "Try one old note first",
-      "visual": "One non-sensitive note plus a comparison checklist",
+      "visual": "",
       "start_sec": 49,
       "end_sec": 56.5,
       "access": {
-        "at_sec": 1.2,
+        "at_sec": 4.0,
         "label": "AVAILABLE ON",
         "plans": [
           {
@@ -214,7 +268,19 @@
             "on": true
           }
         ]
-      }
+      },
+      "flow": [
+        {
+          "icon": "doc",
+          "label": "Old note",
+          "at_sec": 0.5
+        },
+        {
+          "icon": "search",
+          "label": "Compare",
+          "at_sec": 2.5
+        }
+      ]
     }
   ],
   "brand": {
