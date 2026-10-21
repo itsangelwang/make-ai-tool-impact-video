@@ -1,15 +1,25 @@
-import React from 'react';
+import React, {createContext, useContext} from 'react';
 import {Audio, Sequence, staticFile} from 'remotion';
 
 /** Play public/<folder>/<name>.wav at frame `at` (local to the enclosing Sequence).
  * Pair every sound with a visible cause; keep it under the narration. */
-export const Sfx = ({at, name, volume = 0.6, folder = 'audio/sfx'}) => (
-  <Sequence from={Math.max(0, Math.round(at))} durationInFrames={30}>
-    <Audio src={staticFile(`${folder}/${name}.wav`)} volume={volume} />
-  </Sequence>
-);
+/** Optional allowlist of sound kinds (story.sfx as an array); null plays every sound. */
+export const SfxFilter = createContext(null);
 
-/** Key clicks for visible typing: `count` taps every `every` frames, cycling key variants. */
-export const Taps = ({from, count, every = 3, volume = 0.3, folder = 'audio/sfx', names = ['key-1', 'key-2', 'key-3']}) => (
-  <>{Array.from({length: count}, (_, i) => <Sfx key={i} at={from + i * every} name={names[(i * 7) % names.length]} volume={volume} folder={folder} />)}</>
-);
+export const Sfx = ({at, name, volume = 0.6, folder = 'audio/sfx', kind = name}) => {
+  const allowed = useContext(SfxFilter);
+  if (allowed && !allowed.includes(kind)) return null;
+  return <Sequence from={Math.max(0, Math.round(at))} durationInFrames={30}>
+    <Audio src={staticFile(`${folder}/${name}.wav`)} volume={volume} />
+  </Sequence>;
+};
+
+/** Real keyboard typing for visible typing: one recorded clip trimmed to the typing span, faded out. */
+export const Taps = ({from, count, every = 3, volume = 0.3, folder = 'audio/sfx'}) => {
+  const allowed = useContext(SfxFilter);
+  if (allowed && !allowed.includes('typing')) return null;
+  const frames = Math.max(6, count * every);
+  return <Sequence from={Math.max(0, Math.round(from))} durationInFrames={frames}>
+    <Audio src={staticFile(`${folder}/typing.wav`)} volume={(f) => volume * Math.min(1, (frames - f) / 6)} />
+  </Sequence>;
+};

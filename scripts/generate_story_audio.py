@@ -4,7 +4,9 @@
 Everything is generated from code, so there are no licensing questions.
 
   sfx   --output DIR                      tick, pop, notify, key-1..3, return,
-                                          swish, uhoh, coin, stamp (.wav)
+                                          swish, uhoh, coin, stamp, typing,
+                                          callend (.wav); fallback only, prefer
+                                          recorded sounds (prepare_sfx.py)
   music --events events.json --output bgm.wav [--bpm 120]
 
 events.json holds seconds on the video timeline: "end" (required) and optional
@@ -63,6 +65,12 @@ def sfx(out: Path) -> None:
     write(out / "uhoh.wav", render(0.75, lambda t: 0.5 * (math.sin(2 * math.pi * 392 * (1 + 0.01 * math.sin(30 * t)) * t) * env(t, 0.01, 0.12) if t < 0.28 else math.sin(2 * math.pi * 293.7 * (1 + 0.012 * math.sin(30 * t)) * t) * env(t - 0.28, 0.01, 0.2))))
     write(out / "coin.wav", render(0.6, lambda t: 0.45 * bell(1975.5, t, 0.08) + 0.5 * bell(2637.0, t - 0.07, 0.25)))
     write(out / "stamp.wav", render(0.3, lambda t: 0.9 * math.sin(2 * math.pi * (95 - 40 * t) * t) * env(t, 0.002, 0.06) + 0.4 * noise() * env(t, 0.001, 0.015)))
+    # fallback typing bed (3 s of uneven key presses) and a two-tone hang-up
+    hits = [0.0]
+    while hits[-1] < 2.9:
+        hits.append(hits[-1] + 0.07 + 0.09 * abs(noise()))
+    write(out / "typing.wav", render(3.0, lambda t: sum((0.5 * noise() + 0.4 * math.sin(2 * math.pi * 2900 * t)) * env(t - h, 0.0008, 0.01) for h in hits if 0 <= t - h < 0.05)))
+    write(out / "callend.wav", render(0.6, lambda t: 0.4 * (math.sin(2 * math.pi * 620 * t) * env(t, 0.005, 0.12) if t < 0.25 else math.sin(2 * math.pi * 465 * t) * env(t - 0.25, 0.005, 0.15))))
 
 
 # ---------------------------------------------------------------------- music

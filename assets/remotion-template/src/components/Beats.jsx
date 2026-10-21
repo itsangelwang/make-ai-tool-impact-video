@@ -249,7 +249,7 @@ export const ProductShot = ({shot, width = 936, click, reveal, stamp, callout, f
     {sound && drag ? <><Sfx at={drag.at} name="swish" volume={0.35} /><Sfx at={dragEnd} name="pop" volume={0.55} /></> : null}
     {sound && type ? <Taps from={type.at} count={Math.round((type.frames || 45) / 3)} every={3} volume={0.25} /> : null}
     {sound && focus ? focus.map((band) => <Sfx key={band.at} at={band.at} name="tick" volume={0.35} />) : null}
-    {sound && click ? <Sfx at={click.at} name="return" volume={0.6} /> : null}
+    {sound && click ? <Sfx at={click.at} name="return" kind="click" volume={0.6} /> : null}
     {sound && reveal ? <Sfx at={reveal.at} name="swish" volume={0.3} /> : null}
     {sound && zoom ? <Sfx at={zoom.at} name="swish" volume={0.25} /> : null}
     {sound && wait ? <Sfx at={wait.at + (wait.frames || 30)} name="coin" volume={0.45} /> : null}
@@ -411,6 +411,6 @@ export const CallEnd = ({call, palette, font, sound = false}) => {
         <span style={{fontSize: 28, fontWeight: 500, color: palette.muted}}>{call.timer}</span>
       </div>
     </div>
-    {sound ? <><Sfx at={call.end_at} name="key-2" volume={0.5} /><Sfx at={call.end_at + 8} name="uhoh" volume={0.4} /><Sfx at={call.end_at + 16} name="pop" volume={0.5} /></> : null}
+    {sound ? <><Sfx at={call.end_at} name="key-2" kind="click" volume={0.5} /><Sfx at={call.end_at + 3} name="callend" volume={0.45} /><Sfx at={call.end_at + 16} name="pop" volume={0.5} /></> : null}
   </div>;
 };

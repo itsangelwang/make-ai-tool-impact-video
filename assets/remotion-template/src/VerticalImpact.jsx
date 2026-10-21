@@ -3,6 +3,7 @@ import {AbsoluteFill, Audio, Img, Sequence, interpolate, spring, staticFile, use
 import {TimedCaptions} from './TimedCaptions';
 import {ProgressBar} from './components/ProgressBar';
 import {Icon, objectColor} from './components/Icon';
+import {SfxFilter} from './components/Sfx';
 import {AccessChips, CheckCards, Correction, FeatureIntro, Flow, NewTag, ProductShot, RoleStrip, Scrub, Toast, CallEnd} from './components/Beats';
 
 const FONTS = {
@@ -195,6 +196,7 @@ export const VerticalImpact = ({story}) => {
   const labels = {...LABELS[locale], ...(story.labels || {})};
   return (
     <FontContext.Provider value={FONTS[locale].body}>
+    <SfxFilter.Provider value={Array.isArray(story.sfx) ? story.sfx : null}>
     <AbsoluteFill style={{background: story.palette.paper}}>
       {story.scenes.map((scene, index) => {
         const start = Math.round(scene.start_sec * fps);
@@ -216,6 +218,7 @@ export const VerticalImpact = ({story}) => {
       {(story.transitions||[]).map((transition) => <Sequence key={`${transition.start_sec}-${transition.label}`} from={Math.round(transition.start_sec*fps)} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}><FullFrameTransition transition={transition} palette={story.palette} displayFont={FONTS[locale].display} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}/></Sequence>)}
       {story.brand ? <Sequence from={Math.round(story.brand.start_sec * fps)} durationInFrames={Math.round((story.brand.end_sec - story.brand.start_sec) * fps)}><BrandEnding brand={story.brand} palette={story.palette} displayFont={FONTS[locale].display} /></Sequence> : null}
     </AbsoluteFill>
+    </SfxFilter.Provider>
     </FontContext.Provider>
   );
 };

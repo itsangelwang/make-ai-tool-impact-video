@@ -26,7 +26,7 @@ PRESETS = {
         "reference_id": "fa4c9eb3dccc4806b382b40d61c6b10a",  # Fish Official "Sawyer", US male
         "model": "drama-3",
         "temperature": 0.85,
-        "speed": 1.08,
+        "speed": 1.15,
     },
 }
 DEFAULTS = {"model": "s2.1-pro", "temperature": 0.7, "speed": 1.0}
