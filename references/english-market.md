@@ -46,7 +46,27 @@ The approved style follows the story's emotional arc instead of one flat or unif
 
 ### Other providers
 
-- For OpenRouter, audition `deepgram/flux-tts:free` first while its free alias is available. Use the dedicated speech endpoint, keep `OPENROUTER_API_KEY` out of files and logs, and generate only an 8–12 second passage until the user approves the voice. Shortlist `flux-hannah-en`, `flux-heather-en`, and `flux-wes-en`. Treat the generic free text router and Flux TTS as separate models; query the live catalog before every audition because free aliases can change.
+For OpenRouter, use the dedicated `/api/v1/audio/speech` path through `scripts/openrouter_tts.py`. When available, start with `deepgram/flux-tts:free`; query the live OpenRouter model catalog before use because free aliases and availability can change. Do not confuse the generic `openrouter/free` text router with the speech-specific Flux model.
+
+```bash
+OPENROUTER_API_KEY=... python3 <skill-dir>/scripts/openrouter_tts.py \
+  --text "Tomorrow's meeting is already on your calendar." \
+  --output <project-dir>/video/qa/voice-sample.mp3 \
+  --model deepgram/flux-tts:free --voice flux-hannah-en --speed 0.95
+```
+
+For Deepgram, use Flux TTS batch when the user has access; Flux is Early Access, so keep Aura-2 as the stable fallback. Store the key only in `DEEPGRAM_API_KEY`.
+
+```bash
+DEEPGRAM_API_KEY=... python3 <skill-dir>/scripts/deepgram_tts.py \
+  --script <project-dir>/script-package.json \
+  --output <project-dir>/video/public/audio/narration.mp3 \
+  --model flux-hannah-en --speed 0.95 --expressivity 1
+```
+
+Prefer a neural provider with timestamps; Deepgram batch audio does not itself supply word timestamps, so measure the final audio and generate phrase timing with `caption_pipeline.py`, then manually spot-check phrase boundaries against the waveform.
+
+- For OpenRouter, keep `OPENROUTER_API_KEY` out of files and logs, and generate only an 8–12 second passage until the user approves the voice. Shortlist `flux-hannah-en`, `flux-heather-en`, and `flux-wes-en`.
 - For Deepgram Flux TTS, shortlist `flux-hannah-en` (thoughtful storytelling), `flux-heather-en` (engaging), and `flux-wes-en` (warm). Audition the same 8–12 second passage for comparison.
 - For Deepgram or OpenRouter, start at speed `0.95` or `1.0` and expressivity `0` or `1`. With any provider, do not fix an overlong script by accelerating it beyond the approved preset speed.
 - Flux TTS and `/v2/speak` are Early Access. If access or stability fails, use Aura-2 such as `aura-2-andromeda-en` or `aura-2-arcas-en`, disclose the fallback in the review, and require a fresh voice approval.
