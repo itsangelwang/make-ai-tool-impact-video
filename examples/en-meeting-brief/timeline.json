@@ -1,6 +1,6 @@
 {
   "language": "en-US",
-  "duration_sec": 60,
+  "duration_sec": 61.6,
   "captions": [
     {
       "start_sec": 0.3,
@@ -26,62 +26,62 @@
       "voice": "and compare them by hand. [frustrated] Easy to miss one."
     },
     {
-      "start_sec": 17.73,
-      "end_sec": 22.96,
+      "start_sec": 18.53,
+      "end_sec": 23.76,
       "text": "Now? You upload the same five notes to Example Notes AI.",
       "voice": "[excited] Now? You upload the same five notes to Example Notes AI."
     },
     {
-      "start_sec": 23.11,
-      "end_sec": 27.04,
+      "start_sec": 23.91,
+      "end_sec": 27.84,
       "text": "And boom, it drafts a one-page prep brief:",
       "voice": "[excited] And boom, it drafts a one-page prep brief:"
     },
     {
-      "start_sec": 27.19,
-      "end_sec": 30.25,
+      "start_sec": 27.99,
+      "end_sec": 31.05,
       "text": "decisions, open action items, and owners."
     },
     {
-      "start_sec": 30.4,
-      "end_sec": 35.2,
+      "start_sec": 31.2,
+      "end_sec": 36.0,
       "text": "Like this one: vendor quote, no reply yet, owner Maya.",
       "voice": "Like this one: [emphasis] vendor quote, no reply yet, owner Maya."
     },
     {
-      "start_sec": 36.9,
-      "end_sec": 40.83,
+      "start_sec": 38.5,
+      "end_sec": 42.43,
       "text": "But it's a draft. Before you send it,",
       "voice": "[calm] But it's a draft. Before you send it,"
     },
     {
-      "start_sec": 40.98,
-      "end_sec": 45.34,
+      "start_sec": 42.58,
+      "end_sec": 46.94,
       "text": "check each date and owner against the original notes.",
       "voice": "check each [emphasis] date and owner against the original notes."
     },
     {
-      "start_sec": 45.49,
-      "end_sec": 50.29,
+      "start_sec": 47.09,
+      "end_sec": 51.89,
       "text": "If you run weekly meetings, try it on one old,",
       "voice": "[confident] If you run weekly meetings, try it on one old,"
     },
     {
-      "start_sec": 50.44,
-      "end_sec": 54.37,
+      "start_sec": 52.04,
+      "end_sec": 55.97,
       "text": "non-sensitive note first, and see what it misses."
     }
   ],
   "transitions": [
     {
       "start_sec": 16.18,
-      "end_sec": 17.58,
+      "end_sec": 18.38,
       "label": "Hand the same notes to AI",
       "readable": true
     },
     {
-      "start_sec": 35.35,
-      "end_sec": 36.75,
+      "start_sec": 36.15,
+      "end_sec": 38.35,
       "label": "You still own the check",
       "readable": true
     }

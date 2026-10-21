@@ -321,10 +321,10 @@ class StateAndUtilitiesTests(unittest.TestCase):
             "duration_sec": 60,
             "captions": [
                 {"start_sec": 0, "end_sec": 30, "text": "你" * 90},
-                {"start_sec": 31.5, "end_sec": 58, "text": "我" * 80},
+                {"start_sec": 32.2, "end_sec": 58, "text": "我" * 80},
             ],
             "transitions": [
-                {"start_sec": 30, "end_sec": 31.5, "label": "下一步", "readable": True}
+                {"start_sec": 30, "end_sec": 32.2, "label": "下一步", "readable": True}
             ],
         }
         self.assertEqual(timeline_validator.validate(data), [])
@@ -339,7 +339,7 @@ class StateAndUtilitiesTests(unittest.TestCase):
         errors = timeline_validator.validate(data)
         self.assertTrue(any("too fast" in error for error in errors))
         self.assertTrue(any("overlaps" in error for error in errors))
-        self.assertTrue(any("at least 1.2" in error for error in errors))
+        self.assertTrue(any("at least 2" in error for error in errors))
 
     def test_timeline_defaults_to_english(self):
         data = {
@@ -366,9 +366,9 @@ class StateAndUtilitiesTests(unittest.TestCase):
             "duration_sec": 60,
             "captions": [
                 {"start_sec": 0, "end_sec": 25, "text": " ".join(["work"] * 55)},
-                {"start_sec": 26.5, "end_sec": 58, "text": " ".join(["check"] * 55)},
+                {"start_sec": 27.2, "end_sec": 58, "text": " ".join(["check"] * 55)},
             ],
-            "transitions": [{"start_sec": 25, "end_sec": 26.5, "readable": True}],
+            "transitions": [{"start_sec": 25, "end_sec": 27.2, "readable": True}],
         }
         self.assertEqual(timeline_validator.validate(data), [])
 
@@ -498,6 +498,14 @@ class BuildCaptionsTests(unittest.TestCase):
                     self.assertEqual(result.returncode, 1)
                     self.assertIn(f"narration mismatch at normalized character {location}", result.stderr)
                     self.assertEqual(output.read_text(), "keep")
+
+    def test_brand_cue_keeps_flag_for_hidden_caption_bar(self):
+        timeline = {"language": "en-US", "captions": [
+            {"start_sec": 0, "end_sec": 2, "text": "Hello there."},
+            {"start_sec": 2.1, "end_sec": 5, "text": "ACEMODE. 10x Faster, Log Off Earlier.", "brand": True}]}
+        cues = build_captions.build_captions(timeline)
+        self.assertNotIn("brand", cues[0])
+        self.assertTrue(cues[1]["brand"])
 
     def test_invalid_timing_rejected(self):
         for start, end in ((-1, 1), (1, 1), (0, float("nan")), (True, 1), (0, 0.0001)):
@@ -632,7 +640,7 @@ class StoryBeatTests(unittest.TestCase):
     def test_template_story_uses_every_beat_and_passes(self):
         story = self.story()
         keys = {key for scene in story["scenes"] for key in scene}
-        self.assertTrue({"new_feature", "new_tag", "shot", "roles", "checks", "access"} <= keys)
+        self.assertTrue({"new_feature", "shot", "roles", "checks", "access", "flow", "fix"} <= keys)
         self.assertEqual(check_story.check(story, self.TEMPLATE / "public", check_story.icon_names()), [])
 
     def test_beat_mistakes_are_reported(self):
@@ -645,6 +653,32 @@ class StoryBeatTests(unittest.TestCase):
         self.assertTrue(any("not found" in e for e in errors))
         self.assertTrue(any("click.at_sec" in e for e in errors))
         self.assertTrue(any("rocket" in e for e in errors))
+
+    def test_reading_load_and_static_screens_are_flagged(self):
+        story = self.story()
+        scene = next(s for s in story["scenes"] if s["id"] == "s2")
+        scene["headline"] = "A very long headline that keeps going and asks the viewer to read far too much text"
+        scene["flow"] = scene["flow"][:2]
+        story["transitions"] = []
+        errors = check_story.check(story, self.TEMPLATE / "public", check_story.icon_names())
+        self.assertTrue(any("words on screen" in e for e in errors))
+        self.assertTrue(any("unchanged for" in e for e in errors))
+
+    def test_neighboring_scenes_with_the_same_form_are_listed(self):
+        story = self.story()
+        story["scenes"][4]["flow"], story["scenes"][5]["flow"] = story["scenes"][6]["flow"], story["scenes"][6]["flow"]
+        story["scenes"][5].pop("fix"); story["scenes"][5].pop("checks", None)
+        story["scenes"][6].pop("access")
+        self.assertTrue(check_story.variety_notes(story))
+
+    def test_before_to_after_needs_a_chapter_transition(self):
+        story = self.story()
+        story["scenes"][1]["type"], story["scenes"][2]["type"] = "before-workflow", "ai-handoff"
+        story["transitions"] = []
+        self.assertTrue(any("chapter transition" in e for e in check_story.transition_errors(story)))
+        boundary = story["scenes"][2]["start_sec"]
+        story["transitions"] = [{"start_sec": boundary - 1.4, "end_sec": boundary, "label": "Hand it over", "symbol": "→", "color": "#6857F5"}]
+        self.assertEqual(check_story.transition_errors(story), [])
 
     def test_icon_names_match_component(self):
         self.assertTrue({"doc", "table", "user", "calendar", "slides"} <= check_story.icon_names())

@@ -52,6 +52,8 @@ def build_captions(timeline: dict, script: dict | None = None) -> list[dict]:
         if end_ms <= start_ms:
             raise ValueError(f"caption {index} collapses after millisecond rounding")
         output = {"startMs": start_ms, "endMs": end_ms, "text": cue["text"], "language": language}
+        if cue.get("brand") is True:
+            output["brand"] = True  # the brand card shows these words; the caption bar hides
         for key in ("highlightCool", "highlightWarm"):
             if key in cue:
                 if not isinstance(cue[key], list) or not all(isinstance(term, str) for term in cue[key]):

@@ -1,6 +1,6 @@
 {
   "language": "zh-CN",
-  "duration_sec": 60,
+  "duration_sec": 61.6,
   "captions": [
     {
       "start_sec": 0.3,
@@ -23,56 +23,56 @@
       "text": "再手动对照，很容易漏。"
     },
     {
-      "start_sec": 18.11,
-      "end_sec": 22.56,
+      "start_sec": 18.91,
+      "end_sec": 23.36,
       "text": "现在把五份记录一起交给示例笔记 AI，"
     },
     {
-      "start_sec": 22.71,
-      "end_sec": 26.09,
+      "start_sec": 23.51,
+      "end_sec": 26.89,
       "text": "它先整理出一页会前摘要："
     },
     {
-      "start_sec": 26.24,
-      "end_sec": 30.69,
+      "start_sec": 27.04,
+      "end_sec": 31.49,
       "text": "已定的决定、没做完的任务和负责人。"
     },
     {
-      "start_sec": 30.84,
-      "end_sec": 37.42,
+      "start_sec": 31.64,
+      "end_sec": 38.22,
       "text": "比如供应商报价这一条，它标出还没回复，负责人是小林。"
     },
     {
-      "start_sec": 39.12,
-      "end_sec": 42.5,
+      "start_sec": 40.72,
+      "end_sec": 44.1,
       "text": "但这只是草稿。发出去之前，"
     },
     {
-      "start_sec": 42.65,
-      "end_sec": 47.1,
+      "start_sec": 44.25,
+      "end_sec": 48.7,
       "text": "你要回到原记录，核对日期和负责人。"
     },
     {
-      "start_sec": 47.25,
-      "end_sec": 53.3,
+      "start_sec": 48.85,
+      "end_sec": 54.9,
       "text": "如果你也常开周会，先拿一份不敏感的记录试一次，"
     },
     {
-      "start_sec": 53.45,
-      "end_sec": 56.03,
+      "start_sec": 55.05,
+      "end_sec": 57.63,
       "text": "看看它有没有漏项。"
     }
   ],
   "transitions": [
     {
       "start_sec": 16.56,
-      "end_sec": 17.96,
+      "end_sec": 18.76,
       "label": "把同样五份记录交给 AI",
       "readable": true
     },
     {
-      "start_sec": 37.57,
-      "end_sec": 38.97,
+      "start_sec": 38.37,
+      "end_sec": 40.57,
       "label": "最后一步还是你",
       "readable": true
     }

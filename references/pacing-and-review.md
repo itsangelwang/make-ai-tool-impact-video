@@ -43,7 +43,7 @@ Use rhythm in waves:
 
 - Accelerate repetitive clicks, opening, importing, searching, and sorting.
 - Slow down for the product promise, AI output, concrete example, decision, and responsibility boundary.
-- Give every readable chapter transition a dedicated full-frame background for about 1.2–1.5 seconds.
+- Give every readable chapter transition a dedicated full-frame background for about 2.2 seconds (at least 2.0): the label must be fully on screen and still for over a second. Pause the narration while the card is up.
 - Do not stack two transitions with the same color, wording, and communication purpose. Replace the second with an object handoff or internal morph.
 - A transition must finish before the incoming scene becomes visible.
 - Build every consequential beat as enter → act → stable result. Do not cut immediately after the action.

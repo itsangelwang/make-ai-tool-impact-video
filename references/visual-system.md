@@ -12,16 +12,48 @@ Build natively at 1080×1920 and 30 fps. Use a warm near-white background, near-
 - `human-check`: pause motion and foreground the approval, correction, privacy, or judgment step.
 - `next-action`: resolve into one reversible experiment and readiness label.
 
+## Every screen: reading load, pacing, and variety
+
+Check every scene, not only the whole video. Render a still at each scene's busiest moment and read it at phone size.
+
+- **One idea per screen.** Keep authored on-screen text (label, headline, card and beat labels; captions and real UI excluded) at or under 18 words per scene. If a screen needs more, split it into beats that appear one at a time, in sync with the words that name them.
+- **Animate instead of writing.** Turn a list into a `flow` of icons, a changed value into a `fix` (strike and replace), a long screenshot into `focus` bands that light one row at a time, a "find it in the recording" step into a `scrub`. Hide the human-check and next-action text boxes by leaving `visual` empty when beats already carry the point.
+- **Open fast.** The first frame must already show the situation, and something new should appear within the first second; take the cover once the opening hook is complete (the template's `npm run cover` uses frame 60, about 2 seconds in), never from an empty frame.
+- **Keep the screen moving, but readable.** Something visible should change at least every 4 seconds; a scene that sits still longer loses the viewer. Keep each new state up for at least 1.2 seconds so it can be read.
+- **Vary the form.** Mix real UI, icon flows, audio scrubbing, corrections, role strips, focus bands, stamps, and chips. Do not use the same form in two neighboring scenes.
+- **One color per object.** Icons in the same row must not share a color. The template gives each kind of object a fixed color for the whole video (recording teal, table violet, email amber, date pink, person blue, document green); keep it when the object reappears so the viewer can follow it. Override with `palette.objects` or an item's `color`.
+- **Calm, harmonious color.** Light tinted backgrounds, white cards, one phase accent per screen, and object colors only on icons. Avoid muddy browns and olive, neon on neon, red text on a coral background, and more than three saturated colors on one screen.
+- **Layered type, not all bold.** Use four levels: an eyebrow (small spaced capitals with a colored dot), one headline (heavy, with one key word in the accent color via `*word*`), labels (medium weight), and notes (regular, muted). Only the headline and the emphasized caption words are heavy; everything else steps down.
+- **No lonely words.** Never leave one word alone on a line in a headline, card, or caption. The template balances headline and caption lines automatically; rewrite a headline if it still breaks badly.
+- **Nothing covers anything.** No element may hide another element's text or the detail it points at. Put callouts beside or above their target without covering it or a column header, put stamps in empty corners, keep content above the caption zone, and make sure the incoming scene fully covers the outgoing one during a transition. Check stills in the middle of every transition as well as in the middle of every scene.
+- **Each phase looks different.** The template themes scenes by phase: the problem (pain, before) on coral with a red-orange accent, what AI changes (handoff, after) on lavender with violet, the person's job (human check) on light blue with blue (the person color), and the try-it on mint with green. Chapter-card gradients run from a light tint to a deep, saturated tone of the same color; never darken a warm color toward brown. The eyebrow, headline accent, a large faint phase word in the background, and the progress-bar segment all take the phase color. Match each chapter card's `color` to the phase it opens. Override with `palette.phases`.
+- **Transitions between phases.** Every scene change gets a short entrance (about 0.4 s) that cycles slide, circle wipe, and rise; set a scene's `enter` (`slide`, `wipe`, `rise`, `none`) to choose one. A phase change (before → AI handoff or after, after → human check) gets a readable full-frame chapter card from `story.transitions` (about 2.2 s, at least 2.0; ends at the next scene's start; no narration over it). Give each card `kicker` (a 1–2 word tag such as "NOW" or "YOUR TURN") and, whenever the phase change has a cause, `from` and `to` icon lists so the card shows the handoff (three notes become one table; a table becomes a date and a person to check) over a gradient background. Use at most two or three chapter cards, each with its own color and symbol; `check_story.py` requires one between before and after.
+- **Progress bar.** The template draws a thin chapter progress bar at the top (one segment per scene, hidden on the brand card). Set `"progress": false` in story.json only when the platform already shows one.
+
+`scripts/check_story.py` enforces the word limit and the 4-second rule (both in `scripts/limits.json`) and lists neighboring scenes that share a form.
+
 ## Story beats in story.json
 
 The template turns these optional scene fields into the beats proven in the first English video. Times (`at_sec`) are seconds from the scene start; place them on the matching narration words after fitting the timeline to the audio. Run `scripts/check_story.py <project-dir>/video/src/story.json` before rendering.
 
 - `new_feature` (pain hook): `{at_sec, date, name, accent, capability, items: [{icon, label}]}`. The pain stack yields to a card naming what is new, its official date, and up to three objects it produces.
 - `new_tag`: short text such as `"New in ChatGPT"` shown as a NEW pill under the scene label.
-- `shot`: a real screenshot region, `{src, source_width, crop: {x, y, w, h}, evidence, click, reveal, stamp, callout}`. Coordinates are source pixels. `click: {at_sec, x, y}` moves the cursor to the control and presses it; `reveal: {at_sec, frames}` wipes the result in; `stamp: {at_sec, label}` marks the new capability; `callout: {at_sec, x, y, title, note}` points at the detail to check, with (x, y) just above it. Crop so product text reaches about 40 px. `evidence` labels the source, e.g. "REAL CHATGPT TEST".
+- `shot`: a real screenshot region, `{src, source_width, crop: {x, y, w, h}, evidence, click, reveal, stamp, callout}`. Coordinates are source pixels. `click: {at_sec, x, y}` moves the cursor to the control and presses it; `reveal: {at_sec, frames}` wipes the result in; `stamp: {at_sec, label}` marks the new capability; `callout: {at_sec, x, y, title, note, until_sec}` points at the detail to check, with (x, y) just above it; set `until_sec` so it leaves when the focus moves on. Crop so product text reaches about 40 px. `evidence` labels the source, e.g. "REAL CHATGPT TEST".
 - `roles`: `{at_sec, you: {icon, label}, ai: {name, outputs: [{icon, label}]}}`. One action from the person, outputs ticking off for the AI.
 - `checks` with `checks_at_sec`: up to three `{icon, label}` items the person verifies.
 - `access`: `{at_sec, label, plans: [{name, on}]}` from the official source; unavailable plans are struck through.
+- `flow`: 2–4 `{icon, label, at_sec}` tiles with arrows, each appearing at its own time; labels are 1–2 words. Replaces text cards in any scene.
+- `call_end`: `{at_sec, people: [name, name], timer, end_at_sec, file}` a generic video call (not any real product): two people, a running timer, a hang-up click at `end_at_sec`, then the saved recording slides out. Opens a story that starts from a meeting.
+- `toast`: `{at_sec, icon, title, note, until_sec}` a system-style notification that slides down. Open with one so the first frame already shows the situation ("Call ended · Recording saved") and the first seconds move fast.
+- `fix`: `{at_sec, label, wrong, right}`. The wrong value is struck through and the right one pops in.
+- `scrub`: `{at_sec, length, ask, ask_at_sec}`. An audio player whose playhead jumps back and forth; `ask` pops above it (e.g. "Who said Thursday?").
+- `shot.zoom`: `{at_sec, frames, from}` starts on a wide crop of the whole result (same aspect ratio as `crop`) and pushes in, so viewers see everything the tool produced before the detail. Pair it with `shot.summary`: `{at_sec, text, until_sec}`, one short line such as "5 action items · owners · dates", shown just below the screenshot so it never covers it.
+- `shot.drag`: `{at_sec, frames, from, to, file, region, mask}` carries a file card in with the pointer and reveals the real attachment (`region`) on drop.
+- `shot.type`: `{at_sec, frames, region, lines, mask}` uncovers the real typed text left to right, line by line, with a caret and key sounds.
+- `shot.click` now hovers first (hand pointer and a glow), presses, and ripples; `shot.wait`: `{at_sec, frames}` shows neutral progress dots (never an imitation of the product's own loading screen).
+- Build a product interaction as one flow, the way a person works: open → drag the file in → type the request → hover and click → wait → result in full → push in to the detail.
+- `shot.focus`: `[{at_sec, y, h}]` source-pixel bands; everything else in the screenshot dims so one row is read at a time.
+- `steps_at_sec`: times at which before/after step cards appear, instead of all at once.
 
 Set `"sfx": true` in story.json after generating `public/audio/sfx` with `generate_story_audio.py sfx`; each beat then plays its matching swish, pop, stamp, or return. Icons come from `components/Icon.jsx`; add a new icon there rather than inlining SVG in a scene.
 
@@ -35,7 +67,7 @@ Shape rhythm in waves rather than giving every scene the same pace. Accelerate r
 
 Use zoom only to direct attention to a consequential detail: the selected import file, the relevant product result, the unfinished task inside a summary, the source sentence used for verification, or the final output replacing a stack of inputs. Pair the zoom with a state change or highlighted evidence; avoid decorative push-ins that do not clarify the workflow.
 
-When a chapter transition contains a readable label, give it a dedicated full-frame background for roughly 1.2–1.5 seconds. Do not layer a transition title over the outgoing or incoming scene. Hold the title stable long enough to read, then reveal the next scene; shorter overlays are reserved for nonverbal action handoffs.
+When a chapter transition contains a readable label, give it a dedicated full-frame background for about 2.2 seconds. Do not layer a transition title over the outgoing or incoming scene. Hold the title stable long enough to read, then reveal the next scene; shorter overlays are reserved for nonverbal action handoffs.
 
 End the outgoing caption before a readable transition begins. For captions revealed by semantic word groups, adapt the stagger to phrase length and preserve a stable fully revealed hold; never let the transition cover the final words. Place a full-frame transition entirely before the next scene boundary so the incoming scene starts unobscured.
 
