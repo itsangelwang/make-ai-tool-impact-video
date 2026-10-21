@@ -29,7 +29,9 @@ export const getClickState = (frame, clickFrame, {approachFrames = 10, pressFram
  * during its reaction/press. size/color/rippleColor customize the pointer.
  * Render target and state feedback using getClickState with the same click frame.
  */
-export const Cursor = ({path, clicks = [], size = 42, color = '#20252b', rippleColor = '#447d92', clickTiming = {}}) => {
+/** hand: [[startFrame, endFrame], ...] ranges where the pointer is over a button and shows a
+ * pointing hand, as a browser does; the fingertip stays on the same point as the arrow tip. */
+export const Cursor = ({path, clicks = [], hand = [], size = 42, color = '#20252b', rippleColor = '#447d92', clickTiming = {}}) => {
   const frame = useCurrentFrame();
   if (!path?.length) return null;
   if (path.some((point, i) => !Number.isFinite(point.frame) || !Number.isFinite(point.x) || !Number.isFinite(point.y) || (i > 0 && point.frame <= path[i - 1].frame))) throw new Error('Cursor path requires finite coordinates and strictly increasing frames');
@@ -43,6 +45,8 @@ export const Cursor = ({path, clicks = [], size = 42, color = '#20252b', rippleC
   const pressed = states.some((state) => state.phase === 'press');
   return <div style={{position: 'absolute', left: x, top: y, pointerEvents: 'none', zIndex: 20}}>
     {states.map((state, i) => state.rippleVisible && <div key={i} style={{position: 'absolute', width: 84, height: 84, left: -42, top: -42, border: `3px solid ${rippleColor}`, borderRadius: '50%', opacity: 1 - state.rippleProgress, transform: `scale(${0.25 + state.rippleProgress})`}} />)}
-    <svg width={size} height={size * 1.3} viewBox="0 0 32 42" style={{transformOrigin: '0 0', transform: `scale(${pressed ? 0.86 : 1})`}}><path d="M2 2 L2 31 L10 24 L17 39 L23 36 L16 22 L28 22 Z" fill={color} stroke="white" strokeWidth="2" /></svg>
+    {hand.some(([start, end]) => frame >= start && frame <= end)
+      ? <svg width={size * 1.1} height={size * 1.35} viewBox="0 0 32 40" style={{position: 'absolute', left: -size * 0.45, top: -2, transformOrigin: '45% 0', transform: `scale(${pressed ? 0.88 : 1})`}}><path d="M12 4a3 3 0 0 1 6 0v11a3 3 0 0 1 6 1v1a3 3 0 0 1 5 2v8c0 6-4 11-10 11h-3c-4 0-7-2-9-6l-5-8a3 3 0 0 1 5-3l3 4V4z" fill="#fff" stroke={color} strokeWidth="2.2" strokeLinejoin="round" /><path d="M18 15v8M24 17v6" stroke={color} strokeWidth="1.8" strokeLinecap="round" /></svg>
+      : <svg width={size} height={size * 1.3} viewBox="0 0 32 42" style={{transformOrigin: '0 0', transform: `scale(${pressed ? 0.86 : 1})`}}><path d="M2 2 L2 31 L10 24 L17 39 L23 36 L16 22 L28 22 Z" fill={color} stroke="white" strokeWidth="2" /></svg>}
   </div>;
 };

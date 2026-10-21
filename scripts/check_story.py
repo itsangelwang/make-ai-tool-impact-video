@@ -35,7 +35,7 @@ def screen_words(scene: dict, story: dict) -> int:
     texts += [item.get("label") for item in feature.get("items", [])]
     shot = scene.get("shot") or {}
     callout = shot.get("callout") or {}
-    texts += [callout.get("title"), callout.get("note"), (shot.get("stamp") or {}).get("label")]
+    texts += [callout.get("title"), callout.get("note"), (shot.get("stamp") or {}).get("label"), (shot.get("summary") or {}).get("text")]
     texts += [item.get("label") for item in scene.get("flow", [])]
     roles = scene.get("roles") or {}
     texts += [(roles.get("you") or {}).get("label"), (roles.get("ai") or {}).get("name")]
@@ -71,9 +71,13 @@ def change_times(scene: dict) -> list[float]:
     if isinstance(fix.get("at_sec"), (int, float)):
         times.append(fix["at_sec"] + 24 / 30)  # the right value pops in
     shot = scene.get("shot") or {}
-    for key in ("click", "reveal", "stamp", "callout"):
+    for key in ("click", "reveal", "stamp", "callout", "summary", "zoom", "drag", "type", "wait"):
         if isinstance((shot.get(key) or {}).get("at_sec"), (int, float)):
             times.append(shot[key]["at_sec"])
+    for key in ("drag", "type", "wait", "zoom"):  # these keep moving until they finish
+        item = shot.get(key) or {}
+        if isinstance(item.get("at_sec"), (int, float)):
+            times.append(item["at_sec"] + item.get("frames", 30) / 30)
     times += [band["at_sec"] for band in shot.get("focus", []) if isinstance(band.get("at_sec"), (int, float))]
     times += [item["at_sec"] for item in scene.get("flow", []) if isinstance(item.get("at_sec"), (int, float))]
     times += [t for t in scene.get("steps_at_sec", []) if isinstance(t, (int, float))]
@@ -86,7 +90,7 @@ def main_form(scene: dict) -> str:
     present = []
     for key in BEATS:
         if scene.get(key):
-            parts = [sub for sub in ("click", "focus", "callout", "stamp") if key == "shot" and scene["shot"].get(sub)]
+            parts = [sub for sub in ("zoom", "drag", "type", "click", "focus", "callout", "stamp") if key == "shot" and scene["shot"].get(sub)]
             present.append(f"{key}({','.join(parts)})" if parts else key)
     return "+".join(present) or scene.get("type", "?")
 
@@ -129,9 +133,17 @@ def check(story: dict, public_dir: Path, icons: set[str]) -> list[str]:
                 errors.append(f"{sid}.shot.crop requires numeric x, y, and positive w, h")
             elif isinstance(shot.get("source_width"), (int, float)) and crop["x"] + crop["w"] > shot["source_width"]:
                 errors.append(f"{sid}.shot.crop extends past source_width")
-            for beat in ("click", "reveal", "stamp", "callout"):
+            for beat in ("click", "reveal", "stamp", "callout", "summary", "zoom", "drag", "type", "wait"):
                 if beat in shot:
                     timed(f"{sid}.shot.{beat}", shot[beat], length)
+            zoom = shot.get("zoom") or {}
+            start_crop = zoom.get("from") or {}
+            if zoom and crop.get("h") and start_crop.get("h") and abs(start_crop.get("w", 0) / start_crop["h"] - crop["w"] / crop["h"]) > 0.03 * crop["w"] / crop["h"]:
+                errors.append(f"{sid}.shot.zoom.from must have the same aspect ratio as shot.crop")
+            for beat in ("drag", "type"):
+                region = (shot.get(beat) or {}).get("region")
+                if beat in shot and region is not None and not all(isinstance(region.get(k), (int, float)) for k in "xywh"):
+                    errors.append(f"{sid}.shot.{beat}.region requires x, y, w, h in source pixels")
             for index, band in enumerate(shot.get("focus", [])):
                 timed(f"{sid}.shot.focus[{index}]", band, length)
                 if not isinstance(band.get("y"), (int, float)) or not isinstance(band.get("h"), (int, float)) or band.get("h", 0) <= 0:

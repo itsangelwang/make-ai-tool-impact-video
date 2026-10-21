@@ -4,7 +4,7 @@ import {Cursor, getClickState} from './Cursor';
 import {Burst} from './Emphasis';
 import {Icon, objectColor} from './Icon';
 import {Shot} from './Shot';
-import {Sfx} from './Sfx';
+import {Sfx, Taps} from './Sfx';
 
 // Story beats extracted from the first English video. Frames are local to the
 // enclosing Sequence. Each takes `palette` and `font`; `sound` adds the matching
@@ -134,6 +134,9 @@ export const AccessChips = ({at, label, plans, palette, font, sound = false}) =>
  * the result, a NEW stamp, and a pointed callout. Coordinates are source pixels.
  * shot: {src, source_width, crop: {x, y, w, h}}; click: {at, x, y};
  * reveal: {at, frames}; stamp: {at, label}; callout: {at, x, y, title, note}. */
+const lerp = (a, b, t) => a + (b - a) * t;
+const smooth = (x) => x * x * (3 - 2 * x);
+
 /** Dims a shot except one horizontal band (source y, h), so the viewer reads one row at a time.
  * focus: [{at, y, h}] in order; each band holds until the next one starts. */
 const FocusBands = ({focus, crop, k, palette}) => {
@@ -151,24 +154,90 @@ const FocusBands = ({focus, crop, k, palette}) => {
   </>;
 };
 
-export const ProductShot = ({shot, width = 936, click, reveal, stamp, callout, focus, evidence, palette, font, sound = false}) => {
+/** A real screenshot region with real-feeling operation on top. Coordinates are source pixels.
+ * shot: {src, source_width, crop}; zoom: {at, frames, from: crop} starts wide on the full result and
+ * pushes in to `crop` (keep the same aspect ratio); drag: {at, frames, from: {x, y}, to: {x, y}, file,
+ * region, mask} carries a file card in with the pointer and reveals `region` on drop; type: {at, frames,
+ * region, lines, mask} reveals the real text left to right, line by line, with a caret; click: {at, x, y}
+ * hovers (hand pointer, glow), presses, and ripples; wait: {at, frames} shows neutral progress dots;
+ * reveal, stamp, focus, callout, and summary ({at, text, until}) as before. */
+export const ProductShot = ({shot, width = 936, click, reveal, stamp, callout, focus, zoom, drag, type, wait, summary, evidence, palette, font, sound = false}) => {
   const frame = useCurrentFrame();
-  const k = width / shot.crop.w;
-  const toFrame = (x, y) => ({x: (x - shot.crop.x) * k, y: (y - shot.crop.y) * k});
+  const final = shot.crop;
+  const zt = zoom ? smooth(interpolate(frame, [zoom.at, zoom.at + (zoom.frames || 24)], [0, 1], clamp)) : 1;
+  const crop = zoom ? {x: lerp(zoom.from.x, final.x, zt), y: lerp(zoom.from.y, final.y, zt), w: lerp(zoom.from.w, final.w, zt), h: lerp(zoom.from.h, final.h, zt)} : final;
+  const k = width / crop.w;
+  const boxHeight = final.h * (width / final.w);
+  const toFrame = (x, y) => ({x: (x - crop.x) * k, y: (y - crop.y) * k});
+  const box = (r) => ({left: (r.x - crop.x) * k, top: (r.y - crop.y) * k, width: r.w * k, height: r.h * k});
   const shown = reveal ? interpolate(frame, [reveal.at, reveal.at + (reveal.frames || 30)], [0, 100], clamp) : 100;
   const press = click ? getClickState(frame, click.at) : null;
   const target = click ? toFrame(click.x, click.y) : null;
   const point = callout ? toFrame(callout.x, callout.y) : null;
   const calloutIn = useSpring(callout ? callout.at : 0, {damping: 9, stiffness: 180});
-  // A callout leaves when its moment is over (callout.until), e.g. when focus moves to another row.
   const calloutGone = callout && Number.isFinite(callout.until) ? interpolate(frame, [callout.until, callout.until + 6], [1, 0], clamp) : 1;
+  const summaryIn = useSpring(summary ? summary.at : 0, {damping: 12, stiffness: 180});
+  const summaryGone = summary && Number.isFinite(summary.until) ? interpolate(frame, [summary.until, summary.until + 8], [1, 0], clamp) : 1;
+
+  // One pointer path through the drag, then the click.
+  const path = [];
+  if (drag) {
+    const a = toFrame(drag.from.x, drag.from.y), b = toFrame(drag.to.x, drag.to.y), f = drag.frames || 36;
+    path.push({frame: drag.at, x: a.x, y: a.y}, {frame: drag.at + f * 0.55, x: lerp(a.x, b.x, 0.6), y: Math.min(a.y, b.y) - 70}, {frame: drag.at + f, x: b.x, y: b.y}, {frame: drag.at + f + 10, x: b.x + 30, y: b.y + 40});
+  }
+  if (click) {
+    const last = path[path.length - 1];
+    const startFrame = last ? Math.max(last.frame + 4, click.at - 34) : Math.max(0, click.at - 34);
+    const from = last && last.frame < startFrame ? last : {x: target.x - 260, y: target.y + 240};
+    if (!last || last.frame < startFrame) path.push({frame: startFrame, x: from.x, y: from.y});
+    path.push({frame: lerp(startFrame, click.at - 6, 0.5), x: lerp(from.x, target.x, 0.55), y: Math.min(from.y, target.y) - 50}, {frame: click.at - 6, x: target.x, y: target.y}, {frame: click.at + 12, x: target.x, y: target.y}, {frame: click.at + 36, x: target.x + 120, y: target.y + 160});
+  }
+  const hover = click ? Math.min(1, Math.max(0, (frame - (click.at - 12)) / 6)) * (frame < click.at + 14 ? 1 : 0) : 0;
+
+  // Drag: file card follows the pointer; the region stays hidden until the drop, then pops in.
+  const dragEnd = drag ? drag.at + (drag.frames || 36) : 0;
+  const pointerAt = (f) => {
+    const next = path.findIndex((pt) => pt.frame > f);
+    const p0 = next <= 0 ? path[Math.max(0, next === 0 ? 0 : path.length - 1)] : path[next - 1];
+    const p1 = next <= 0 ? p0 : path[next];
+    const t = p0 === p1 ? 0 : smooth(Math.min(1, (f - p0.frame) / (p1.frame - p0.frame)));
+    return {x: lerp(p0.x, p1.x, t), y: lerp(p0.y, p1.y, t)};
+  };
+  const dropPop = drag ? interpolate(frame, [dragEnd, dragEnd + 8], [0, 1], clamp) : 1;
+  // Typing: each line of the region is uncovered left to right in turn.
+  const typeT = type ? interpolate(frame, [type.at, type.at + (type.frames || 45)], [0, 1], clamp) : 1;
+  const lines = type ? type.lines || 1 : 1;
+
   return <div style={{position: 'relative', width}}>
-    {evidence ? <div style={{fontFamily: font, fontSize: 28, fontWeight: 700, color: palette.muted, letterSpacing: 0.5, marginBottom: 14}}>{evidence}</div> : null}
-    <div style={card({overflow: 'hidden', clipPath: `inset(0 0 ${100 - shown}% 0)`, transform: press ? `scale(${press.targetScale})` : undefined})}>
-      <Shot src={shot.src} sourceWidth={shot.source_width} crop={shot.crop} width={width} />
-      {focus?.length ? <FocusBands focus={focus} crop={shot.crop} k={k} palette={palette} /> : null}
+    {evidence ? <div style={{fontFamily: font, fontSize: 24, fontWeight: 700, letterSpacing: 2, color: palette.muted, marginBottom: 14}}>{evidence}</div> : null}
+    {/* Overlays share the screenshot's box so source coordinates line up exactly. */}
+    <div style={{position: 'relative'}}>
+    <div style={card({position: 'relative', height: boxHeight, overflow: 'hidden', clipPath: `inset(0 0 ${100 - shown}% 0)`})}>
+      <Shot src={shot.src} sourceWidth={shot.source_width} crop={crop} width={width} />
+      {drag && drag.region ? <div style={{position: 'absolute', ...box(drag.region), background: drag.mask || '#fff', opacity: 1 - dropPop}} /> : null}
+      {type ? Array.from({length: lines}, (_, i) => {
+        const r = type.region, lineH = r.h / lines;
+        const t = Math.max(0, Math.min(1, typeT * lines - i));
+        const b = box({x: r.x, y: r.y + i * lineH, w: r.w, h: lineH});
+        return <div key={i} style={{position: 'absolute', left: b.left + b.width * t, top: b.top, width: b.width * (1 - t) + 4, height: b.height, background: type.mask || '#fff'}}>
+          {t > 0 && t < 1 || (i === lines - 1 && typeT >= 1 && Math.floor(frame / 15) % 2 === 0 && frame < type.at + (type.frames || 45) + 20) ? <div style={{position: 'absolute', left: 0, top: b.height * 0.15, width: 3, height: b.height * 0.7, background: palette.ink}} /> : null}
+        </div>;
+      }) : null}
+      {focus?.length ? <FocusBands focus={focus} crop={crop} k={k} palette={palette} /> : null}
+      {click && hover > 0 ? <div style={{position: 'absolute', left: target.x - 46, top: target.y - 46, width: 92, height: 92, borderRadius: '50%', boxShadow: `0 0 0 ${6 * hover}px ${palette.cool}55`, background: press && press.phase === 'press' ? 'rgba(0,0,0,.18)' : 'transparent', transform: `scale(${press ? press.targetScale : 1})`}} /> : null}
+      {wait && frame >= wait.at && frame < wait.at + (wait.frames || 30) ? <div style={{position: 'absolute', inset: 0, background: 'rgba(255,255,255,.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16}}>
+        {[0, 1, 2].map((i) => <div key={i} style={{width: 22, height: 22, borderRadius: '50%', background: palette.cool, transform: `translateY(${Math.sin((frame - wait.at) / 3 - i) * 10}px)`, opacity: 0.85}} />)}
+      </div> : null}
     </div>
-    {click ? <Cursor path={[{frame: Math.max(0, click.at - 30), x: target.x - 160, y: target.y + 260}, {frame: click.at - 4, x: target.x, y: target.y}, {frame: click.at + 10, x: target.x, y: target.y}, {frame: click.at + 34, x: target.x + 220, y: target.y + 520}]} clicks={[click.at]} rippleColor={palette.cool} /> : null}
+    {drag && frame >= drag.at && frame < dragEnd + 4 ? (() => {
+      const pt = pointerAt(frame);
+      const shrink = interpolate(frame, [dragEnd - 6, dragEnd + 4], [1, 0.4], clamp);
+      return <div style={{position: 'absolute', left: pt.x + 18, top: pt.y + 18, zIndex: 19, transform: `scale(${shrink}) rotate(${-4 * shrink}deg)`, transformOrigin: '0 0', opacity: shrink, display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderRadius: 18, background: '#fff', boxShadow: '0 18px 40px rgba(23,25,35,.25)', fontFamily: font, fontSize: 26, fontWeight: 600, color: palette.ink, whiteSpace: 'nowrap'}}>
+        <Icon name="mic" size={40} color={objectColor('mic', palette)} />{drag.file}
+      </div>;
+    })() : null}
+    {path.length ? <Cursor path={path} clicks={click ? [click.at] : []} hand={click ? [[click.at - 12, click.at + 14]] : []} rippleColor={palette.cool} /> : null}
+    {summary && summaryIn && summaryGone > 0 ? <div style={{position: 'absolute', left: '50%', top: boxHeight + 26, transformOrigin: '50% 0', transform: `translateX(-50%) scale(${summaryIn})`, opacity: Math.min(1, summaryIn * 2) * summaryGone, zIndex: 7, padding: '20px 30px', borderRadius: 22, background: palette.ink, color: '#fff', fontFamily: font, fontSize: 38, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 20px 50px rgba(23,25,35,.35)'}}>{summary.text}</div> : null}
     {stamp ? <NewStamp at={stamp.at} label={stamp.label} palette={palette} font={font} sound={sound} style={{right: -10, top: -40}} /> : null}
     {callout && calloutIn && calloutGone > 0 ? <div style={{position: 'absolute', left: point.x - 150, top: point.y - 130, width: 300, zIndex: 6, opacity: Math.min(1, calloutIn * 2) * calloutGone, transform: `scale(${calloutIn})`, transformOrigin: '50% 100%'}}>
       <div style={{background: palette.warm, color: '#fff', borderRadius: 20, padding: '14px 18px', fontFamily: font, textAlign: 'center', boxShadow: '0 12px 30px rgba(240,100,73,.35)'}}>
@@ -176,9 +245,14 @@ export const ProductShot = ({shot, width = 936, click, reveal, stamp, callout, f
       </div>
       <div style={{width: 0, height: 0, margin: '0 auto', borderLeft: '16px solid transparent', borderRight: '16px solid transparent', borderTop: `18px solid ${palette.warm}`}} />
     </div> : null}
+    </div>
+    {sound && drag ? <><Sfx at={drag.at} name="swish" volume={0.35} /><Sfx at={dragEnd} name="pop" volume={0.55} /></> : null}
+    {sound && type ? <Taps from={type.at} count={Math.round((type.frames || 45) / 3)} every={3} volume={0.25} /> : null}
     {sound && focus ? focus.map((band) => <Sfx key={band.at} at={band.at} name="tick" volume={0.35} />) : null}
     {sound && click ? <Sfx at={click.at} name="return" volume={0.6} /> : null}
     {sound && reveal ? <Sfx at={reveal.at} name="swish" volume={0.3} /> : null}
+    {sound && zoom ? <Sfx at={zoom.at} name="swish" volume={0.25} /> : null}
+    {sound && wait ? <Sfx at={wait.at + (wait.frames || 30)} name="coin" volume={0.45} /> : null}
     {sound && callout ? <Sfx at={callout.at} name="pop" volume={0.5} /> : null}
   </div>;
 };

@@ -321,10 +321,10 @@ class StateAndUtilitiesTests(unittest.TestCase):
             "duration_sec": 60,
             "captions": [
                 {"start_sec": 0, "end_sec": 30, "text": "你" * 90},
-                {"start_sec": 31.5, "end_sec": 58, "text": "我" * 80},
+                {"start_sec": 32.2, "end_sec": 58, "text": "我" * 80},
             ],
             "transitions": [
-                {"start_sec": 30, "end_sec": 31.5, "label": "下一步", "readable": True}
+                {"start_sec": 30, "end_sec": 32.2, "label": "下一步", "readable": True}
             ],
         }
         self.assertEqual(timeline_validator.validate(data), [])
@@ -339,7 +339,7 @@ class StateAndUtilitiesTests(unittest.TestCase):
         errors = timeline_validator.validate(data)
         self.assertTrue(any("too fast" in error for error in errors))
         self.assertTrue(any("overlaps" in error for error in errors))
-        self.assertTrue(any("at least 1.2" in error for error in errors))
+        self.assertTrue(any("at least 2" in error for error in errors))
 
     def test_timeline_defaults_to_english(self):
         data = {
@@ -366,9 +366,9 @@ class StateAndUtilitiesTests(unittest.TestCase):
             "duration_sec": 60,
             "captions": [
                 {"start_sec": 0, "end_sec": 25, "text": " ".join(["work"] * 55)},
-                {"start_sec": 26.5, "end_sec": 58, "text": " ".join(["check"] * 55)},
+                {"start_sec": 27.2, "end_sec": 58, "text": " ".join(["check"] * 55)},
             ],
-            "transitions": [{"start_sec": 25, "end_sec": 26.5, "readable": True}],
+            "transitions": [{"start_sec": 25, "end_sec": 27.2, "readable": True}],
         }
         self.assertEqual(timeline_validator.validate(data), [])
 
@@ -659,6 +659,7 @@ class StoryBeatTests(unittest.TestCase):
         scene = next(s for s in story["scenes"] if s["id"] == "s2")
         scene["headline"] = "A very long headline that keeps going and asks the viewer to read far too much text"
         scene["flow"] = scene["flow"][:2]
+        story["transitions"] = []
         errors = check_story.check(story, self.TEMPLATE / "public", check_story.icon_names())
         self.assertTrue(any("words on screen" in e for e in errors))
         self.assertTrue(any("unchanged for" in e for e in errors))

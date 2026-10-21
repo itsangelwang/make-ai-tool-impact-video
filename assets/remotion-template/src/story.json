@@ -22,7 +22,7 @@
   ],
   "transitions": [
     {
-      "start_sec": 12.6,
+      "start_sec": 11.8,
       "end_sec": 14.0,
       "label": "Hand the same notes to AI",
       "symbol": "→",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "start_sec": 38.6,
+      "start_sec": 37.8,
       "end_sec": 40.0,
       "label": "You still own the check",
       "symbol": "✓",

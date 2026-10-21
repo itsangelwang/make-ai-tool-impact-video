@@ -7,7 +7,7 @@
   "cue_rate_max": {"zh": 4.2, "en": 2.7},
   "average_rate_max": {"zh": 3.8, "en": 2.5},
   "caption_length_max": {"zh": 34, "en": 14},
-  "readable_transition_min_sec": 1.2,
+  "readable_transition_min_sec": 2.0,
   "scenes": {"min": 5, "max": 7},
   "before_steps": {"min": 2, "max": 3},
   "after_steps": {"min": 2, "max": 4},

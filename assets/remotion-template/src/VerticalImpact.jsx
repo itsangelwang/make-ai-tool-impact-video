@@ -13,6 +13,18 @@ const LABELS = {
   zh: {handoff: '交给 AI 处理这一步', humanCheck: '最后一步仍由人负责', nextAction: '今天可以这样试', before: '使用前', after: '使用后', you: '你'},
   en: {handoff: 'AI takes this step', humanCheck: 'You still own the final check', nextAction: 'Try this today', before: 'Before', after: 'After', you: 'YOU'},
 };
+// Each phase of the story has its own look so viewers always know where they are:
+// the problem (warm), what AI changes (violet), the person's job (amber), and the try-it (green).
+const PHASES = {
+  problem: {types: ['pain-hook', 'before-workflow'], paper: '#FBEDE7', accent: '#E8553A'},
+  ai: {types: ['ai-handoff', 'after-workflow', 'before-after'], paper: '#EFECFF', accent: '#6857F5'},
+  human: {types: ['human-check'], paper: '#FFF4D6', accent: '#B7791F'},
+  next: {types: ['next-action'], paper: '#E5F4EA', accent: '#2E8B57'},
+};
+export const phaseOf = (type, palette = {}) => {
+  const [name, phase] = Object.entries(PHASES).find(([, item]) => item.types.includes(type)) || ['ai', PHASES.ai];
+  return {name, ...phase, ...(palette.phases?.[name] || {})};
+};
 const localeOf = (story) => (String(story.language || 'en-US').startsWith('en') ? 'en' : 'zh');
 const FontContext = createContext(FONTS.zh.body);
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'};
@@ -104,8 +116,11 @@ export const BrandEnding = ({brand, palette, displayFont}) => {
   </AbsoluteFill>;
 };
 
-const Scene = ({scene, palette, labels, sound}) => {
+const Scene = ({scene, palette: base, labels, sound}) => {
   const font = useContext(FontContext);
+  const phase = phaseOf(scene.type, base);
+  // Beats keep the story palette for warm/cool meaning; the scene paper follows the phase.
+  const palette = {...base, paper: phase.paper};
   const frame = useCurrentFrame();
   const local = frame;
   const pulse = interpolate(local, [0, 18, 45], [.96, 1.03, 1], clamp);
@@ -113,7 +128,8 @@ const Scene = ({scene, palette, labels, sound}) => {
   const after = scene.after || [];
   const steps = scene.type === 'after-workflow' ? after : before;
   const beat = {palette, font, sound};
-  const shot = scene.shot ? {shot: scene.shot, evidence: scene.shot.evidence, click: withFrames(scene.shot.click), reveal: withFrames(scene.shot.reveal), stamp: withFrames(scene.shot.stamp), callout: scene.shot.callout ? {...withFrames(scene.shot.callout), until: scene.shot.callout.until_sec === undefined ? undefined : at(scene.shot.callout.until_sec)} : undefined, focus: (scene.shot.focus || []).map(withFrames)} : null;
+  const until = (item) => (item ? {...withFrames(item), until: item.until_sec === undefined ? undefined : at(item.until_sec)} : undefined);
+  const shot = scene.shot ? {shot: scene.shot, evidence: scene.shot.evidence, click: withFrames(scene.shot.click), reveal: withFrames(scene.shot.reveal), stamp: withFrames(scene.shot.stamp), callout: until(scene.shot.callout), summary: until(scene.shot.summary), focus: (scene.shot.focus || []).map(withFrames), zoom: withFrames(scene.shot.zoom), drag: withFrames(scene.shot.drag), type: withFrames(scene.shot.type), wait: withFrames(scene.shot.wait)} : null;
   const flow = scene.flow ? scene.flow.map(withFrames) : null;
   const stepAt = (i) => (scene.steps_at_sec ? at(scene.steps_at_sec[i]) : null);
   const showBox = Boolean(scene.visual);
@@ -122,12 +138,12 @@ const Scene = ({scene, palette, labels, sound}) => {
   const introAt = scene.new_feature ? at(scene.new_feature.at_sec) : null;
   const stackOpacity = introAt === null ? 1 : interpolate(local, [introAt - 6, introAt], [1, 0], clamp);
   return (
-    <AbsoluteFill style={{padding: '112px 72px 360px', background: palette.paper, color: palette.ink, overflow: 'hidden'}}>
-      <div style={{position: 'absolute', width: 650, height: 650, right: -350, top: -260, borderRadius: '50%', background: `${palette.cool}16`, transform: `scale(${pulse})`}} />
+    <AbsoluteFill style={{padding: '112px 72px 360px', background: phase.paper, color: palette.ink, overflow: 'hidden'}}>
+      <div style={{position: 'absolute', width: 650, height: 650, right: -350, top: -260, borderRadius: '50%', background: `${phase.accent}1F`, transform: `scale(${pulse})`}} />
       <div style={{position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column'}}>
-        <div><Badge color={scene.type === 'before-workflow' ? palette.warm : palette.cool}>{scene.label}</Badge></div>
+        <div><Badge color={phase.accent}>{scene.label}</Badge></div>
         {scene.new_tag ? <div style={{marginTop: 22}}><NewTag at={0} {...beat}>{scene.new_tag}</NewTag></div> : null}
-        <h1 style={{textWrap: 'balance', fontWeight: 800, fontFamily: font, fontSize: scene.type === 'pain-hook' ? 92 : 72, lineHeight: 1.08, margin: '38px 0 20px', letterSpacing: -2}}><Headline text={scene.headline} accent={['pain-hook', 'before-workflow', 'human-check'].includes(scene.type) ? palette.warm : palette.cool} /></h1>
+        <h1 style={{textWrap: 'balance', fontWeight: 800, fontFamily: font, fontSize: scene.type === 'pain-hook' ? 92 : 72, lineHeight: 1.08, margin: '38px 0 20px', letterSpacing: -2}}><Headline text={scene.headline} accent={phase.accent} /></h1>
         {/* The body sits centered between the headline and the caption zone. */}
         <div style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', paddingBottom: 40}}>
         {shot ? <div style={{marginBottom: 38}}><ProductShot {...shot} {...beat} /></div> : null}
@@ -139,8 +155,8 @@ const Scene = ({scene, palette, labels, sound}) => {
         {['before-workflow', 'after-workflow'].includes(scene.type) && !custom ? steps.map((step, i) => <Card key={step} index={i} delay={stepAt(i)} accent={scene.type === 'after-workflow' ? palette.cool : palette.warm}>{step}</Card>) : null}
         {scene.type === 'ai-handoff' && !shot && showBox ? <div style={{marginTop: 120, textAlign: 'center', transform: `scale(${pulse})`}}><div style={{fontFamily: font, fontWeight: 900, fontSize: 56, padding: 42, background: palette.ink, color: '#fff', borderRadius: 36}}>{scene.visual}</div><div style={{height: 100, width: 10, background: palette.cool, margin: '0 auto'}} /><div style={{fontFamily: font, fontSize: 44, fontWeight: 850, color: palette.cool}}>{labels.handoff}</div></div> : null}
         {scene.type === 'before-after' && !custom ? <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24}}><div><Badge color={palette.warm}>{labels.before}</Badge>{before.map((x,i)=><Card key={x} index={i} accent={palette.warm}>{x}</Card>)}</div><div><Badge color={palette.cool}>{labels.after}</Badge>{after.map((x,i)=><Card key={x} index={i} accent={palette.cool}>{x}</Card>)}</div></div> : null}
-        {scene.type === 'human-check' && showBox ? <div style={{padding: 46, border: `5px solid ${palette.warm}`, borderRadius: 36, background: '#fff'}}><div style={{fontFamily: font, fontSize: 34, fontWeight: 500, color: palette.muted}}>{labels.humanCheck}</div><div style={{textWrap: 'balance', fontFamily: font, fontSize: 56, lineHeight: 1.2, fontWeight: 700, marginTop: 18}}>{scene.visual}</div></div> : null}
-        {scene.type === 'next-action' && showBox ? <div style={{padding: 48, background: palette.cool, color: '#fff', borderRadius: 40}}><div style={{fontFamily: font, fontSize: 30, fontWeight: 500, opacity: .85}}>{labels.nextAction}</div><div style={{textWrap: 'balance', fontFamily: font, fontSize: 58, lineHeight: 1.2, fontWeight: 700, marginTop: 18}}>{scene.visual}</div></div> : null}
+        {scene.type === 'human-check' && showBox ? <div style={{padding: 46, border: `5px solid ${phase.accent}`, borderRadius: 36, background: '#fff'}}><div style={{fontFamily: font, fontSize: 34, fontWeight: 500, color: palette.muted}}>{labels.humanCheck}</div><div style={{textWrap: 'balance', fontFamily: font, fontSize: 56, lineHeight: 1.2, fontWeight: 700, marginTop: 18}}>{scene.visual}</div></div> : null}
+        {scene.type === 'next-action' && showBox ? <div style={{padding: 48, background: phase.accent, color: '#fff', borderRadius: 40}}><div style={{fontFamily: font, fontSize: 30, fontWeight: 500, opacity: .85}}>{labels.nextAction}</div><div style={{textWrap: 'balance', fontFamily: font, fontSize: 58, lineHeight: 1.2, fontWeight: 700, marginTop: 18}}>{scene.visual}</div></div> : null}
         {scene.scrub ? <div style={{marginTop: 20}}><Scrub scrub={{...withFrames(scene.scrub), ask_at: scene.scrub.ask_at_sec === undefined ? undefined : at(scene.scrub.ask_at_sec)}} {...beat} /></div> : null}
         {scene.roles ? <div style={{marginTop: 30}}><RoleStrip at={at(scene.roles.at_sec)} you={scene.roles.you} ai={scene.roles.ai} youLabel={labels.you} {...beat} /></div> : null}
         {scene.checks ? <div style={{marginTop: 30}}><CheckCards at={at(scene.checks_at_sec)} checks={scene.checks} {...beat} /></div> : null}
@@ -154,7 +170,7 @@ const Scene = ({scene, palette, labels, sound}) => {
 // Every scene change gets a short nonverbal transition: the next scene enters over the
 // previous one (which stays underneath for ENTER_FRAMES). Readable chapter transitions
 // from story.transitions still play as full-frame cards on top.
-const ENTER_FRAMES = 12;
+const ENTER_FRAMES = 16;
 const ENTER_CYCLE = ['slide', 'wipe', 'rise'];
 const SceneEnter = ({type, children}) => {
   const frame = useCurrentFrame();
@@ -187,7 +203,7 @@ export const VerticalImpact = ({story}) => {
         const first = Math.round(story.scenes[0].start_sec * fps);
         const last = Math.round(story.scenes[story.scenes.length - 1].end_sec * fps);
         const durations = story.scenes.map((scene) => Math.max(1, Math.round((scene.end_sec - scene.start_sec) * fps)));
-        return <Sequence from={first} durationInFrames={Math.max(1, last - first)}><ProgressBar durationsInFrames={durations} top={64} height={8} color={story.palette.cool} trackColor={`${story.palette.ink}22`} /></Sequence>;
+        return <Sequence from={first} durationInFrames={Math.max(1, last - first)}><ProgressBar durationsInFrames={durations} colors={story.scenes.map((scene) => phaseOf(scene.type, story.palette).accent)} top={64} height={8} color={story.palette.cool} trackColor={`${story.palette.ink}22`} /></Sequence>;
       })() : null}
       {story.audio ? <Audio src={staticFile(story.audio)} /> : null}
       <TimedCaptions />
