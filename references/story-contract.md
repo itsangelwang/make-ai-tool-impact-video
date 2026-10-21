@@ -15,6 +15,7 @@ Create JSON with `schema_version: 1` and these required fields:
 - `readiness`: one of `use-now`, `try-now`, `watch`, `future`.
 - `next_action`: a small, reversible experiment consistent with readiness.
 - `narration`: natural speech with no stage directions; normally 150–190 Han characters for `zh-CN` or 90–135 words for `en-US` when readable transitions are included. Use the low end only for a deliberately fast, energetic delivery.
+- `coverage`: the existing-coverage check from [topic-check.md](topic-check.md): `checked_at`, `existing` (each `by` = `official` or `creator`, `url`, `shows`), `our_angle`, and `decision` (`make` or `change-angle`; `skip` fails validation).
 - `brand`: optional; `null` or `{name, slogan, start_sec, end_sec}` for the brand card that follows the last scene. See [brand-system.md](brand-system.md).
 - `scenes`: 5–7 objects with `id`, `type`, `purpose`, `start_sec`, `end_sec`, `headline`, `visual`, and `claim_ids`.
 

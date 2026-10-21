@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -54,6 +55,7 @@ def package(task="整理会议纪要", audience="项目经理"):
         "readiness": "try-now",
         "next_action": "用一份非敏感材料对照测试",
         "narration": "你" * 180,
+        "coverage": {"checked_at": "2026-10-21", "existing": [{"by": "official", "url": "https://example.com/launch", "shows": "功能总览"}], "our_angle": "一个人完成一件具体任务", "decision": "make"},
         "scenes": scenes,
     }
 
@@ -78,6 +80,20 @@ class PackageTests(unittest.TestCase):
     def test_waitlist_is_explicit(self):
         item = package()
         item["readiness"] = "watch"
+        self.assertEqual(validator.validate(item, ledger()), [])
+
+    def test_coverage_check_is_required_and_skip_stops(self):
+        item = package()
+        del item["coverage"]
+        self.assertTrue(any("coverage" in e for e in validator.validate(item, ledger())))
+        item = package()
+        item["coverage"]["decision"] = "skip"
+        self.assertTrue(any("skip" in e for e in validator.validate(item, ledger())))
+        item = package()
+        item["coverage"]["existing"] = [{"by": "someone", "url": ""}]
+        self.assertTrue(any("existing 0" in e for e in validator.validate(item, ledger())))
+        item = package()
+        item["coverage"]["decision"] = "change-angle"
         self.assertEqual(validator.validate(item, ledger()), [])
 
     def test_bad_duration_fails(self):
@@ -381,6 +397,28 @@ class SnapshotVersionTests(unittest.TestCase):
             self.assertTrue((first / "video" / "src" / "components" / "Shot.jsx").is_file())
             self.assertFalse(any(p.suffix == ".mp4" for p in first.rglob("*")))
             self.assertEqual((first / "NOTE.txt").read_text().strip(), "first review")
+
+
+class VerifyVideoToolTests(unittest.TestCase):
+    def test_falls_back_to_remotion_bundled_ffmpeg(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            compositor = project / "node_modules" / "@remotion" / "compositor-test"
+            compositor.mkdir(parents=True)
+            for name in ("ffmpeg", "ffprobe"):
+                (compositor / name).write_text("")
+            video = project / "renders" / "final.mp4"
+            video.parent.mkdir()
+            with unittest.mock.patch.object(verify_video.shutil, "which", return_value=None):
+                probe, mpeg, source = verify_video.find_tools(video)
+            self.assertEqual(source, "remotion-bundled")
+            self.assertEqual(Path(mpeg).parent, compositor.resolve())
+            self.assertIn(str(compositor.resolve()), verify_video.tool_env(mpeg)["DYLD_LIBRARY_PATH"])
+
+    def test_decode_names_encoders_for_bundled_ffmpeg(self):
+        command = verify_video.decode_command("ffmpeg", Path("final.mp4"))
+        self.assertEqual(command[-6:], ["-c:v", "rawvideo", "-c:a", "pcm_s16le", "-f", "null", "-"][-6:])
+        self.assertIn("rawvideo", command)
 
 
 class ExampleTests(unittest.TestCase):

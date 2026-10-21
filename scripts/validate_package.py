@@ -18,10 +18,11 @@ SCENE_TYPES = {
 READINESS = {"use-now", "try-now", "watch", "future"}
 LEVELS = {"observed", "vendor-claim", "inference", "hypothesis"}
 SOURCE_TYPES = {"official", "independent", "community", "user-provided"}
+COVERAGE_DECISIONS = {"make", "change-angle", "skip"}
 REQUIRED = {
     "schema_version", "language", "market", "tool", "audience", "task", "before_steps", "friction",
     "ai_change", "after_steps", "human_check", "readiness", "next_action",
-    "narration", "scenes",
+    "narration", "scenes", "coverage",
 }
 
 
@@ -36,6 +37,27 @@ def han_count(text: str) -> int:
 
 def word_count(text: str) -> int:
     return len(re.findall(r"\b[\w]+(?:[’'-][\w]+)*\b", text, flags=re.UNICODE))
+
+
+def coverage_errors(coverage) -> list[str]:
+    if not isinstance(coverage, dict):
+        return ["coverage must be an object; see references/topic-check.md"]
+    errors = []
+    if not coverage.get("checked_at") or not coverage.get("our_angle"):
+        errors.append("coverage requires checked_at and our_angle")
+    existing = coverage.get("existing")
+    if not isinstance(existing, list):
+        errors.append("coverage.existing must list the official and creator videos checked")
+    else:
+        for index, item in enumerate(existing):
+            if not isinstance(item, dict) or item.get("by") not in {"official", "creator"} or not item.get("url") or not item.get("shows"):
+                errors.append(f"coverage.existing {index} requires by (official or creator), url, and shows")
+    decision = coverage.get("decision")
+    if decision not in COVERAGE_DECISIONS:
+        errors.append(f"coverage.decision must be one of {sorted(COVERAGE_DECISIONS)}")
+    elif decision == "skip":
+        errors.append("coverage.decision is skip; tell the user why and propose another topic instead of making this video")
+    return errors
 
 
 def validate(package: dict, ledger: dict, duration_exception: str | None = None) -> list[str]:
@@ -53,6 +75,7 @@ def validate(package: dict, ledger: dict, duration_exception: str | None = None)
         low, high = LIMITS[field]["min"], LIMITS[field]["max"]
         if not isinstance(package[field], list) or not low <= len(package[field]) <= high:
             errors.append(f"{field} must contain {low}-{high} steps")
+    errors.extend(coverage_errors(package["coverage"]))
     if package["readiness"] not in READINESS:
         errors.append(f"readiness must be one of {sorted(READINESS)}")
     language = package["language"]
