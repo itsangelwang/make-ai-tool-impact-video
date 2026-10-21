@@ -169,6 +169,8 @@ Visually inspect the full video and representative frames. Confirm native 1080×
 
 ## 6. Deliver
 
-Deliver the MP4, cover, captions, source ledger, claim ledger, and QA report. State actual duration and publication blockers. Do not publish automatically.
+Deliver the MP4, cover, captions, source ledger, claim ledger, QA report, and `social-titles.md`. State actual duration and publication blockers. Do not publish automatically.
+
+Write `<project-dir>/social-titles.md` with three post titles in English and three in Chinese, each set written natively for its market rather than translated. Base each title on the final video's hook and before → after change; keep every claim within `claim-ledger.json` and never add numbers, rankings, or results the video does not show. Name the tool, keep each title short enough to read on a phone at a glance (about 60 characters in English, 25 in Chinese), and avoid clickbait. Show the titles to the user with the delivery.
 
 Use [references/failure-modes.md](references/failure-modes.md) when evidence, access, rights, TTS, browser, FFmpeg, or rendering is unavailable.
