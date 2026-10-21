@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -360,6 +361,28 @@ class StateAndUtilitiesTests(unittest.TestCase):
         self.assertIn("model=flux-hannah-en", url)
         self.assertNotIn("DEEPGRAM_API_KEY", url)
 
+
+
+class VerifyVideoToolTests(unittest.TestCase):
+    def test_falls_back_to_remotion_bundled_ffmpeg(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            compositor = project / "node_modules" / "@remotion" / "compositor-test"
+            compositor.mkdir(parents=True)
+            for name in ("ffmpeg", "ffprobe"):
+                (compositor / name).write_text("")
+            video = project / "renders" / "final.mp4"
+            video.parent.mkdir()
+            with unittest.mock.patch.object(verify_video.shutil, "which", return_value=None):
+                probe, mpeg, source = verify_video.find_tools(video)
+            self.assertEqual(source, "remotion-bundled")
+            self.assertEqual(Path(mpeg).parent, compositor.resolve())
+            self.assertIn(str(compositor.resolve()), verify_video.tool_env(mpeg)["DYLD_LIBRARY_PATH"])
+
+    def test_decode_names_encoders_for_bundled_ffmpeg(self):
+        command = verify_video.decode_command("ffmpeg", Path("final.mp4"))
+        self.assertEqual(command[-6:], ["-c:v", "rawvideo", "-c:a", "pcm_s16le", "-f", "null", "-"][-6:])
+        self.assertIn("rawvideo", command)
 
 
 class ExampleTests(unittest.TestCase):
