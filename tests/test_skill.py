@@ -526,6 +526,11 @@ class ReadmeTests(unittest.TestCase):
         self.assertIn("ACEMODE", self.readme)
         self.assertIn(str(fish_audio_tts.DEFAULT_ENV_FILE), self.readme)
 
+    def test_social_titles_are_a_stated_output(self):
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("social-titles.md", skill)
+        self.assertIn("social-titles.md", self.readme)
+
 
 class LimitsConsistencyTests(unittest.TestCase):
     """Docs repeat key numbers for readers; they must match scripts/limits.json."""
