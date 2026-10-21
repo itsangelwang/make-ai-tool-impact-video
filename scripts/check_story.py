@@ -46,9 +46,10 @@ def screen_words(scene: dict, story: dict) -> int:
     fix = scene.get("fix") or {}
     texts += [fix.get("label"), fix.get("wrong"), fix.get("right")]
     texts.append((scene.get("scrub") or {}).get("ask"))
-    if scene.get("type") in {"pain-hook", "before-workflow"} and not scene.get("flow") and not scene.get("shot"):
+    custom = any(scene.get(key) for key in ("shot", "flow", "scrub", "fix"))
+    if scene.get("type") in {"pain-hook", "before-workflow"} and not custom:
         texts += story.get("before_steps", []) if scene.get("type") == "before-workflow" or not feature else []
-    if scene.get("type") == "after-workflow" and not scene.get("flow") and not scene.get("shot"):
+    if scene.get("type") == "after-workflow" and not custom:
         texts += story.get("after_steps", [])
     return words(*texts)
 
@@ -60,8 +61,15 @@ def change_times(scene: dict) -> list[float]:
         item = scene.get(key)
         if isinstance(item, dict) and isinstance(item.get("at_sec"), (int, float)):
             times.append(item["at_sec"])
-    if isinstance((scene.get("scrub") or {}).get("ask_at_sec"), (int, float)):
-        times.append(scene["scrub"]["ask_at_sec"])
+    scrub = scene.get("scrub") or {}
+    if isinstance(scrub.get("at_sec"), (int, float)):
+        # The playhead keeps jumping for six moves of 22 frames each.
+        times += [scrub["at_sec"] + (8 + 22 * n) / 30 for n in range(1, 7)]
+    if isinstance(scrub.get("ask_at_sec"), (int, float)):
+        times.append(scrub["ask_at_sec"])
+    fix = scene.get("fix") or {}
+    if isinstance(fix.get("at_sec"), (int, float)):
+        times.append(fix["at_sec"] + 24 / 30)  # the right value pops in
     shot = scene.get("shot") or {}
     for key in ("click", "reveal", "stamp", "callout"):
         if isinstance((shot.get(key) or {}).get("at_sec"), (int, float)):

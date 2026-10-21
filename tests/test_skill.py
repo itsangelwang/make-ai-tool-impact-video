@@ -499,6 +499,14 @@ class BuildCaptionsTests(unittest.TestCase):
                     self.assertIn(f"narration mismatch at normalized character {location}", result.stderr)
                     self.assertEqual(output.read_text(), "keep")
 
+    def test_brand_cue_keeps_flag_for_hidden_caption_bar(self):
+        timeline = {"language": "en-US", "captions": [
+            {"start_sec": 0, "end_sec": 2, "text": "Hello there."},
+            {"start_sec": 2.1, "end_sec": 5, "text": "ACEMODE. 10x Faster, Log Off Earlier.", "brand": True}]}
+        cues = build_captions.build_captions(timeline)
+        self.assertNotIn("brand", cues[0])
+        self.assertTrue(cues[1]["brand"])
+
     def test_invalid_timing_rejected(self):
         for start, end in ((-1, 1), (1, 1), (0, float("nan")), (True, 1), (0, 0.0001)):
             with self.subTest(start=start, end=end), self.assertRaises(ValueError):

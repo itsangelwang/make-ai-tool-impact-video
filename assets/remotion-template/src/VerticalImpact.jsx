@@ -27,10 +27,13 @@ const Card = ({children, index = 0, delay = null, accent = '#6857F5'}) => {
   const {fps} = useVideoConfig();
   const start = delay === null ? index * 6 : delay;
   const p = frame < start ? 0 : spring({frame: frame - start, fps, config: {damping: 18, stiffness: 150}});
-  return <div style={{padding: '26px 28px', marginBottom: 20, borderRadius: 28, background: '#fff', borderLeft: `10px solid ${accent}`, boxShadow: '0 16px 45px rgba(31,35,48,.10)', textWrap: 'balance', fontFamily: font, fontSize: 42, fontWeight: 750, color: '#161820', opacity: p, transform: `translateY(${(1-p)*55}px) scale(${.96 + p*.04})`}}>{children}</div>;
+  return <div style={{padding: '26px 28px', marginBottom: 20, borderRadius: 28, background: '#fff', borderLeft: `10px solid ${accent}`, boxShadow: '0 16px 45px rgba(31,35,48,.10)', textWrap: 'balance', fontFamily: font, fontSize: 42, fontWeight: 600, color: '#161820', opacity: p, transform: `translateY(${(1-p)*55}px) scale(${.96 + p*.04})`}}>{children}</div>;
 };
 
-const Badge = ({children, color}) => <div style={{display: 'inline-block', padding: '12px 20px', borderRadius: 999, color: '#fff', background: color, fontFamily: useContext(FontContext), fontSize: 28, fontWeight: 850, letterSpacing: 1}}>{children}</div>;
+// Type levels: eyebrow (small, spaced caps) > headline (800, one accent word) > labels (600-700) > notes (500, muted).
+const Badge = ({children, color}) => <div style={{display: 'inline-flex', alignItems: 'center', gap: 12, color, fontFamily: useContext(FontContext), fontSize: 26, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase'}}><span style={{width: 12, height: 12, borderRadius: '50%', background: color}} />{children}</div>;
+// "*word*" in a headline is drawn in the scene's accent color.
+const Headline = ({text, accent}) => String(text || '').split(/(\*[^*]+\*)/).map((part, i) => part.startsWith('*') && part.endsWith('*') ? <span key={i} style={{color: accent}}>{part.slice(1, -1)}</span> : part);
 
 // Full-frame chapter card. Optional `from` / `to` icon lists turn it into an object handoff:
 // the previous phase's objects slide in, converge, and become the next phase's objects.
@@ -69,8 +72,8 @@ export const FullFrameTransition = ({transition, displayFont, palette = {}, dura
       </> : <div style={{position: 'absolute', left: '50%', top: '50%', marginLeft: -75, marginTop: -75, width: 150, height: 150, borderRadius: 40, background: 'rgba(255,255,255,.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 84, fontWeight: 950, transform: `scale(${0.6 + enter * 0.4})`}}>{transition.symbol || '→'}</div>}
     </div>
     <div style={{position: 'absolute', left: 80, right: 80, top: 960, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, color: '#fff', textAlign: 'center'}}>
-      {transition.kicker ? <div style={{padding: '10px 22px', borderRadius: 999, background: 'rgba(255,255,255,.2)', fontFamily: displayFont, fontSize: 30, fontWeight: 900, letterSpacing: 3, opacity: enter}}>{transition.kicker}</div> : null}
-      <div style={{textWrap: 'balance', fontFamily: displayFont, fontSize: 64, fontWeight: 950, lineHeight: 1.1, maxWidth: 900}}>
+      {transition.kicker ? <div style={{padding: '10px 22px', borderRadius: 999, background: 'rgba(255,255,255,.2)', fontFamily: displayFont, fontSize: 28, fontWeight: 700, letterSpacing: 4, opacity: enter}}>{transition.kicker}</div> : null}
+      <div style={{textWrap: 'balance', fontFamily: displayFont, fontSize: 66, fontWeight: 800, lineHeight: 1.1, letterSpacing: -1, maxWidth: 900}}>
         {words.map((word, i) => {
           const w = frame < 4 + i * 3 ? 0 : spring({frame: frame - 4 - i * 3, fps, config: {damping: 13, stiffness: 190}});
           return <span key={i} style={{display: 'inline-block', marginRight: '0.28em', opacity: w, transform: `translateY(${(1 - w) * 30}px)`}}>{word}</span>;
@@ -110,10 +113,12 @@ const Scene = ({scene, palette, labels, sound}) => {
   const after = scene.after || [];
   const steps = scene.type === 'after-workflow' ? after : before;
   const beat = {palette, font, sound};
-  const shot = scene.shot ? {shot: scene.shot, evidence: scene.shot.evidence, click: withFrames(scene.shot.click), reveal: withFrames(scene.shot.reveal), stamp: withFrames(scene.shot.stamp), callout: withFrames(scene.shot.callout), focus: (scene.shot.focus || []).map(withFrames)} : null;
+  const shot = scene.shot ? {shot: scene.shot, evidence: scene.shot.evidence, click: withFrames(scene.shot.click), reveal: withFrames(scene.shot.reveal), stamp: withFrames(scene.shot.stamp), callout: scene.shot.callout ? {...withFrames(scene.shot.callout), until: scene.shot.callout.until_sec === undefined ? undefined : at(scene.shot.callout.until_sec)} : undefined, focus: (scene.shot.focus || []).map(withFrames)} : null;
   const flow = scene.flow ? scene.flow.map(withFrames) : null;
   const stepAt = (i) => (scene.steps_at_sec ? at(scene.steps_at_sec[i]) : null);
   const showBox = Boolean(scene.visual);
+  // An animated beat replaces the default text cards for this scene.
+  const custom = Boolean(shot || flow || scene.scrub || scene.fix);
   const introAt = scene.new_feature ? at(scene.new_feature.at_sec) : null;
   const stackOpacity = introAt === null ? 1 : interpolate(local, [introAt - 6, introAt], [1, 0], clamp);
   return (
@@ -122,21 +127,21 @@ const Scene = ({scene, palette, labels, sound}) => {
       <div style={{position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column'}}>
         <div><Badge color={scene.type === 'before-workflow' ? palette.warm : palette.cool}>{scene.label}</Badge></div>
         {scene.new_tag ? <div style={{marginTop: 22}}><NewTag at={0} {...beat}>{scene.new_tag}</NewTag></div> : null}
-        <h1 style={{textWrap: 'balance', fontFamily: font, fontSize: scene.type === 'pain-hook' ? 92 : 72, lineHeight: 1.08, margin: '38px 0 20px', letterSpacing: -3}}>{scene.headline}</h1>
+        <h1 style={{textWrap: 'balance', fontWeight: 800, fontFamily: font, fontSize: scene.type === 'pain-hook' ? 92 : 72, lineHeight: 1.08, margin: '38px 0 20px', letterSpacing: -2}}><Headline text={scene.headline} accent={['pain-hook', 'before-workflow', 'human-check'].includes(scene.type) ? palette.warm : palette.cool} /></h1>
         {/* The body sits centered between the headline and the caption zone. */}
         <div style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', paddingBottom: 40}}>
         {shot ? <div style={{marginBottom: 38}}><ProductShot {...shot} {...beat} /></div> : null}
         {scene.asset ? <Img src={staticFile(scene.asset)} style={{width: '100%', height: 600, objectFit: 'cover', borderRadius: 34, boxShadow: '0 24px 70px rgba(31,35,48,.14)', marginBottom: 38}} /> : null}
         {scene.new_feature ? <div style={{position: 'absolute', left: 0, right: 0, top: '50%', transform: 'translateY(-55%)'}}><FeatureIntro at={introAt} feature={scene.new_feature} {...beat} /></div> : null}
+        {scene.fix ? <div style={{marginTop: 10, marginBottom: 10}}><Correction fix={withFrames(scene.fix)} {...beat} /></div> : null}
         {flow ? <div style={{marginTop: 40, marginBottom: 30, opacity: scene.type === 'pain-hook' ? stackOpacity : 1}}><Flow items={flow} accent={['pain-hook', 'before-workflow'].includes(scene.type) ? palette.warm : palette.cool} {...beat} /></div> : null}
-        {scene.type === 'pain-hook' && !flow ? <div style={{marginTop: 120, opacity: stackOpacity, transform: `rotate(${interpolate(local, [0, 45], [-3, 0], clamp)}deg)`}}>{before.map((step, i) => <div key={step} style={{padding: '28px 30px', marginBottom: 20, marginLeft: i * 34, borderRadius: 28, background: '#fff', borderLeft: `10px solid ${i === before.length - 1 ? palette.warm : palette.cool}`, boxShadow: '0 16px 45px rgba(31,35,48,.12)', fontFamily: font, fontSize: 44, fontWeight: 800}}>{step}</div>)}</div> : null}
-        {['before-workflow', 'after-workflow'].includes(scene.type) && !shot && !flow ? steps.map((step, i) => <Card key={step} index={i} delay={stepAt(i)} accent={scene.type === 'after-workflow' ? palette.cool : palette.warm}>{step}</Card>) : null}
+        {scene.type === 'pain-hook' && !custom ? <div style={{marginTop: 120, opacity: stackOpacity, transform: `rotate(${interpolate(local, [0, 45], [-3, 0], clamp)}deg)`}}>{before.map((step, i) => <div key={step} style={{padding: '28px 30px', marginBottom: 20, marginLeft: i * 34, borderRadius: 28, background: '#fff', borderLeft: `10px solid ${i === before.length - 1 ? palette.warm : palette.cool}`, boxShadow: '0 16px 45px rgba(31,35,48,.12)', fontFamily: font, fontSize: 44, fontWeight: 800}}>{step}</div>)}</div> : null}
+        {['before-workflow', 'after-workflow'].includes(scene.type) && !custom ? steps.map((step, i) => <Card key={step} index={i} delay={stepAt(i)} accent={scene.type === 'after-workflow' ? palette.cool : palette.warm}>{step}</Card>) : null}
         {scene.type === 'ai-handoff' && !shot && showBox ? <div style={{marginTop: 120, textAlign: 'center', transform: `scale(${pulse})`}}><div style={{fontFamily: font, fontWeight: 900, fontSize: 56, padding: 42, background: palette.ink, color: '#fff', borderRadius: 36}}>{scene.visual}</div><div style={{height: 100, width: 10, background: palette.cool, margin: '0 auto'}} /><div style={{fontFamily: font, fontSize: 44, fontWeight: 850, color: palette.cool}}>{labels.handoff}</div></div> : null}
-        {scene.type === 'before-after' && !flow ? <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24}}><div><Badge color={palette.warm}>{labels.before}</Badge>{before.map((x,i)=><Card key={x} index={i} accent={palette.warm}>{x}</Card>)}</div><div><Badge color={palette.cool}>{labels.after}</Badge>{after.map((x,i)=><Card key={x} index={i} accent={palette.cool}>{x}</Card>)}</div></div> : null}
-        {scene.type === 'human-check' && showBox ? <div style={{padding: 46, border: `5px solid ${palette.warm}`, borderRadius: 36, background: '#fff'}}><div style={{fontFamily: font, fontSize: 40, color: palette.muted}}>{labels.humanCheck}</div><div style={{textWrap: 'balance', fontFamily: font, fontSize: 60, lineHeight: 1.2, fontWeight: 900, marginTop: 18}}>{scene.visual}</div></div> : null}
-        {scene.type === 'next-action' && showBox ? <div style={{padding: 48, background: palette.cool, color: '#fff', borderRadius: 40}}><div style={{fontFamily: font, fontSize: 34, opacity: .8}}>{labels.nextAction}</div><div style={{textWrap: 'balance', fontFamily: font, fontSize: 62, lineHeight: 1.2, fontWeight: 900, marginTop: 18}}>{scene.visual}</div></div> : null}
+        {scene.type === 'before-after' && !custom ? <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24}}><div><Badge color={palette.warm}>{labels.before}</Badge>{before.map((x,i)=><Card key={x} index={i} accent={palette.warm}>{x}</Card>)}</div><div><Badge color={palette.cool}>{labels.after}</Badge>{after.map((x,i)=><Card key={x} index={i} accent={palette.cool}>{x}</Card>)}</div></div> : null}
+        {scene.type === 'human-check' && showBox ? <div style={{padding: 46, border: `5px solid ${palette.warm}`, borderRadius: 36, background: '#fff'}}><div style={{fontFamily: font, fontSize: 34, fontWeight: 500, color: palette.muted}}>{labels.humanCheck}</div><div style={{textWrap: 'balance', fontFamily: font, fontSize: 56, lineHeight: 1.2, fontWeight: 700, marginTop: 18}}>{scene.visual}</div></div> : null}
+        {scene.type === 'next-action' && showBox ? <div style={{padding: 48, background: palette.cool, color: '#fff', borderRadius: 40}}><div style={{fontFamily: font, fontSize: 30, fontWeight: 500, opacity: .85}}>{labels.nextAction}</div><div style={{textWrap: 'balance', fontFamily: font, fontSize: 58, lineHeight: 1.2, fontWeight: 700, marginTop: 18}}>{scene.visual}</div></div> : null}
         {scene.scrub ? <div style={{marginTop: 20}}><Scrub scrub={{...withFrames(scene.scrub), ask_at: scene.scrub.ask_at_sec === undefined ? undefined : at(scene.scrub.ask_at_sec)}} {...beat} /></div> : null}
-        {scene.fix ? <div style={{marginTop: 30}}><Correction fix={withFrames(scene.fix)} {...beat} /></div> : null}
         {scene.roles ? <div style={{marginTop: 30}}><RoleStrip at={at(scene.roles.at_sec)} you={scene.roles.you} ai={scene.roles.ai} youLabel={labels.you} {...beat} /></div> : null}
         {scene.checks ? <div style={{marginTop: 30}}><CheckCards at={at(scene.checks_at_sec)} checks={scene.checks} {...beat} /></div> : null}
         {scene.access ? <div style={{marginTop: 30}}><AccessChips at={at(scene.access.at_sec)} label={scene.access.label} plans={scene.access.plans} {...beat} /></div> : null}

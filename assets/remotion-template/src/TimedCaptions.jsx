@@ -32,7 +32,7 @@ export const TimedCaptions = () => {
   const {fps} = useVideoConfig();
   const ms = frame * 1000 / fps;
   const cue = captions.find((item) => ms >= item.startMs && ms < item.endMs);
-  if (!cue) return null;
+  if (!cue || cue.brand) return null;
   const english = (cue.language || 'en-US').startsWith('en');
   const units = english ? cue.text.split(/(\s+)/).filter(Boolean) : cue.text.split('');
   const localFrame = (ms - cue.startMs) * fps / 1000;
@@ -50,7 +50,7 @@ export const TimedCaptions = () => {
         const cool = !warm && containsIndex(cue.text,startIndex,cue.highlightCool);
         const emphasized = warm || cool;
         if (index === lineBreak && english) return <div key={`br-${index}`} style={{flexBasis:'100%',height:0}} />;
-        const span = <span key={`${char}-${index}`} style={{display:'inline-block',whiteSpace:/^\s+$/.test(char)?'pre':'normal',fontFamily:english?'Inter, Avenir Next, Arial, sans-serif':'Hannotate SC, Kaiti SC, PingFang SC, sans-serif',fontSize:english?(emphasized?48:43):(emphasized?42:38),lineHeight:english?1.22:1.35,fontWeight:emphasized?900:800,color:warm?'#FF9B74':cool?'#B9AFFF':'#fff',opacity:progress,transform:`translateY(${(1-progress)*(emphasized?32:24)}px) rotate(${english?0:(1-progress)*(index%2?5:-4)}deg) scale(${(.78+progress*.22)*(emphasized&&!english?1.1:1)})`}}>{char}</span>;
+        const span = <span key={`${char}-${index}`} style={{display:'inline-block',whiteSpace:/^\s+$/.test(char)?'pre':'normal',fontFamily:english?'Inter, Avenir Next, Arial, sans-serif':'Hannotate SC, Kaiti SC, PingFang SC, sans-serif',fontSize:english?(emphasized?48:43):(emphasized?42:38),lineHeight:english?1.22:1.35,fontWeight:emphasized?900:650,color:warm?'#FF9B74':cool?'#B9AFFF':'#fff',opacity:progress,transform:`translateY(${(1-progress)*(emphasized?32:24)}px) rotate(${english?0:(1-progress)*(index%2?5:-4)}deg) scale(${(.78+progress*.22)*(emphasized&&!english?1.1:1)})`}}>{char}</span>;
         return index === lineBreak ? [span, <div key={`br-${index}`} style={{flexBasis:'100%',height:0}} />] : span;
       })}
     </div>

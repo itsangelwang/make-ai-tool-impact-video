@@ -49,15 +49,15 @@ export const FeatureIntro = ({at, feature, palette, font, sound = false}) => {
     <div style={card({border: `6px solid ${palette.cool}`, borderRadius: 40, padding: '38px 42px 42px', fontFamily: font, boxShadow: '0 30px 80px rgba(104,87,245,.25)'})}>
       <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
         <span style={{background: palette.cool, color: '#fff', borderRadius: 14, padding: '8px 18px', fontSize: 34, fontWeight: 900, letterSpacing: 2}}>NEW</span>
-        {feature.date ? <span style={{fontSize: 30, fontWeight: 800, color: palette.muted}}>{feature.date}</span> : null}
+        {feature.date ? <span style={{fontSize: 30, fontWeight: 500, color: palette.muted}}>{feature.date}</span> : null}
       </div>
-      <div style={{fontSize: 80, fontWeight: 900, color: palette.ink, letterSpacing: -2, marginTop: 22, lineHeight: 1}}>{feature.name}{feature.accent ? <span style={{color: palette.cool}}> {feature.accent}</span> : null}</div>
-      {feature.capability ? <div style={{fontSize: 40, fontWeight: 800, color: palette.muted, marginTop: 16, textWrap: 'balance'}}>{feature.capability}</div> : null}
+      <div style={{fontSize: 80, fontWeight: 800, color: palette.ink, letterSpacing: -2, marginTop: 22, lineHeight: 1, textWrap: 'balance'}}>{feature.name}{feature.accent ? <span style={{color: palette.cool}}> {feature.accent}</span> : null}</div>
+      {feature.capability ? <div style={{fontSize: 38, fontWeight: 500, color: palette.muted, marginTop: 16, textWrap: 'balance'}}>{feature.capability}</div> : null}
       {items.length ? <div style={{display: 'flex', gap: 22, marginTop: 32}}>{items.slice(0, 3).map((item, i) => {
         const t = frame < at + 12 + i * 6 ? 0 : spring({frame: frame - at - 12 - i * 6, fps, config: {damping: 9, stiffness: 200}});
         const color = objectColor(item.icon, palette, item.color);
         return <div key={item.label} style={{flex: 1, height: 170, borderRadius: 28, background: `${color}1A`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, transform: `scale(${t})`, opacity: Math.min(1, t * 2)}}>
-          <Icon name={item.icon} size={76} color={color} /><span style={{fontSize: 34, fontWeight: 900, color: palette.ink}}>{item.label}</span>
+          <Icon name={item.icon} size={76} color={color} /><span style={{fontSize: 32, fontWeight: 650, color: palette.ink}}>{item.label}</span>
         </div>;
       })}</div> : null}
     </div>
@@ -76,16 +76,16 @@ export const RoleStrip = ({at, you, ai, palette, font, sound = false, youLabel =
   const tickAt = (i) => at + 18 + i * 18;
   return <div style={{display: 'flex', gap: 20, alignItems: 'stretch', fontFamily: font, opacity: p, transform: `translateY(${(1 - p) * 40}px)`}}>
     <div style={card({flex: '0 0 300px', padding: '24px 28px'})}>
-      <div style={{fontSize: 28, fontWeight: 800, color: palette.muted}}>{youLabel}</div>
-      <div style={{display: 'flex', alignItems: 'center', gap: 14, marginTop: 10}}><Icon name={you.icon} size={56} color={objectColor(you.icon, palette, you.color)} /><span style={{fontSize: 40, fontWeight: 900, color: palette.ink}}>{you.label}</span></div>
+      <div style={{fontSize: 24, fontWeight: 700, letterSpacing: 3, color: palette.muted}}>{youLabel}</div>
+      <div style={{display: 'flex', alignItems: 'center', gap: 14, marginTop: 10}}><Icon name={you.icon} size={56} color={objectColor(you.icon, palette, you.color)} /><span style={{fontSize: 38, fontWeight: 700, color: palette.ink, whiteSpace: 'nowrap'}}>{you.label}</span></div>
     </div>
     <div style={{display: 'flex', alignItems: 'center', fontSize: 50, color: palette.cool, fontWeight: 900}}>→</div>
     <div style={card({flex: 1, padding: '24px 28px', border: `4px solid ${palette.cool}`})}>
-      <div style={{fontSize: 28, fontWeight: 800, color: palette.cool}}>{ai.name}</div>
+      <div style={{fontSize: 24, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', color: palette.cool}}>{ai.name}</div>
       <div style={{display: 'flex', flexWrap: 'wrap', gap: 22, marginTop: 10}}>{(ai.outputs || []).map((out, i) => {
         const t = frame < tickAt(i) ? 0 : spring({frame: frame - tickAt(i), fps, config: {damping: 9, stiffness: 200}});
         return <div key={out.label} style={{display: 'flex', alignItems: 'center', gap: 10, opacity: 0.35 + 0.65 * Math.min(1, t)}}>
-          <Icon name={out.icon} size={52} color={objectColor(out.icon, palette, out.color)} /><span style={{fontSize: 38, fontWeight: 900, color: palette.ink}}>{out.label}</span>
+          <Icon name={out.icon} size={52} color={objectColor(out.icon, palette, out.color)} /><span style={{fontSize: 36, fontWeight: 700, color: palette.ink}}>{out.label}</span>
           <span style={{display: 'inline-flex', width: 40, height: 40, borderRadius: '50%', background: objectColor(out.icon, palette, out.color), color: '#fff', fontSize: 26, alignItems: 'center', justifyContent: 'center', transform: `scale(${t})`}}>✓</span>
         </div>;
       })}</div>
@@ -104,7 +104,7 @@ export const CheckCards = ({at, checks, palette, font, sound = false}) => {
     const t = frame < start ? 0 : spring({frame: frame - start, fps, config: {damping: 10, stiffness: 180}});
     return <div key={check.label} style={card({flex: 1, position: 'relative', padding: '30px 26px', fontFamily: font, opacity: Math.min(1, t * 1.5), transform: `translateY(${(1 - t) * 40}px)`})}>
       <Icon name={check.icon} size={76} color={objectColor(check.icon, palette, check.color)} />
-      <div style={{fontSize: 38, fontWeight: 900, color: palette.ink, marginTop: 14, lineHeight: 1.15, textWrap: 'balance'}}>{check.label}</div>
+      <div style={{fontSize: 36, fontWeight: 700, color: palette.ink, marginTop: 14, lineHeight: 1.15, textWrap: 'balance'}}>{check.label}</div>
       <div style={{position: 'absolute', right: 22, top: 22, width: 54, height: 54, borderRadius: '50%', background: palette.warm, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34, fontWeight: 900, transform: `scale(${t})`}}>✓</div>
       {sound ? <Sfx at={start + 6} name="pop" volume={0.5} /> : null}
     </div>;
@@ -118,12 +118,12 @@ export const AccessChips = ({at, label, plans, palette, font, sound = false}) =>
   const {fps} = useVideoConfig();
   const p = useSpring(at);
   return <div style={{fontFamily: font, opacity: p}}>
-    <div style={{fontSize: 28, fontWeight: 800, letterSpacing: 2, color: palette.muted, marginBottom: 14}}>{label}</div>
+    <div style={{fontSize: 24, fontWeight: 700, letterSpacing: 3, color: palette.muted, marginBottom: 14}}>{label}</div>
     <div style={{display: 'flex', gap: 12}}>{plans.map((plan, i) => {
       const start = at + 4 + i * 5;
       const t = plan.on && frame >= start ? spring({frame: frame - start, fps, config: {damping: 10, stiffness: 200}}) : 0;
       const lit = t > 0.5;
-      return <div key={plan.name} style={{flex: 1, height: 84, borderRadius: 20, background: lit ? '#2E8B57' : '#fff', color: lit ? '#fff' : palette.muted, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, fontWeight: 900, textDecoration: plan.on ? 'none' : 'line-through', transform: `scale(${0.9 + Math.min(1, t) * 0.1})`, boxShadow: '0 8px 20px rgba(23,25,35,.08)'}}>
+      return <div key={plan.name} style={{flex: 1, height: 84, borderRadius: 20, background: lit ? '#2E8B57' : '#fff', color: lit ? '#fff' : palette.muted, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, fontWeight: plan.on ? 700 : 500, textDecoration: plan.on ? 'none' : 'line-through', transform: `scale(${0.9 + Math.min(1, t) * 0.1})`, boxShadow: '0 8px 20px rgba(23,25,35,.08)'}}>
         {plan.name}{lit ? ' ✓' : ''}{sound && plan.on ? <Sfx at={start} name="pop" volume={0.35} /> : null}
       </div>;
     })}</div>
@@ -160,6 +160,8 @@ export const ProductShot = ({shot, width = 936, click, reveal, stamp, callout, f
   const target = click ? toFrame(click.x, click.y) : null;
   const point = callout ? toFrame(callout.x, callout.y) : null;
   const calloutIn = useSpring(callout ? callout.at : 0, {damping: 9, stiffness: 180});
+  // A callout leaves when its moment is over (callout.until), e.g. when focus moves to another row.
+  const calloutGone = callout && Number.isFinite(callout.until) ? interpolate(frame, [callout.until, callout.until + 6], [1, 0], clamp) : 1;
   return <div style={{position: 'relative', width}}>
     {evidence ? <div style={{fontFamily: font, fontSize: 28, fontWeight: 700, color: palette.muted, letterSpacing: 0.5, marginBottom: 14}}>{evidence}</div> : null}
     <div style={card({overflow: 'hidden', clipPath: `inset(0 0 ${100 - shown}% 0)`, transform: press ? `scale(${press.targetScale})` : undefined})}>
@@ -168,9 +170,9 @@ export const ProductShot = ({shot, width = 936, click, reveal, stamp, callout, f
     </div>
     {click ? <Cursor path={[{frame: Math.max(0, click.at - 30), x: target.x - 160, y: target.y + 260}, {frame: click.at - 4, x: target.x, y: target.y}, {frame: click.at + 10, x: target.x, y: target.y}, {frame: click.at + 34, x: target.x + 220, y: target.y + 520}]} clicks={[click.at]} rippleColor={palette.cool} /> : null}
     {stamp ? <NewStamp at={stamp.at} label={stamp.label} palette={palette} font={font} sound={sound} style={{right: -10, top: -40}} /> : null}
-    {callout && calloutIn ? <div style={{position: 'absolute', left: point.x - 150, top: point.y - 130, width: 300, zIndex: 6, opacity: Math.min(1, calloutIn * 2), transform: `scale(${calloutIn})`, transformOrigin: '50% 100%'}}>
+    {callout && calloutIn && calloutGone > 0 ? <div style={{position: 'absolute', left: point.x - 150, top: point.y - 130, width: 300, zIndex: 6, opacity: Math.min(1, calloutIn * 2) * calloutGone, transform: `scale(${calloutIn})`, transformOrigin: '50% 100%'}}>
       <div style={{background: palette.warm, color: '#fff', borderRadius: 20, padding: '14px 18px', fontFamily: font, textAlign: 'center', boxShadow: '0 12px 30px rgba(240,100,73,.35)'}}>
-        <div style={{fontSize: 34, fontWeight: 900, textWrap: 'balance'}}>{callout.title}</div>{callout.note ? <div style={{fontSize: 26, fontWeight: 700}}>{callout.note}</div> : null}
+        <div style={{fontSize: 34, fontWeight: 800, textWrap: 'balance'}}>{callout.title}</div>{callout.note ? <div style={{fontSize: 26, fontWeight: 500, opacity: 0.92}}>{callout.note}</div> : null}
       </div>
       <div style={{width: 0, height: 0, margin: '0 auto', borderLeft: '16px solid transparent', borderRight: '16px solid transparent', borderTop: `18px solid ${palette.warm}`}} />
     </div> : null}
@@ -196,7 +198,7 @@ export const Flow = ({items, palette, font, sound = false, accent}) => {
         {i ? <div style={{fontSize: 54, fontWeight: 900, color, opacity: Math.min(1, t * 2)}}>→</div> : null}
         <div style={card({width: size, height: size, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, fontFamily: font, opacity: Math.min(1, t * 2), transform: `scale(${0.6 + t * 0.4})`, background: `linear-gradient(180deg, ${tint}1F, #fff 70%)`, border: `5px solid ${tint}`})}>
           <Icon name={item.icon} size={size * 0.42} color={tint} />
-          <span style={{fontSize: 36, fontWeight: 900, color: palette.ink, textAlign: 'center', lineHeight: 1.05, textWrap: 'balance'}}>{item.label}</span>
+          <span style={{fontSize: 34, fontWeight: 700, color: palette.ink, textAlign: 'center', lineHeight: 1.1, textWrap: 'balance'}}>{item.label}</span>
         </div>
         {sound ? <Sfx at={item.at} name="pop" volume={0.4} /> : null}
       </React.Fragment>;
@@ -213,14 +215,14 @@ export const Correction = ({fix, palette, font, sound = false}) => {
   const strike = interpolate(frame, [fix.at + 12, fix.at + 22], [0, 1], clamp);
   const right = frame < fix.at + 24 ? 0 : spring({frame: frame - fix.at - 24, fps, config: {damping: 9, stiffness: 200}});
   return <div style={card({padding: '30px 36px', fontFamily: font, opacity: enter, transform: `translateY(${(1 - enter) * 40}px)`, border: `5px solid ${palette.warm}`})}>
-    {fix.label ? <div style={{fontSize: 38, fontWeight: 800, color: palette.muted}}>{fix.label}</div> : null}
+    {fix.label ? <div style={{fontSize: 34, fontWeight: 500, color: palette.muted}}>{fix.label}</div> : null}
     <div style={{display: 'flex', alignItems: 'center', gap: 26, marginTop: 14, flexWrap: 'wrap'}}>
-      <span style={{position: 'relative', fontSize: 58, fontWeight: 900, color: palette.muted}}>
+      <span style={{position: 'relative', fontSize: 54, fontWeight: 600, color: palette.muted}}>
         {fix.wrong}
         <span style={{position: 'absolute', left: -6, top: '52%', height: 8, width: `calc(${strike * 100}% + 12px)`, background: palette.warm, borderRadius: 4}} />
       </span>
       <span style={{fontSize: 54, fontWeight: 900, color: palette.warm, opacity: Math.min(1, right * 2)}}>→</span>
-      <span style={{fontSize: 62, fontWeight: 900, color: '#2E8B57', transform: `scale(${right})`, display: 'inline-block'}}>{fix.right}</span>
+      <span style={{fontSize: 62, fontWeight: 800, color: '#2E8B57', transform: `scale(${right})`, display: 'inline-block'}}>{fix.right}</span>
     </div>
     {sound ? <><Sfx at={fix.at + 12} name="swish" volume={0.35} /><Sfx at={fix.at + 24} name="stamp" volume={0.6} /></> : null}
   </div>;
@@ -245,7 +247,7 @@ export const Scrub = ({scrub, palette, font, sound = false}) => {
   const secs = Math.round(head * (mm * 60 + ss));
   const stamp = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
   return <div style={{position: 'relative', paddingTop: 150, fontFamily: font, opacity: enter}}>
-    {ask ? <div style={{position: 'absolute', top: 0, left: `${Math.min(70, head * 100)}%`, transform: `translateX(-40%) scale(${ask})`, transformOrigin: '30% 100%', background: palette.warm, color: '#fff', borderRadius: 22, padding: '16px 24px', fontSize: 40, fontWeight: 900, whiteSpace: 'nowrap', boxShadow: '0 12px 30px rgba(240,100,73,.35)'}}>{scrub.ask}</div> : null}
+    {ask ? <div style={{position: 'absolute', top: 0, left: `${Math.min(70, head * 100)}%`, transform: `translateX(-40%) scale(${ask})`, transformOrigin: '30% 100%', background: palette.warm, color: '#fff', borderRadius: 22, padding: '16px 24px', fontSize: 38, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: '0 12px 30px rgba(240,100,73,.35)'}}>{scrub.ask}</div> : null}
     <div style={card({padding: '30px 34px', display: 'flex', alignItems: 'center', gap: 26})}>
       <div style={{width: 92, height: 92, borderRadius: '50%', background: palette.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto'}}>
         <Icon name={paused ? 'pause' : 'play'} size={70} color="#fff" />
@@ -255,7 +257,7 @@ export const Scrub = ({scrub, palette, font, sound = false}) => {
           <div style={{position: 'absolute', left: 0, top: 0, bottom: 0, width: `${head * 100}%`, borderRadius: 8, background: palette.warm}} />
           <div style={{position: 'absolute', left: `calc(${head * 100}% - 17px)`, top: -9, width: 34, height: 34, borderRadius: '50%', background: '#fff', border: `6px solid ${palette.warm}`}} />
         </div>
-        <div style={{display: 'flex', justifyContent: 'space-between', marginTop: 16, fontSize: 32, fontWeight: 800, color: palette.muted}}><span>{stamp}</span><span>{total}</span></div>
+        <div style={{display: 'flex', justifyContent: 'space-between', marginTop: 16, fontSize: 30, fontWeight: 600, color: palette.muted, fontVariantNumeric: 'tabular-nums'}}><span>{stamp}</span><span>{total}</span></div>
       </div>
     </div>
     {sound ? [0, 1, 2, 3, 4, 5].map((n) => <Sfx key={n} at={scrub.at + 8 + n * 22} name="tick" volume={0.3} />) : null}
