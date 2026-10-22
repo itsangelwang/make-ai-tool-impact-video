@@ -41,12 +41,15 @@ The template turns these optional scene fields into the beats proven in the firs
 - `shot`: a real screenshot region, `{src, source_width, crop: {x, y, w, h}, evidence, click, reveal, stamp, callout}`. Coordinates are source pixels. `click: {at_sec, x, y}` moves the cursor to the control and presses it; `reveal: {at_sec, frames}` wipes the result in; `stamp: {at_sec, label}` marks the new capability; `callout: {at_sec, x, y, title, note, until_sec}` points at the detail to check, with (x, y) just above it; set `until_sec` so it leaves when the focus moves on. Crop so product text reaches about 40 px. `evidence` labels the source, e.g. "REAL CHATGPT TEST".
 - `roles`: `{at_sec, you: {icon, label}, ai: {name, outputs: [{icon, label}]}}`. One action from the person, outputs ticking off for the AI.
 - `checks` with `checks_at_sec`: up to three `{icon, label}` items the person verifies.
-- `access`: `{at_sec, label, plans: [{name, on}]}` from the official source; unavailable plans are struck through.
+- `plans`: `{at_sec, title, feature, icon, plans: [{name, on}]}` from the official source. Reads like a pricing table: `title` says whose plans ("ChatGPT plans"), `feature` heads the ✓/✕ column ("Audio uploads"), and included rows tick in turn. Prefer it to `access`, whose colored chips did not say what was included where.
+- `access`: `{at_sec, label, plans: [{name, on}]}`, the older chip row; unavailable plans are struck through.
 - `flow`: 2–4 `{icon, label, at_sec}` tiles with arrows, each appearing at its own time; labels are 1–2 words. Replaces text cards in any scene.
 - `call_end`: `{at_sec, people: [name, name], timer, end_at_sec, file}` a generic video call (not any real product): two people, a running timer, a hang-up click at `end_at_sec`, then the saved recording slides out. Opens a story that starts from a meeting.
 - `toast`: `{at_sec, icon, title, note, until_sec}` a system-style notification that slides down. Open with one so the first frame already shows the situation ("Call ended · Recording saved") and the first seconds move fast.
 - `fix`: `{at_sec, label, wrong, right}`. The wrong value is struck through and the right one pops in.
-- `scrub`: `{at_sec, length, ask, ask_at_sec}`. An audio player whose playhead jumps back and forth; `ask` pops above it (e.g. "Who said Thursday?").
+- `scrub`: `{at_sec, length, file, ask, ask_at_sec}`. The recording's waveform player whose playhead jumps back and forth; `ask` pops above it (e.g. "Who said Thursday?"); `file` hangs the recording chip under it.
+- `replay` and `send` (human check against the source): `replay: {at_sec, jump_sec, replay_sec, file, length, who, quote, marker}` shows the same recording player; at `jump_sec` the playhead jumps to the moment `who` said `quote`, and at `replay_sec` it rewinds there again. `send: {at_sec, label}` is a button the cursor clicks once the check is done. Put `jump_sec` on the narration that names the quote, and `send.at_sec` on "send". Use them instead of "Replay → Send" icon tiles.
+- `tryit` (next action): `{consent: {at_sec, people: [a, b], ask, yes}, old: {at_sec, file, length}}`. The opening's call window returns small: one person asks (`"OK to record?"`), the other agrees (`"Sure!"`), and the recording dot starts; then the window slides away and the cursor drags an earlier recording into a ChatGPT-style box. `old.file` is a placeholder (`old-call-xxx.mp3`, length `xx:xx`), never a realistic name. Start `old` at least 1 s after `consent`.
 - `shot.zoom`: `{at_sec, frames, from}` starts on a wide crop of the whole result (same aspect ratio as `crop`) and pushes in, so viewers see everything the tool produced before the detail. Pair it with `shot.summary`: `{at_sec, text, until_sec}`, one short line such as "5 action items · owners · dates", shown just below the screenshot so it never covers it.
 - `shot.drag`: `{at_sec, frames, from, to, file, region, mask}` carries a file card in with the pointer and reveals the real attachment (`region`) on drop.
 - `shot.type`: `{at_sec, frames, region, lines, mask}` uncovers the real typed text left to right, line by line, with a caret and key sounds.
@@ -58,6 +61,18 @@ The template turns these optional scene fields into the beats proven in the firs
 Set `"sfx": true` in story.json after generating `public/audio/sfx` with `generate_story_audio.py sfx`; each beat then plays its matching swish, pop, stamp, or return. Icons come from `components/Icon.jsx`; add a new icon there rather than inlining SVG in a scene.
 
 Write a custom scene component only for a beat these fields cannot express, such as a bespoke object handoff, and reuse the components in `components/Beats.jsx` inside it. `public/assets/example-ui.svg` is placeholder UI for the template; never ship it in a video.
+
+## Lessons from the ChatGPT audio-upload video
+
+The user asked for each of these; build them in from the start.
+
+- **One object, one look.** Whatever the story follows (a recording, a file, a document) looks the same every time it appears: the same chip, icon, color, name and length, and the same waveform for audio. `RecordingChip` and the shared waveform do this for recordings in `call_end`, `scrub`, `shot.drag` (set `drag.length`), `replay` and `tryit`. Viewers should be able to tell it is one recording from the opening to the end.
+- **Highlights stay whole.** A focus frame keeps all four sides visible, including on a screenshot's first or last row; the template keeps it inside the card. Crop so the last highlighted row ends inside the crop with a little margin.
+- **Show the check, not its name.** For "verify before you act", animate the act (jump to the moment in the source, show what was said, correct the value, then click the action) rather than tiles labeled "Replay" and "Send".
+- **Say whose plans.** A plan table names the product's plans and the feature, e.g. "ChatGPT plans" with an "Audio uploads" column.
+- **No boxed text-and-icon cards for next steps.** The user rejected cards holding an icon, a number and a label, and cards with mini illustrations, as ugly and confusing. Animate a concrete moment with objects the viewer has already seen (`tryit`), or leave the step to the narration.
+- **Placeholders for illustrative things.** A file, name or number that only illustrates (not evidence) uses an obvious placeholder such as `xxx`, so it cannot be mistaken for a real one. Keep fictional company names generic; check that they do not match a well-known brand.
+- **Nothing jumps.** An element that appears later keeps its space from the start, so the rest of the layout does not shift when it arrives.
 
 ## Motion grammar
 

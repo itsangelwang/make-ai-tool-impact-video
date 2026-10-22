@@ -173,6 +173,13 @@ Visually inspect the full video and representative frames. Confirm native 1080×
 
 Deliver the MP4, cover, captions, source ledger, claim ledger, QA report, and `social-titles.md`. State actual duration and publication blockers. Do not publish automatically.
 
-Write `<project-dir>/social-titles.md` with three post titles in English and three in Chinese, each set written natively for its market rather than translated. Base each title on the final video's hook and before → after change; keep every claim within `claim-ledger.json` and never add numbers, rankings, or results the video does not show. Name the tool, keep each title short enough to read on a phone at a glance (about 60 characters in English, 25 in Chinese), and avoid clickbait. Show the titles to the user with the delivery.
+Before delivery, check privacy and safety and report the result:
+- Real screenshots: no account name, avatar, email, chat-history sidebar, browser extension, or other personal UI inside the visible crop (look at each crop, not only the full image).
+- The MP4's metadata holds no name, path or location (`ffprobe -show_entries format_tags`).
+- People and companies in a simulated test are fictional, and their names do not match a well-known brand; illustrative files and numbers use placeholders.
+- Voices are synthetic or licensed; music and sound effects have their source and license recorded in the project.
+- No key, `.env` content or personal path appears in any delivered or committed file.
+
+Write `<project-dir>/social-titles.md` with three post titles in English and three in Chinese, each set written natively for its market rather than translated. Base each title on the final video's hook and before → after change; keep every claim within `claim-ledger.json` and never add numbers, rankings, or results the video does not show. Name the tool, keep each title short enough to read on a phone at a glance (about 60 characters in English, 25 in Chinese), and avoid clickbait. Write them conversational and punchy rather than descriptive; the user preferred casual hooks ("Stop replaying client calls.") over plain summaries. Never quote an illustrative on-screen number as a fact (a demo timer of 30:12 is not a 30-minute test). When the user names platforms (for example Bilibili, Xiaohongshu, YouTube), add one set per platform in its native style. Show the titles to the user with the delivery.
 
 Use [references/failure-modes.md](references/failure-modes.md) when evidence, access, rights, TTS, browser, FFmpeg, or rendering is unavailable.

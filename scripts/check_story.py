@@ -14,7 +14,7 @@ from limits import LIMITS
 ICON_FILE = Path(__file__).resolve().parent.parent / "assets" / "remotion-template" / "src" / "components" / "Icon.jsx"
 # Scene types whose `visual` text the template shows in a box (an empty visual hides the box).
 VISUAL_BOX = {"human-check", "next-action", "ai-handoff"}
-BEATS = ("call_end", "toast", "new_feature", "shot", "flow", "scrub", "roles", "checks", "access", "fix")
+BEATS = ("call_end", "toast", "new_feature", "shot", "flow", "scrub", "roles", "checks", "access", "plans", "fix", "replay", "send", "tryit")
 
 
 def icon_names(icon_file: Path = ICON_FILE) -> set[str]:
@@ -57,12 +57,20 @@ def screen_words(scene: dict, story: dict) -> int:
     texts += [toast.get("title"), toast.get("note")]
     call = scene.get("call_end") or {}
     texts += ["Call ended"] + [name[:1] for name in call.get("people", [])] if call else []
-    custom = any(scene.get(key) for key in ("shot", "flow", "scrub", "fix"))
+    replay = scene.get("replay") or {}
+    texts += [replay.get("quote"), replay.get("who"), (scene.get("send") or {}).get("label")]
+    plans = scene.get("plans") or {}
+    texts += [plans.get("title"), plans.get("feature")] + [plan.get("name") for plan in plans.get("plans", [])]
+    custom = any(scene.get(key) for key in ("shot", "flow", "scrub", "fix", "replay", "plans", "tryit"))
     if scene.get("type") in {"pain-hook", "before-workflow"} and not custom:
         texts += story.get("before_steps", []) if scene.get("type") == "before-workflow" or not feature else []
     if scene.get("type") == "after-workflow" and not custom:
         texts += story.get("after_steps", [])
-    return words(*texts)
+    tryit = scene.get("tryit") or {}
+    # the two phases replace each other, so only the wordier one is on screen at once
+    phase = max(words((tryit.get("consent") or {}).get("ask"), (tryit.get("consent") or {}).get("yes")),
+                words((tryit.get("old") or {}).get("file"), "Ask ChatGPT") if tryit.get("old") else 0) if tryit else 0
+    return words(*texts) + phase
 
 
 def change_times(scene: dict) -> list[float]:
@@ -97,6 +105,23 @@ def change_times(scene: dict) -> list[float]:
     times += [t for t in scene.get("steps_at_sec", []) if isinstance(t, (int, float))]
     if isinstance(scene.get("checks_at_sec"), (int, float)):
         times.append(scene["checks_at_sec"])
+    num = lambda v: isinstance(v, (int, float))
+    replay = scene.get("replay") or {}
+    times += [replay[k] for k in ("at_sec", "jump_sec", "replay_sec") if num(replay.get(k))]
+    if num(replay.get("jump_sec")):
+        times.append(replay["jump_sec"] + 8 / 30)  # the quote pops in
+    send = scene.get("send") or {}
+    if num(send.get("at_sec")):
+        times += [max(0.0, send["at_sec"] - 1), send["at_sec"]]
+    plans = scene.get("plans") or {}
+    if num(plans.get("at_sec")):
+        times += [plans["at_sec"] + (6 + 5 * i) / 30 for i in range(len(plans.get("plans", [])))]
+    tryit = scene.get("tryit") or {}
+    consent, old = tryit.get("consent") or {}, tryit.get("old") or {}
+    if num(consent.get("at_sec")):
+        times += [consent["at_sec"] + f / 30 for f in (0, 4, 14, 22)]
+    if num(old.get("at_sec")):
+        times += [old["at_sec"] + f / 30 for f in (2, 4, 26)]
     return sorted(times)
 
 
@@ -205,6 +230,34 @@ def check(story: dict, public_dir: Path, icons: set[str]) -> list[str]:
                 icon(f"{sid}.checks", item.get("icon"))
             if len(scene["checks"]) > 3:
                 errors.append(f"{sid}.checks shows at most three items")
+        plans = scene.get("plans")
+        if plans is not None:
+            timed(f"{sid}.plans", plans, length)
+            if not plans.get("title") or not plans.get("feature") or not plans.get("plans"):
+                errors.append(f"{sid}.plans requires title (whose plans, e.g. 'ChatGPT plans'), feature and plans")
+            icon(f"{sid}.plans", plans.get("icon", "mic"))
+        replay = scene.get("replay")
+        if replay is not None:
+            timed(f"{sid}.replay", replay, length, keys=("at_sec", "jump_sec") + (("replay_sec",) if "replay_sec" in replay else ()))
+            if not replay.get("file") or not replay.get("quote"):
+                errors.append(f"{sid}.replay requires file and quote")
+        send = scene.get("send")
+        if send is not None:
+            timed(f"{sid}.send", send, length)
+        tryit = scene.get("tryit")
+        if tryit is not None:
+            consent, old = (tryit or {}).get("consent"), (tryit or {}).get("old")
+            if not consent or not old:
+                errors.append(f"{sid}.tryit requires consent and old")
+            else:
+                timed(f"{sid}.tryit.consent", consent, length)
+                timed(f"{sid}.tryit.old", old, length)
+                if len(consent.get("people", [])) != 2 or not consent.get("ask") or not consent.get("yes"):
+                    errors.append(f"{sid}.tryit.consent requires two people, ask and yes")
+                if not old.get("file"):
+                    errors.append(f"{sid}.tryit.old requires file (use a placeholder name such as old-call-xxx.mp3)")
+                elif isinstance(old.get("at_sec"), (int, float)) and isinstance(consent.get("at_sec"), (int, float)) and old["at_sec"] - consent["at_sec"] < 1.0:
+                    errors.append(f"{sid}.tryit.old must start at least 1 s after consent")
         access = scene.get("access")
         if access is not None:
             timed(f"{sid}.access", access, length)

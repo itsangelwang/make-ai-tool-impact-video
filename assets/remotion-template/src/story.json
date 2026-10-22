@@ -212,32 +212,6 @@
       "visual": "Left: three manual steps. Right: upload, draft, check",
       "start_sec": 32,
       "end_sec": 40,
-      "flow": [
-        {
-          "icon": "doc",
-          "label": "5 notes",
-          "at_sec": 0.5
-        },
-        {
-          "icon": "table",
-          "label": "1 brief",
-          "at_sec": 2.5
-        },
-        {
-          "icon": "user",
-          "label": "You check",
-          "at_sec": 4.5
-        }
-      ]
-    },
-    {
-      "id": "s6",
-      "type": "human-check",
-      "label": "Your job",
-      "headline": "You check it",
-      "visual": "",
-      "start_sec": 40,
-      "end_sec": 49,
       "checks": [
         {
           "icon": "calendar",
@@ -248,25 +222,50 @@
           "label": "Owners right"
         }
       ],
-      "checks_at_sec": 5.0,
+      "checks_at_sec": 2.9
+    },
+    {
+      "id": "s6",
+      "type": "human-check",
+      "label": "Your job",
+      "headline": "You check it",
+      "visual": "",
+      "start_sec": 40,
+      "end_sec": 49,
       "fix": {
-        "at_sec": 1.0,
+        "at_sec": 4.0,
         "label": "Original note",
         "wrong": "Nov 4",
         "right": "Nov 11"
+      },
+      "replay": {
+        "at_sec": 0.4,
+        "jump_sec": 1.2,
+        "replay_sec": 6.5,
+        "file": "team-sync-xxx.mp3",
+        "length": "xx:xx",
+        "who": "Sam",
+        "quote": "“…Nov 11.”",
+        "marker": 0.6
+      },
+      "send": {
+        "at_sec": 8.2,
+        "label": "Send"
       }
     },
     {
       "id": "s7",
       "type": "next-action",
       "label": "Try it",
-      "headline": "Try one old note first",
+      "headline": "Try an *old* call",
       "visual": "",
       "start_sec": 49,
       "end_sec": 56.5,
-      "access": {
-        "at_sec": 4.0,
-        "label": "AVAILABLE ON",
+      "plans": {
+        "at_sec": 0.3,
+        "title": "ChatGPT plans",
+        "feature": "File uploads",
+        "icon": "doc",
         "plans": [
           {
             "name": "Free",
@@ -286,18 +285,22 @@
           }
         ]
       },
-      "flow": [
-        {
-          "icon": "doc",
-          "label": "Old note",
-          "at_sec": 0.5
+      "tryit": {
+        "consent": {
+          "at_sec": 2.0,
+          "people": [
+            "Alex",
+            "Sam"
+          ],
+          "ask": "OK to record?",
+          "yes": "Sure!"
         },
-        {
-          "icon": "search",
-          "label": "Compare",
-          "at_sec": 2.5
+        "old": {
+          "at_sec": 4.0,
+          "file": "old-call-xxx.mp3",
+          "length": "xx:xx"
         }
-      ]
+      }
     }
   ],
   "brand": {
