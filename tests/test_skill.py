@@ -647,7 +647,7 @@ class StoryBeatTests(unittest.TestCase):
     def test_template_story_uses_every_beat_and_passes(self):
         story = self.story()
         keys = {key for scene in story["scenes"] for key in scene}
-        self.assertTrue({"new_feature", "shot", "roles", "checks", "access", "flow", "fix"} <= keys)
+        self.assertTrue({"new_feature", "shot", "roles", "checks", "plans", "flow", "fix", "replay", "send", "tryit"} <= keys)
         self.assertEqual(check_story.check(story, self.TEMPLATE / "public", check_story.icon_names()), [])
 
     def test_beat_mistakes_are_reported(self):
@@ -673,9 +673,11 @@ class StoryBeatTests(unittest.TestCase):
 
     def test_neighboring_scenes_with_the_same_form_are_listed(self):
         story = self.story()
-        story["scenes"][4]["flow"], story["scenes"][5]["flow"] = story["scenes"][6]["flow"], story["scenes"][6]["flow"]
-        story["scenes"][5].pop("fix"); story["scenes"][5].pop("checks", None)
-        story["scenes"][6].pop("access")
+        flow = story["scenes"][1]["flow"]
+        for scene in story["scenes"][4:6]:
+            for key in check_story.BEATS:
+                scene.pop(key, None)
+            scene["flow"] = flow
         self.assertTrue(check_story.variety_notes(story))
 
     def test_before_to_after_needs_a_chapter_transition(self):
@@ -771,7 +773,56 @@ class SoundEffectTests(unittest.TestCase):
     def test_template_tags_clicks_and_filters_sounds(self):
         src = ROOT / "assets" / "remotion-template" / "src"
         beats = (src / "components" / "Beats.jsx").read_text(encoding="utf-8")
-        self.assertEqual(beats.count('kind="click"'), 2)
+        self.assertEqual(beats.count('kind="click"'), 3)  # hang-up, product click, Send
         self.assertIn('name="callend"', beats)
         self.assertIn("SfxFilter.Provider", (src / "VerticalImpact.jsx").read_text(encoding="utf-8"))
         self.assertIn("typing.wav", (src / "components" / "Sfx.jsx").read_text(encoding="utf-8"))
+
+
+class VideoPolishLessonTests(unittest.TestCase):
+    """Problems the user had to fix by hand on the ChatGPT audio-upload video."""
+    SRC = ROOT / "assets" / "remotion-template" / "src"
+
+    def story(self):
+        return json.loads((self.SRC / "story.json").read_text(encoding="utf-8"))
+
+    def errors_for(self, scene_id, change):
+        story = self.story()
+        change(next(s for s in story["scenes"] if s["id"] == scene_id))
+        return check_story.check(story, self.SRC.parent / "public", check_story.icon_names())
+
+    def test_one_recording_look_everywhere(self):
+        beats = (self.SRC / "components" / "Beats.jsx").read_text(encoding="utf-8")
+        self.assertGreaterEqual(beats.count("<RecordingChip"), 5)  # call end, scrub, drag, replay, try-it
+        self.assertGreaterEqual(beats.count("<Waveform"), 2)       # scrub and replay share one waveform
+
+    def test_focus_frame_stays_inside_the_card(self):
+        beats = (self.SRC / "components" / "Beats.jsx").read_text(encoding="utf-8")
+        self.assertIn("Math.min(boxHeight - 4", beats)
+        self.assertNotIn("left: -6, right: -6", beats)
+
+    def test_boxed_step_cards_are_not_in_the_template(self):
+        beats = (self.SRC / "components" / "Beats.jsx").read_text(encoding="utf-8")
+        self.assertNotIn("NumberedSteps", beats)
+        self.assertNotIn("StepArt", beats)
+
+    def test_plan_table_must_say_whose_plans(self):
+        errors = self.errors_for("s7", lambda s: s["plans"].pop("title"))
+        self.assertTrue(any("whose plans" in e for e in errors))
+
+    def test_try_it_needs_a_placeholder_file_and_separate_phases(self):
+        self.assertTrue(any("placeholder" in e for e in self.errors_for("s7", lambda s: s["tryit"]["old"].pop("file"))))
+        late = lambda s: s["tryit"]["old"].update(at_sec=s["tryit"]["consent"]["at_sec"] + 0.5)
+        self.assertTrue(any("1 s after consent" in e for e in self.errors_for("s7", late)))
+
+    def test_new_beats_count_toward_reading_load(self):
+        story = self.story()
+        scene = next(s for s in story["scenes"] if s["id"] == "s6")
+        before = check_story.screen_words(scene, story)
+        added = check_story.words("one two three four five six") - check_story.words(scene["replay"]["quote"])
+        scene["replay"]["quote"] = "one two three four five six"
+        self.assertEqual(check_story.screen_words(scene, story), before + added)
+
+    def test_real_mouse_click_is_the_documented_click(self):
+        library = (ROOT / "references" / "sound-library.md").read_text(encoding="utf-8")
+        self.assertIn("mouse-click-290204", library)

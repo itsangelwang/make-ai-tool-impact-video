@@ -4,6 +4,7 @@ import {TimedCaptions} from './TimedCaptions';
 import {ProgressBar} from './components/ProgressBar';
 import {Icon, objectColor} from './components/Icon';
 import {SfxFilter} from './components/Sfx';
+import {ReplayPlayer, SendClick, PlanCheck, TryItStage} from './components/Beats';
 import {AccessChips, CheckCards, Correction, FeatureIntro, Flow, NewTag, ProductShot, RoleStrip, Scrub, Toast, CallEnd} from './components/Beats';
 
 const FONTS = {
@@ -139,7 +140,7 @@ const Scene = ({scene, palette: base, labels, sound}) => {
   const stepAt = (i) => (scene.steps_at_sec ? at(scene.steps_at_sec[i]) : null);
   const showBox = Boolean(scene.visual);
   // An animated beat replaces the default text cards for this scene.
-  const custom = Boolean(shot || flow || scene.scrub || scene.fix || scene.call_end || scene.toast);
+  const custom = Boolean(shot || flow || scene.scrub || scene.fix || scene.call_end || scene.toast || scene.replay || scene.plans || scene.tryit);
   const introAt = scene.new_feature ? at(scene.new_feature.at_sec) : null;
   const stackOpacity = introAt === null ? 1 : interpolate(local, [introAt - 6, introAt], [1, 0], clamp);
   return (
@@ -153,10 +154,14 @@ const Scene = ({scene, palette: base, labels, sound}) => {
         <div style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', paddingBottom: 40}}>
         {scene.call_end ? <div style={{marginBottom: 30, opacity: scene.new_feature ? stackOpacity : 1}}><CallEnd call={{...withFrames(scene.call_end), end_at: at(scene.call_end.end_at_sec)}} {...beat} /></div> : null}
         {scene.toast ? <div style={{marginBottom: 30, opacity: scene.new_feature ? stackOpacity : 1}}><Toast toast={until(scene.toast)} {...beat} /></div> : null}
+        {scene.replay ? <div style={{marginTop: 120, marginBottom: 40}}><ReplayPlayer {...scene.replay} at={at(scene.replay.at_sec)} jump={at(scene.replay.jump_sec)} replay={scene.replay.replay_sec === undefined ? undefined : at(scene.replay.replay_sec)} {...beat} /></div> : null}
+        {scene.plans ? <div style={{marginBottom: 34}}><PlanCheck {...scene.plans} at={at(scene.plans.at_sec)} {...beat} /></div> : null}
+        {scene.tryit ? <div style={{marginTop: 10}}><TryItStage consent={withFrames(scene.tryit.consent)} old={withFrames(scene.tryit.old)} {...beat} /></div> : null}
         {shot ? <div style={{marginBottom: 38}}><ProductShot {...shot} {...beat} /></div> : null}
         {scene.asset ? <Img src={staticFile(scene.asset)} style={{width: '100%', height: 600, objectFit: 'cover', borderRadius: 34, boxShadow: '0 24px 70px rgba(31,35,48,.14)', marginBottom: 38}} /> : null}
         {scene.new_feature ? <div style={{position: 'absolute', left: 0, right: 0, top: '50%', transform: 'translateY(-55%)'}}><FeatureIntro at={introAt} feature={scene.new_feature} {...beat} /></div> : null}
         {scene.fix ? <div style={{marginTop: 10, marginBottom: 10}}><Correction fix={withFrames(scene.fix)} {...beat} /></div> : null}
+        {scene.send ? <div style={{marginTop: 30}}><SendClick at={at(scene.send.at_sec)} label={scene.send.label} {...beat} /></div> : null}
         {flow ? <div style={{marginTop: 40, marginBottom: 30, opacity: scene.type === 'pain-hook' ? stackOpacity : 1}}><Flow items={flow} accent={['pain-hook', 'before-workflow'].includes(scene.type) ? palette.warm : palette.cool} {...beat} /></div> : null}
         {scene.type === 'pain-hook' && !custom ? <div style={{marginTop: 120, opacity: stackOpacity, transform: `rotate(${interpolate(local, [0, 45], [-3, 0], clamp)}deg)`}}>{before.map((step, i) => <div key={step} style={{padding: '28px 30px', marginBottom: 20, marginLeft: i * 34, borderRadius: 28, background: '#fff', borderLeft: `10px solid ${i === before.length - 1 ? palette.warm : palette.cool}`, boxShadow: '0 16px 45px rgba(31,35,48,.12)', fontFamily: font, fontSize: 44, fontWeight: 800}}>{step}</div>)}</div> : null}
         {['before-workflow', 'after-workflow'].includes(scene.type) && !custom ? steps.map((step, i) => <Card key={step} index={i} delay={stepAt(i)} accent={scene.type === 'after-workflow' ? palette.cool : palette.warm}>{step}</Card>) : null}
