@@ -22,7 +22,7 @@ This Skill is maintained with both Codex and Claude Code. These rules apply to e
 
 ## Keep README current and minimal
 
-- Update `README.md` in the same PR whenever a change affects installation, usage, defaults (language, voice, brand, duration), required keys, or outputs. Do not wait to be asked.
+- Update `README.md` (English) and `README.zh-CN.md` (Chinese) together, in the same PR, whenever a change affects installation, usage, defaults (language, voice, brand, duration), required keys, or outputs. Do not wait to be asked.
 - README is for users only: what it does, install, use, defaults and how to change them, key safety, outputs, credits. Keep process rules in `SKILL.md`, maintainer rules here, and details in `references/`.
 - `tests/test_skill.py` checks that README's stated defaults match the code; fix README rather than the test.
 

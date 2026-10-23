@@ -1,35 +1,37 @@
 # Make AI Tool Impact Video
 
-给它一个 AI 工具的名字或链接，它帮你做出一条约 1 分钟、普通人能看懂的竖屏短视频。可在 Codex 和 Claude Code 中使用。
+**English** | [中文](README.zh-CN.md)
 
-## 视频是什么样的
+Give it the name or link of an AI tool, and it helps you make a one-minute vertical video that anyone can follow. Works in **Codex** and **Claude Code**.
 
-每条视频只讲**一个人用这个 AI 工具完成一件具体的事**，约 1 分钟，按这个顺序：
+## What the videos look like
 
-1. **痛点**：以前做这件事卡在哪
-2. **以前怎么做**：手动操作的几个步骤
-3. **现在怎么做**：把同一份材料交给 AI，它接手了哪一步（如果是近期新功能，会在痛点后马上点明“新在哪”）
-4. **人还要做什么**：哪些结果必须自己核对、自己决定
-5. **怎么试**：现在能不能用，从哪个小任务开始
+Each video shows **one person using one AI tool to finish one real task**, in about a minute:
 
-几个原则：
+1. **The pain** — where this task used to get stuck
+2. **Before** — the manual steps
+3. **Now** — the same material handed to AI, and which step it takes over (for a new feature, what's new is called out right after the pain)
+4. **What you still do** — the results a person must check and decide
+5. **Try it** — whether it's available now, and a small first task
 
-- **真实**：用真实的产品截图或录屏；每个说法都有来源，和官方介绍一致，不编造“省时 80%”这类数字
-- **好懂**：一屏只讲一个重点，按“操作 → 结果 → 为什么”的顺序展开，用图标和动作代替大段文字
-- **好读**：每个画面字少、只讲一件事，几秒就有新动作，顶部有进度条
-- **好看好听**：手机竖屏大字，配音语气随剧情起伏，音乐和音效跟着画面节奏走
+Principles:
 
-## 安装
+- **True** — real product screenshots or recordings; every claim has a source and matches the official docs; no made-up "saves 80% of your time" numbers
+- **Clear** — one point per screen, in the order *action → result → why*, with icons and motion instead of paragraphs
+- **Easy to read** — few words per frame, something new every few seconds, a progress bar on top
+- **Looks and sounds good** — big type for phones, a voice that follows the story, music and sound effects on the beat
 
-需要 [Python 3](https://www.python.org/)、[Node.js](https://nodejs.org/) 和 [FFmpeg](https://ffmpeg.org/)。
+## Install
 
-最简单的方法是打开 Codex 或 Claude Code，直接说：
+You need [Python 3](https://www.python.org/), [Node.js](https://nodejs.org/) and [FFmpeg](https://ffmpeg.org/).
+
+The easiest way: open Codex or Claude Code and say
 
 ```text
-帮我安装这个 Skill：https://github.com/itsangelwang/make-ai-tool-impact-video
+Install this skill: https://github.com/itsangelwang/make-ai-tool-impact-video
 ```
 
-也可以手动安装（两个工具共用同一份文件；只用一个工具的话，跳过另一个的 `ln -s` 那行）：
+Or install by hand (both tools share one copy; skip the `ln -s` line for a tool you don't use):
 
 ```bash
 git clone https://github.com/itsangelwang/make-ai-tool-impact-video.git ~/skills/make-ai-tool-impact-video
@@ -38,44 +40,44 @@ ln -s ~/skills/make-ai-tool-impact-video ~/.codex/skills/make-ai-tool-impact-vid
 ln -s ~/skills/make-ai-tool-impact-video ~/.claude/skills/make-ai-tool-impact-video
 ```
 
-以后更新：在 Skill 文件夹里运行 `git pull`。
+To update later, run `git pull` in the skill folder.
 
-## 使用
+## Use
 
-在 Codex 里输入 `$make-ai-tool-impact-video`，在 Claude Code 里输入 `/make-ai-tool-impact-video`，再描述需求：
+Type `$make-ai-tool-impact-video` in Codex or `/make-ai-tool-impact-video` in Claude Code, then describe what you want:
 
 ```text
-为这个 AI 工具做一条一分钟竖屏视频：<产品名称或链接>
-具体任务：把一周的会议笔记整理成周报
+Make a one-minute vertical video for this AI tool: <product name or link>
+The task: turn a week of meeting notes into a weekly update
 ```
 
-不知道做什么？直接说“帮我找这周适合做的 AI 新功能”，AI 会列出几个选题并推荐一个。
+No idea yet? Say "find me an AI feature worth covering this week" and it will suggest a few topics and recommend one.
 
-动手前，AI 会先查官方和其他博主是否已经讲过这个功能：已经讲过同一件事就换个角度，实在没有新东西可讲会建议你换题。
+Before starting, it checks whether the company or other creators have already covered the feature. If the same story is out there it looks for a new angle, and if there's nothing new to say it suggests a different topic.
 
-AI 会先给你一份审片包（脚本、画面、事实来源），**你确认后才会配音出片**，不会自动发布。
+You first get a review pack (script, frames, fact sources). **Nothing is voiced or rendered until you approve it**, and nothing is ever published automatically.
 
-## 默认设置
+## Defaults
 
-| 项目 | 默认 | 想改的话 |
+| Setting | Default | To change it |
 |---|---|---|
-| 语言 | 美式英语 | 说“语言：中文，面向中国市场” |
-| 配音 | Fish Audio 官方声音 “Sawyer”（Drama 3 模型），每个场景一口气连读，语速 1.15 倍 | 说“换个声音”，AI 会先给你试听 |
-| 音乐和音效 | 免版权曲库（如 Pixabay）的真实曲子和音效，你试听选好后才下载 | 说“换首音乐”或“这个音效不好听” |
-| 品牌结尾 | ACEMODE 品牌卡，并念出 “10x Faster, Log Off Earlier.” | 说“不要品牌结尾”，或提供你自己的品牌 |
-| 时长 | 55–65 秒 | 写明理由时最长 75 秒 |
+| Language | US English | Say "Language: Chinese, for the China market" |
+| Voice | Fish Audio "Sawyer" (Drama 3), each scene read in one take, 1.15× speed | Say "change the voice" — you'll get samples first |
+| Music & sound | Real tracks and effects from royalty-free libraries (e.g. Pixabay), downloaded only after you pick them | Say "change the music" or "this sound effect doesn't work" |
+| Brand ending | ACEMODE brand card, reading "10x Faster, Log Off Earlier." | Say "no brand ending", or give your own brand |
+| Length | 55–65 seconds | Up to 75 seconds with a stated reason |
 
-## 配音密钥
+## Voice API key
 
-配音需要 [Fish Audio](https://fish.audio/) 的 API Key（也支持 OpenRouter、Deepgram）。把密钥写进 `~/.config/make-ai-tool-impact-video/.env`，格式参考 [`.env.example`](.env.example)。
+Voiceover needs a [Fish Audio](https://fish.audio/) API key (OpenRouter and Deepgram also work). Put it in `~/.config/make-ai-tool-impact-video/.env`, following [`.env.example`](.env.example).
 
-- 不要放进 Skill 文件夹，不要发到聊天里，也不要上传到 GitHub
-- Fish Audio 免费版一般只能个人使用，商用前请确认你的套餐包含商用权
+- Don't put it in the skill folder, paste it into a chat, or push it to GitHub
+- Fish Audio's free tier is usually for personal use — check your plan before commercial use
 
-## 输出
+## Output
 
-1080×1920 竖屏 MP4、封面、字幕、来源记录、质检报告，以及适合发社交媒体的中英文标题（各 3 个，存在 `social-titles.md`）。
+A 1080×1920 vertical MP4, cover image, captions, source log, quality-check report, and 3 social-media titles each in English and Chinese (in `social-titles.md`).
 
-## 来源与致谢
+## Credits
 
-本项目参考并改编自 [Ah-ha07/AceMode-video-skill](https://github.com/Ah-ha07/AceMode-video-skill)，感谢原作者的探索与分享。本仓库未添加开源许可证；上游代码、品牌和素材的使用权需另行确认。
+Adapted from [Ah-ha07/AceMode-video-skill](https://github.com/Ah-ha07/AceMode-video-skill) — thanks to the original author for exploring and sharing it. This repository has no open-source license yet; rights to the upstream code, brand and assets need to be confirmed separately.

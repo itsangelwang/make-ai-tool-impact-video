@@ -575,36 +575,48 @@ class StoryAudioTests(unittest.TestCase):
 
 
 class ReadmeTests(unittest.TestCase):
-    """README states user-facing defaults; it must change when they change."""
+    """READMEs (English + Chinese) state user-facing defaults; they must change when they change."""
 
     MODEL_NAMES = {"drama-3": "Drama 3", "s2.1-pro": "s2.1-pro", "s2-pro": "s2-pro", "s1": "s1"}
 
     def setUp(self):
         self.readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        self.both = (self.readme, self.readme_zh)
 
     def test_default_voice_matches_preset(self):
         preset = fish_audio_tts.PRESETS["en-sawyer"]
-        self.assertIn("Sawyer", self.readme)
-        self.assertIn(self.MODEL_NAMES[preset["model"]], self.readme)
-        self.assertIn(f"语速 {preset['speed']} 倍", self.readme)
+        for text in self.both:
+            self.assertIn("Sawyer", text)
+            self.assertIn(self.MODEL_NAMES[preset["model"]], text)
+        self.assertIn(f"{preset['speed']}× speed", self.readme)
+        self.assertIn(f"语速 {preset['speed']} 倍", self.readme_zh)
         market = (ROOT / "references" / "english-market.md").read_text(encoding="utf-8")
         self.assertIn(f"speed `{preset['speed']}`", market)
 
     def test_duration_matches_limits(self):
         limits = json.loads((ROOT / "scripts" / "limits.json").read_text())["duration_sec"]
-        self.assertIn(f"{limits['min']}–{limits['max']} 秒", self.readme)
-        self.assertIn(f"最长 {limits['extended_max']} 秒", self.readme)
+        self.assertIn(f"{limits['min']}–{limits['max']} seconds", self.readme)
+        self.assertIn(f"Up to {limits['extended_max']} seconds", self.readme)
+        self.assertIn(f"{limits['min']}–{limits['max']} 秒", self.readme_zh)
+        self.assertIn(f"最长 {limits['extended_max']} 秒", self.readme_zh)
 
     def test_default_brand_and_key_location(self):
         brand = (ROOT / "references" / "brand-system.md").read_text(encoding="utf-8")
         self.assertIn("`ACEMODE` (default)", brand)
-        self.assertIn("ACEMODE", self.readme)
-        self.assertIn(str(fish_audio_tts.DEFAULT_ENV_FILE), self.readme)
+        for text in self.both:
+            self.assertIn("ACEMODE", text)
+            self.assertIn(str(fish_audio_tts.DEFAULT_ENV_FILE), text)
 
     def test_social_titles_are_a_stated_output(self):
         skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("social-titles.md", skill)
-        self.assertIn("social-titles.md", self.readme)
+        for text in self.both:
+            self.assertIn("social-titles.md", text)
+
+    def test_readmes_link_to_each_other(self):
+        self.assertIn("(README.zh-CN.md)", self.readme)
+        self.assertIn("(README.md)", self.readme_zh)
 
 
 class LimitsConsistencyTests(unittest.TestCase):
