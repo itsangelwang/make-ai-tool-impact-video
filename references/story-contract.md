@@ -13,7 +13,7 @@ Create JSON with `schema_version: 1` and these required fields:
 - `after_steps`: 2–4 steps showing person → AI → person responsibility.
 - `human_check`: a concrete verification, judgment, privacy, or accountability duty.
 - `readiness`: one of `use-now`, `try-now`, `watch`, `future`.
-- `next_action`: a small, reversible experiment consistent with readiness.
+- `next_action`: a small, reversible experiment consistent with readiness that is safe to try at work: use non-sensitive or made-up material, stay within the employer's rules and approved apps, and let the AI produce a draft the person reviews rather than sending, posting, or changing records on its own. When access needs a paid plan or an admin to turn the feature on, say so.
 - `narration`: natural speech with no stage directions; normally 150–190 Han characters for `zh-CN` or 90–135 words for `en-US` when readable transitions are included. Use the low end only for a deliberately fast, energetic delivery.
 - `coverage`: the existing-coverage check from [topic-check.md](topic-check.md): `checked_at`, `existing` (each `by` = `official` or `creator`, `url`, `shows`), `our_angle`, and `decision` (`make` or `change-angle`; `skip` fails validation).
 - `brand`: optional; `null` or `{name, slogan, start_sec, end_sec}` for the brand card that follows the last scene. See [brand-system.md](brand-system.md).

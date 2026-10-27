@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Verify stream presence, 9:16 dimensions, duration, decode, and caption bounds."""
+"""Verify stream presence, 9:16 dimensions, duration, decode, dropouts, and caption bounds."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess  # nosec B404
 from pathlib import Path
@@ -45,6 +46,68 @@ def decode_command(ffmpeg: str, video: Path) -> list[str]:
     # Name the encoders explicitly: Remotion's bundled FFmpeg has no default
     # encoder for the null muxer, which made every decode look like a failure.
     return [ffmpeg, "-v", "error", "-i", str(video), "-c:v", "rawvideo", "-c:a", "pcm_s16le", "-f", "null", "-"]
+
+
+# Frames are shrunk to this size before measuring brightness; enough to tell an
+# empty frame from one with any text or picture on it.
+PROBE_W, PROBE_H = 54, 96
+
+
+def parse_silences(stderr: str, duration: float) -> list[tuple[float, float]]:
+    """Read silencedetect output; a silence still open at the end runs to the end."""
+    spans, start = [], None
+    for kind, value in re.findall(r"silence_(start|end): (-?[\d.]+)", stderr):
+        if kind == "start":
+            start = max(0.0, float(value))
+        elif start is not None:
+            spans.append((start, float(value)))
+            start = None
+    if start is not None:
+        spans.append((start, duration))
+    return spans
+
+
+def black_runs(frame_max: list[int], fps: float, luma_max: int, min_sec: float) -> list[tuple[float, float]]:
+    """Find runs of frames whose brightest pixel stays dark, i.e. nothing is on screen."""
+    runs, start = [], None
+    for index, value in enumerate([*frame_max, luma_max + 1]):
+        if value <= luma_max and start is None:
+            start = index
+        elif value > luma_max and start is not None:
+            if (index - start) / fps >= min_sec:
+                runs.append((start / fps, index / fps))
+            start = None
+    return runs
+
+
+def frame_fps(video_stream: dict) -> float:
+    num, _, den = str(video_stream.get("avg_frame_rate") or video_stream.get("r_frame_rate") or "30/1").partition("/")
+    try:
+        return float(num) / float(den or 1) or 30.0
+    except (ValueError, ZeroDivisionError):
+        return 30.0
+
+
+def find_dropouts(ffmpeg: str, video: Path, duration: float, fps: float) -> list[str]:
+    """Report sound that drops out and frames that go black for longer than limits.json allows."""
+    limits, problems = LIMITS["dropout"], []
+    # Remotion's bundled FFmpeg has silencedetect but no blackdetect and no
+    # rawvideo muxer, so black frames are measured here from piped gray frames.
+    silence = subprocess.run([  # nosec B603
+        ffmpeg, "-hide_banner", "-nostats", "-i", str(video), "-vn",
+        "-af", f"silencedetect=noise={limits['silence_db']}dB:d={limits['silence_sec']}", "-f", "null", "-",
+    ], capture_output=True, text=True, env=tool_env(ffmpeg))
+    for start, end in parse_silences(silence.stderr, duration):
+        problems.append(f"sound drops out from {start:.2f}s to {end:.2f}s")
+    frames = subprocess.run([  # nosec B603
+        ffmpeg, "-v", "error", "-i", str(video), "-an", "-vf", f"scale={PROBE_W}:{PROBE_H},format=gray",
+        "-c:v", "rawvideo", "-f", "image2pipe", "-",
+    ], capture_output=True, env=tool_env(ffmpeg))
+    size = PROBE_W * PROBE_H
+    frame_max = [max(frames.stdout[i:i + size]) for i in range(0, len(frames.stdout) - size + 1, size)]
+    for start, end in black_runs(frame_max, fps, limits["black_luma_max"], limits["black_sec"]):
+        problems.append(f"screen goes black from {start:.2f}s to {end:.2f}s")
+    return problems
 
 
 def main() -> int:
@@ -95,6 +158,8 @@ def main() -> int:
         if decode.returncode:
             detail = (decode.stderr.strip().splitlines() or [""])[-1].replace(str(args.video), args.video.name)
             errors.append(f"full decode failed: {detail[:200]}")
+        elif videos and audios:
+            errors.extend(find_dropouts(ffmpeg, args.video, duration, frame_fps(videos[0])))
     try:
         cues = json.loads(args.captions.read_text(encoding="utf-8"))
         last = 0

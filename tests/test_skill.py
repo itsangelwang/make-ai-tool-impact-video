@@ -426,6 +426,29 @@ class VerifyVideoToolTests(unittest.TestCase):
         self.assertIn("rawvideo", command)
 
 
+class DropoutTests(unittest.TestCase):
+    def test_parses_closed_and_open_silences(self):
+        stderr = "[silencedetect] silence_start: 20.01\n[silencedetect] silence_end: 22.02 | silence_duration: 2.01\n" \
+                 "[silencedetect] silence_start: 58.5\n"
+        self.assertEqual(verify_video.parse_silences(stderr, 60.0), [(20.01, 22.02), (58.5, 60.0)])
+        self.assertEqual(verify_video.parse_silences("", 60.0), [])
+
+    def test_flags_only_long_empty_dark_runs(self):
+        # A dark brand card still has bright text, so its brightest pixel is high.
+        frames = [255] * 10 + [16] * 6 + [255] * 10 + [16] * 9 + [26] * 3 + [255]
+        self.assertEqual(verify_video.black_runs(frames, 30.0, 40, 0.25), [(26 / 30, 38 / 30)])
+
+    def test_skill_states_dropout_limits(self):
+        limits = json.loads((ROOT / "scripts" / "limits.json").read_text())["dropout"]
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn(f"longer than {limits['silence_sec']} seconds", skill)
+        self.assertIn(f"longer than {limits['black_sec']} seconds", skill)
+
+    def test_reads_frame_rate(self):
+        self.assertEqual(verify_video.frame_fps({"avg_frame_rate": "30/1"}), 30.0)
+        self.assertEqual(verify_video.frame_fps({"avg_frame_rate": "0/0"}), 30.0)
+
+
 class ExampleTests(unittest.TestCase):
     """Every folder in examples/ must pass all validators."""
 
