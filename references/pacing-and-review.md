@@ -61,6 +61,23 @@ Use progressive review by default:
 
 Do not repeatedly render or re-analyze an unchanged full composition. Suppress verbose renderer progress when possible and report only failures, output paths, duration, and QA findings. Reuse representative frames for unchanged components. A local clip approval does not replace the final full-video audit before delivery.
 
+## Design self-review before the user sees it
+
+Do not wait for the user to point out problems. Before showing any stills or render, critique them as a designer and fix what you can; then tell the user what the self-review caught. The list is a floor: also flag whatever your own judgment notices.
+
+1. Every element earns its place; cut repeats (a big logo in the middle when the header already shows it).
+2. Mature tone: no childish shapes, over-bouncy springs, emoji, or list-in-a-box layouts.
+3. Finish: no default fonts, flat fills, or frames that sit still; soft layered shadows instead of one heavy drop shadow.
+4. Looks made by a person, not by AI (see "Look made by a person, not by AI" in `visual-system.md`).
+5. Physical sense: nothing floating, nothing hidden that should be seen, sane overlaps.
+6. Color carries one meaning per color; backgrounds never drift toward grey.
+7. A stranger can say what this is and why it matters to them; examples name the feature and show the payoff.
+8. Marks never cross text; a corner card never covers a headline; no source captions or transitions leak into crops.
+9. No dated labels or promises we cannot keep.
+10. First 2 seconds, dead air, words per screen, caption and voice sync, audio balance, licenses, the ending call to action.
+
+For a big visual change, send the user a key-frame sheet (one or two stills per scene, quarter size) and get an OK before the full render. Render the full video once, then sample frames around every transition for problems that only show in motion.
+
 ## Review audit
 
 Watch once without pausing and answer:

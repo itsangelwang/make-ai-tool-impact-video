@@ -116,7 +116,7 @@ class PackageTests(unittest.TestCase):
     def test_brand_card_counts_toward_duration(self):
         item = package()
         item["scenes"][-1]["end_sec"] = 56.5
-        item["brand"] = {"name": "ACEMODE", "slogan": "10x Faster, Log Off Earlier.", "start_sec": 56.5, "end_sec": 60}
+        item["brand"] = {"name": "ACEMODE", "slogan": "10x Faster. Reclaim Your Time.", "start_sec": 56.5, "end_sec": 60}
         self.assertEqual(validator.validate(item, ledger()), [])
         item["brand"]["start_sec"] = 57
         self.assertTrue(any("brand card must start" in e for e in validator.validate(item, ledger())))
@@ -576,7 +576,7 @@ class BuildCaptionsTests(unittest.TestCase):
     def test_brand_cue_keeps_flag_for_hidden_caption_bar(self):
         timeline = {"language": "en-US", "captions": [
             {"start_sec": 0, "end_sec": 2, "text": "Hello there."},
-            {"start_sec": 2.1, "end_sec": 5, "text": "ACEMODE. 10x Faster, Log Off Earlier.", "brand": True}]}
+            {"start_sec": 2.1, "end_sec": 5, "text": "ACEMODE. 10x Faster. Reclaim Your Time.", "brand": True}]}
         cues = build_captions.build_captions(timeline)
         self.assertNotIn("brand", cues[0])
         self.assertTrue(cues[1]["brand"])
@@ -595,7 +595,7 @@ class FitTimelineTests(unittest.TestCase):
                 {"start_sec": 0.3, "end_sec": 3.0, "text": "Three quotes. Two hundred chairs."},
                 {"start_sec": 3.2, "end_sec": 6.0, "text": "Now paste them into ChatGPT."},
                 {"start_sec": 7.6, "end_sec": 10.0, "text": "It builds a calculator."},
-                {"start_sec": 0, "end_sec": 0, "text": "ACEMODE. 10x Faster, Log Off Earlier.", "brand": True},
+                {"start_sec": 0, "end_sec": 0, "text": "ACEMODE. 10x Faster. Reclaim Your Time.", "brand": True},
             ],
             "transitions": [{"start_sec": 6.1, "end_sec": 7.5, "label": "Hand off", "readable": True}],
         }

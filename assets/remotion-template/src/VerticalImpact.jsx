@@ -9,7 +9,8 @@ import {AccessChips, CheckCards, Correction, FeatureIntro, Flow, NewTag, Product
 
 const FONTS = {
   zh: {body: 'PingFang SC, Noto Sans CJK SC, Arial, sans-serif', display: 'Hannotate SC, Kaiti SC, PingFang SC, sans-serif'},
-  en: {body: 'Inter, Avenir Next, SF Pro Display, Arial, sans-serif', display: 'Inter, Avenir Next, SF Pro Display, Arial, sans-serif'},
+  // System font first: it has every weight, so the type levels stay distinct (Inter is often not installed and the fallback looks uniformly heavy)
+  en: {body: "system-ui, -apple-system, 'SF Pro Display', Inter, Arial, sans-serif", display: "system-ui, -apple-system, 'SF Pro Display', Inter, Arial, sans-serif"},
 };
 const LABELS = {
   zh: {handoff: '交给 AI 处理这一步', humanCheck: '最后一步仍由人负责', nextAction: '今天可以这样试', before: '使用前', after: '使用后', you: '你'},

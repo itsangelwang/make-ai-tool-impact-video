@@ -12,9 +12,9 @@ Presets:
 
 - `ACEMODE` (default)
   - Name: `ACEMODE`
-  - Slogan: `10x Faster, Log Off Earlier.`
+  - Slogan: `10x Faster. Reclaim Your Time.`
   - No supporting line on the card.
-  - Spoken by default: add a final narration cue with `text` `ACEMODE. 10x Faster, Log Off Earlier.` and `voice` `[confident] AceMode. 10x faster. Log off earlier.` so it is pronounced "Ace Mode".
+  - Spoken by default: add a final narration cue with `text` `ACEMODE. 10x Faster. Reclaim Your Time.` and `voice` `[confident] AceMode. 10x faster. Reclaim your time.` so it is pronounced "Ace Mode".
 
 Preserve the exact user-supplied spelling, capitalization, punctuation, logo, and slogan. Do not normalize them or add supporting lines unless requested. Keep the brand card to roughly 3–4 seconds. Use a distinct full-frame background, restrained brand glow, and character or word-level bounce. Do not place factual product claims on the brand card.
 
