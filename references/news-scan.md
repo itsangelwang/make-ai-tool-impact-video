@@ -72,7 +72,7 @@ Then update the backlog: set `Last scan`, add new items to the right section, an
 Last scan: YYYY-MM-DD
 
 ## Creator
-- Plans: <paid plans, e.g. ChatGPT Plus, Claude Pro; free tools are fine>
+- Plans: <paid plans and free tools the creator can record with>
 - Language: <main video language>
 - Focus: <what the channel covers and what it leaves out>
 
