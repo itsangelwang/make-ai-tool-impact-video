@@ -13,6 +13,34 @@ When the user asks what to make, propose 3–6 candidates and recommend one. Pre
 
 For each candidate give the date, the one task it changes, who can use it, and the main risk (narrow access, hard to show, vendor-only claims). Mark aggregator-only facts as unverified.
 
+### Is it actually different?
+
+A feature can be new and still not be news. Before proposing it, name what ChatGPT, Claude, Gemini, and other mainstream tools already offer for the same job. If a viewer would say "X already does this", either drop it or find the true difference and verify it on each vendor's own pages. Never claim a difference from memory.
+
+Rank how far it changes the workflow; prefer the higher levels:
+
+1. Saves a step (no more copy-paste). Rarely worth a video on its own.
+2. Replaces a tool (one AI instead of a spreadsheet plus slides).
+3. Changes who does the work (the AI makes the call or watches the inbox; the person approves).
+4. Makes something possible that the person could not do before.
+
+### Can the creator record it?
+
+Ask which plans the creator pays for, and check plan access on the official pages before outlining. A launch is often limited to higher tiers or one region, and secondary coverage often gets this wrong. A feature the creator cannot open can only be explained with official footage and labeled diagrams; mark it `watch` and say so before proposing it.
+
+### Angles beyond one feature
+
+When single features are thin, offer one of these, keeping one task and one example thread:
+
+- **Same task, two or three tools.** Same input, same prompt, same day, default settings, the first result only (or disclose a retry), and the plan tier on screen. Judge by one objective test the viewer can check, such as "did the deck include the Nov 4 vendor deadline?", and give a verdict for this task only, not "best AI". Compare equal tiers. Run the test before scripting; if the results do not differ, pick a harder task or skip. When the agent making the video belongs to one of the tested vendors, say so to the user and show every raw output.
+- **"AI can now ___".** A new capability that several vendors shipped close together (calling a business, working in the background). Show who offers it and who can use it today. Usually `watch`, so it is an explainer, not a how-to.
+- **Claim vs reality.** Test what the launch promised, or report documented gaps. This fits the human-check beat.
+- **Tool relay.** Several tools chained for one job. Only propose it when each handoff is justified by a test or by a step only one tool can do; otherwise viewers ask why not use one tool.
+
+### Score before recommending
+
+Give the user a short table for the top candidates: new (date), different from existing tools, workflow level, recordable with the creator's plans, existing coverage, and verdict (`make`, `change-angle`, `skip`). If existing reviews already judge one thing, such as how a deck looks, look for what they skip, such as whether the content is correct.
+
 ## Checking existing coverage
 
 Search for, and open, at least:
