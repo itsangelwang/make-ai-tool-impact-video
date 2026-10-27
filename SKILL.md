@@ -88,7 +88,13 @@ python3 <skill-dir>/scripts/build_captions.py \
   --output <project-dir>/video/src/captions.json
 ```
 
-Register the review bundle with `project_state.py review`. Wait for explicit approval before final TTS or delivery render. Any registered script, claim, story, source, cover, voice, or opening change invalidates approval.
+Register the review bundle with `project_state.py review`, passing the voice as `--voice <provider>:<preset>` (for example `fish:en-sawyer`). Wait for explicit approval before final TTS or delivery render. The approval covers what the video says and shows; how much of it needs the user again depends on the change:
+
+- **Ask again with a new review:** a changed fact, claim, promise, or the meaning of the script; a different voice; a new cover or opening; a different example, scene plan, or source.
+- **Do it, then check it yourself:** typo fixes, volume and mix changes, and moving scenes, beats, and captions to fit the measured narration. `project_state.py` ignores `*_sec` timing and the story's `audio`/`sfx` fields, so these keep the approval; confirm them with stills and `verify_video.py`.
+- **Show only what changed:** a local visual fix inside an approved scene. Show the user a still or a 5–15 second clip of that scene, not the whole review.
+
+Before delivery, watch the full final render once whatever changed (section 6).
 
 ## 5. Iterate by communication purpose
 
@@ -118,7 +124,7 @@ It copies the editable inputs (packages, ledgers, `video/src`) into `<project-di
 
 ## 6. Finish and verify
 
-Generate final TTS only after approval. Never use a voice the user has rejected. For English, use Fish Audio with the `en-sawyer` preset and the natural-delivery rules in `references/english-market.md`; fall back to OpenRouter or Deepgram only when Fish Audio is unavailable, following "Other providers" in `references/english-market.md`. Store credentials only in provider-specific environment variables, never in JSON, source files, logs, or Git. When the user has an approved voice preset, reuse it without new auditions; otherwise audition at least two 8–12 second samples before committing to a voice or generating the full narration.
+Generate final TTS only after approval, and first run `project_state.py status <project-dir> --voice <provider>:<preset>` with the voice about to be used; it fails if the approved inputs or the voice changed. Never use a voice the user has rejected. For English, use Fish Audio with the `en-sawyer` preset and the natural-delivery rules in `references/english-market.md`; fall back to OpenRouter or Deepgram only when Fish Audio is unavailable, following "Other providers" in `references/english-market.md`. Store credentials only in provider-specific environment variables, never in JSON, source files, logs, or Git. When the user has an approved voice preset, reuse it without new auditions; otherwise audition at least two 8–12 second samples before committing to a voice or generating the full narration.
 
 For Fish Audio, keep credentials in a `.env` file outside the Skill directory and any Git repository (for example `~/.config/make-ai-tool-impact-video/.env`), and keep only placeholders in `.env.example`. Never read, print, or summarize the populated `.env` file. Use an original synthetic voice or a voice the user has permission to use; do not clone another provider's preset voice. The `en-sawyer` preset uses `drama-3`; other calls default to the paid `s2.1-pro`; use `s2.1-pro-free` only when its current availability and the user's intended usage comply with Fish Audio's live terms.
 

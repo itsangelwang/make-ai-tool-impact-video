@@ -180,9 +180,56 @@ class StateAndUtilitiesTests(unittest.TestCase):
                 files.extend([f"--{name}", str(path)])
             state = ROOT / "scripts" / "project_state.py"
             subprocess.run([sys.executable, state, "init", project], check=True, capture_output=True)
-            subprocess.run([sys.executable, state, "review", project, *files], check=True, capture_output=True)
+            subprocess.run([sys.executable, state, "review", project, *files, "--voice", "fish:en-sawyer"], check=True, capture_output=True)
             subprocess.run([sys.executable, state, "approve", project, "--by", "user"], check=True, capture_output=True)
             (project / "story").write_text("changed")
+            result = subprocess.run([sys.executable, state, "status", project], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("review-invalidated", result.stdout)
+
+    def approved_story_project(self, project: Path) -> Path:
+        state = ROOT / "scripts" / "project_state.py"
+        flags = []
+        for name in ("package", "claims", "story", "sources", "cover", "opening"):
+            path = project / (f"{name}.json" if name == "story" else name)
+            path.write_text(name)
+            flags.extend([f"--{name}", str(path)])
+        story = {"scenes": [{"id": "s1", "headline": "Five old notes", "start_sec": 0, "end_sec": 6,
+                             "beats": [{"at_sec": 1.2, "text": "Maya"}]}]}
+        (project / "story.json").write_text(json.dumps(story))
+        subprocess.run([sys.executable, state, "init", project], check=True, capture_output=True)
+        subprocess.run([sys.executable, state, "review", project, *flags, "--voice", "fish:en-sawyer"], check=True, capture_output=True)
+        subprocess.run([sys.executable, state, "approve", project, "--by", "user"], check=True, capture_output=True)
+        return state
+
+    def test_approval_survives_retiming_and_mix(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            state = self.approved_story_project(project)
+            story = json.loads((project / "story.json").read_text())
+            story["scenes"][0].update(start_sec=0, end_sec=7.4)
+            story["scenes"][0]["beats"][0]["at_sec"] = 1.9
+            story.update(audio="audio/mix.wav", sfx=True)
+            (project / "story.json").write_text(json.dumps(story, indent=2))
+            result = subprocess.run([sys.executable, state, "status", project, "--voice", "fish:en-sawyer"],
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout)
+            self.assertIn('"approved"', result.stdout)
+
+    def test_approval_invalidates_on_meaning_or_voice_change(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            state = self.approved_story_project(project)
+            result = subprocess.run([sys.executable, state, "status", project, "--voice", "fish:other"],
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("voice", result.stdout)
+        with tempfile.TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            state = self.approved_story_project(project)
+            story = json.loads((project / "story.json").read_text())
+            story["scenes"][0]["headline"] = "Six old notes"
+            (project / "story.json").write_text(json.dumps(story))
             result = subprocess.run([sys.executable, state, "status", project], capture_output=True, text=True)
             self.assertEqual(result.returncode, 1)
             self.assertIn("review-invalidated", result.stdout)
@@ -197,7 +244,7 @@ class StateAndUtilitiesTests(unittest.TestCase):
                 flags.extend([f"--{name}", str(path)])
             state_script = ROOT / "scripts" / "project_state.py"
             subprocess.run([sys.executable, state_script, "init", project], check=True, capture_output=True)
-            subprocess.run([sys.executable, state_script, "review", project, *flags], check=True, capture_output=True)
+            subprocess.run([sys.executable, state_script, "review", project, *flags, "--voice", "fish:en-sawyer"], check=True, capture_output=True)
             state = json.loads((project / ".impact-video-state.json").read_text())
             self.assertEqual(state["review"]["files"]["package"]["path"], "package")
             self.assertNotIn(str(project), json.dumps(state))
