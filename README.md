@@ -17,7 +17,7 @@ Each video shows **one person using one AI tool to finish one real task**, in ab
 Principles:
 
 - **True** — real product screenshots or recordings; every claim has a source and matches the official docs; no made-up "saves 80% of your time" numbers
-- **Clear** — one point per screen, in the order *action → result → why*, with icons and motion instead of paragraphs
+- **Clear** — one point per screen, in the order *action → result → why*; shows what things really look like instead of text in boxes, with clear type levels instead of all-bold text
 - **Easy to read** — few words per frame, something new every few seconds, a progress bar on top
 - **Looks and sounds good** — big type for phones, a voice that follows the story, music and sound effects on the beat
 

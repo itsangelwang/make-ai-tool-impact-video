@@ -50,7 +50,7 @@ export const TimedCaptions = () => {
         const cool = !warm && containsIndex(cue.text,startIndex,cue.highlightCool);
         const emphasized = warm || cool;
         if (index === lineBreak && english) return <div key={`br-${index}`} style={{flexBasis:'100%',height:0}} />;
-        const span = <span key={`${char}-${index}`} style={{display:'inline-block',whiteSpace:/^\s+$/.test(char)?'pre':'normal',fontFamily:english?'Inter, Avenir Next, Arial, sans-serif':'Hannotate SC, Kaiti SC, PingFang SC, sans-serif',fontSize:english?(emphasized?48:43):(emphasized?42:38),lineHeight:english?1.22:1.35,fontWeight:emphasized?900:650,color:warm?'#FF9B74':cool?'#B9AFFF':'#fff',opacity:progress,transform:`translateY(${(1-progress)*(emphasized?32:24)}px) rotate(${english?0:(1-progress)*(index%2?5:-4)}deg) scale(${(.78+progress*.22)*(emphasized&&!english?1.1:1)})`}}>{char}</span>;
+        const span = <span key={`${char}-${index}`} style={{display:'inline-block',whiteSpace:/^\s+$/.test(char)?'pre':'normal',fontFamily:english?"system-ui, -apple-system, 'SF Pro Display', Inter, Arial, sans-serif":'Hannotate SC, Kaiti SC, PingFang SC, sans-serif',fontSize:english?(emphasized?48:43):(emphasized?42:38),lineHeight:english?1.22:1.35,fontWeight:emphasized?900:650,color:warm?'#FF9B74':cool?'#B9AFFF':'#fff',opacity:progress,transform:`translateY(${(1-progress)*(emphasized?32:24)}px) rotate(${english?0:(1-progress)*(index%2?5:-4)}deg) scale(${(.78+progress*.22)*(emphasized&&!english?1.1:1)})`}}>{char}</span>;
         return index === lineBreak ? [span, <div key={`br-${index}`} style={{flexBasis:'100%',height:0}} />] : span;
       })}
     </div>
