@@ -4,7 +4,7 @@ Run this before writing the story. The goal is not to avoid topics others covere
 
 ## Choosing a topic
 
-When the user asks what to make, propose 3–6 candidates and recommend one. Prefer a tool or feature that:
+When the user asks what to make, propose up to 3–6 candidates that pass "Judge the value before recommending" below, and recommend one. Prefer a tool or feature that:
 
 - was announced within the last 90 days (see "Introduce what is new" in [story-contract.md](story-contract.md)), with a verified official date;
 - changes one task an ordinary person already does (meetings, slides, email, notes, files, planning);
@@ -37,9 +37,27 @@ When single features are thin, offer one of these, keeping one task and one exam
 - **Claim vs reality.** Test what the launch promised, or report documented gaps. This fits the human-check beat.
 - **Tool relay.** Several tools chained for one job. Only propose it when each handoff is justified by a test or by a step only one tool can do; otherwise viewers ask why not use one tool.
 
-### Score before recommending
+### Where else to look
 
-Give the user a short table for the top candidates: new (date), different from existing tools, workflow level, recordable with the creator's plans, existing coverage, and verdict (`make`, `change-angle`, `skip`). If existing reviews already judge one thing, such as how a deck looks, look for what they skip, such as whether the content is correct.
+New launches are only one source. When they are thin, also look at:
+
+- **Life admin:** leases, insurance policies, medical bills, phone plans, tax paperwork. Use fictional documents, and end with "check the original or ask a professional".
+- **Features people pay for but don't use:** memory, projects, scheduled tasks, voice. Tie each to one task, never a feature list.
+- **AI tools beyond the big chatbots:** meeting notes, research-to-audio, slide makers, AI browsers, video editors.
+- **One role at a time:** the same feature used by a teacher, a realtor, or a shop owner.
+
+### Judge the value before recommending
+
+Recommend only topics whose value is high. Before proposing any candidate, judge:
+
+- **Impact:** how many ordinary viewers do this task, and how much it matters when it goes wrong.
+- **Difference:** what this video adds over existing tools and existing coverage.
+- **Recordable:** the creator can show real UI with their plans.
+- **Likely result:** predict the outcome before testing. If the likely result is flat (both tools pass an easy test, or the change is one saved step), the value is low.
+
+Drop low-value candidates instead of recommending them; at most name them in one line with the reason, so the user knows they were considered. If no candidate is high value, say so and suggest where to look next rather than padding the list. A tool the user names themselves still gets the coverage check below, and the user decides.
+
+Give the user a short table for the candidates that pass: new (date), different from existing tools, workflow level, recordable with the creator's plans, existing coverage, likely result, and verdict (`make`, `change-angle`, `skip`). If existing reviews already judge one thing, such as how a deck looks, look for what they skip, such as whether the content is correct.
 
 ## Checking existing coverage
 
