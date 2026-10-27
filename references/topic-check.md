@@ -9,13 +9,16 @@ When the user asks what to make, run the weekly scan in [news-scan.md](news-scan
 - was announced within the last 90 days (see "Introduce what is new" in [story-contract.md](story-contract.md)), with a verified official date;
 - changes one task an ordinary person already does (meetings, slides, email, notes, files, planning);
 - can be shown truthfully: the user can open it and record real UI, or official screenshots/video are available;
-- has an access path for the audience; flag Pro/Business-only or region-limited features as `try-now` or `watch`.
+- has an access path for the audience; flag Pro/Business-only or region-limited features as `try-now` or `watch`;
+- comes from a different vendor than the last two videos in the backlog's `Made` list, unless it clearly stands out.
 
 For each candidate give the date, the one task it changes, who can use it, and the main risk (narrow access, hard to show, vendor-only claims). Mark aggregator-only facts as unverified.
 
 ### Is it actually different?
 
 A feature can be new and still not be news. Before proposing it, name what ChatGPT, Claude, Gemini, and other mainstream tools already offer for the same job. If a viewer would say "X already does this", either drop it or find the true difference and verify it on each vendor's own pages. Never claim a difference from memory.
+
+"It could be done before" is not enough to drop a topic: almost any task had a slower workaround. Compare with the old way instead. Keep it only if the new way is clearly faster, simpler, or better for an ordinary person, in a way the video can show side by side.
 
 Rank how far it changes the workflow; prefer the higher levels:
 
@@ -54,7 +57,7 @@ Recommend only topics whose value is high. Before proposing any candidate, judge
 - **Difference:** what this video adds over existing tools and existing coverage.
 - **Recordable:** the creator can show real UI with their plans.
 - **Wow:** would a viewer stop scrolling? Prefer features that are visual or audible (voice, live translation, AI acting on a screen or calling someone) over text in, text out.
-- **Fun or genuinely new:** a topic needs one of two things. Either a surprise or fun moment ("AI can actually do this?", something a viewer would laugh at or send to a friend), or a practical use the viewer has never seen. Useful alone is not enough: a practical topic fails when it is old news, obvious, or widely covered, even with strong visuals.
+- **Fun or genuinely new:** a topic needs one of two things. Either a surprise or fun moment ("AI can actually do this?", something a viewer would laugh at or send to a friend), or a practical use the viewer has never seen. A fun topic still needs a one-line answer to "why would I try this?"; if a viewer would watch it and not want to try it, drop it. When the tool may be unfamiliar, say what it is in the first seconds, and judge how well known it is by the target audience, not by the creator's own habits. Useful alone is not enough: a practical topic fails when it is old news, obvious, or widely covered, even with strong visuals.
 - **New to the viewer:** would viewers already think of doing this themselves? "Upload it to AI and ask" is obvious to most people, so a video built on it teaches nothing. The video must teach something about the AI tool they would not work out alone: a capability they don't know exists, a setup step that is not obvious, or a failure they would not expect. Know-how about the task itself (what to ask the hospital for) does not count.
 - **Likely result:** predict the outcome before testing. If the likely result is flat (both tools pass an easy test, or the change is one saved step), the value is low.
 

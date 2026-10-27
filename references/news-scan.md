@@ -62,7 +62,7 @@ Give the user a short digest, with official links for every item:
 
 If nothing reaches deep dive, say so plainly instead of filling the list, and point to the best follow-up or capability group.
 
-Then update the backlog: set `Last scan`, add new items to the right section, and move items the user rejects to `Dropped`. Once a video is made, move its topic to `Made` with the date and add its follow-up.
+Then update the backlog: set `Last scan`, add new items to the right section, and move items the user rejects to `Dropped` with the reason. Before turning a reason into a general rule (for the backlog, `Creator`, or this Skill), check whether it holds up: is it too broad, does it contradict an earlier rule, does it mix the creator's own view with the audience's? Raise any doubt with the user and record the agreed wording. Once a video is made, move its topic to `Made` with the date and add its follow-up.
 
 ## Backlog template
 
