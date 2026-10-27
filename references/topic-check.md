@@ -4,7 +4,7 @@ Run this before writing the story. The goal is not to avoid topics others covere
 
 ## Choosing a topic
 
-When the user asks what to make, propose up to 3–6 candidates that pass "Judge the value before recommending" below, and recommend one. Prefer a tool or feature that:
+When the user asks what to make, run the weekly scan in [news-scan.md](news-scan.md) first; it finds, scores, and sorts the candidates. Propose up to 3–6 candidates that pass "Judge the value before recommending" below, and recommend one. Prefer a tool or feature that:
 
 - was announced within the last 90 days (see "Introduce what is new" in [story-contract.md](story-contract.md)), with a verified official date;
 - changes one task an ordinary person already does (meetings, slides, email, notes, files, planning);
@@ -53,6 +53,7 @@ Recommend only topics whose value is high. Before proposing any candidate, judge
 - **Impact:** how many ordinary viewers do this task, and how much it matters when it goes wrong.
 - **Difference:** what this video adds over existing tools and existing coverage.
 - **Recordable:** the creator can show real UI with their plans.
+- **Wow:** would a viewer stop scrolling? Prefer features that are visual or audible (voice, live translation, AI acting on a screen or calling someone) over text in, text out.
 - **New to the viewer:** would viewers already think of doing this themselves? "Upload it to AI and ask" is obvious to most people, so a video built on it teaches nothing. The video must teach something about the AI tool they would not work out alone: a capability they don't know exists, a setup step that is not obvious, or a failure they would not expect. Know-how about the task itself (what to ask the hospital for) does not count.
 - **Likely result:** predict the outcome before testing. If the likely result is flat (both tools pass an easy test, or the change is one saved step), the value is low.
 
