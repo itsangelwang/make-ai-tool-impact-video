@@ -20,6 +20,7 @@ Principles:
 - **Clear** — one point per screen, in the order *action → result → why*; shows what things really look like instead of text in boxes, with clear type levels instead of all-bold text
 - **Easy to read** — few words per frame, something new every few seconds, a progress bar on top
 - **Looks and sounds good** — big type for phones, a voice that follows the story, music and sound effects on the beat
+- **Feels made by a person** — plain talk, real details, colors that each mean one thing, no AI clichés like sparkle icons
 
 ## Install
 
@@ -55,7 +56,7 @@ No idea yet? Say "find me an AI feature worth covering this week". It scans offi
 
 Before starting, it checks whether the company or other creators have already covered the feature. If the same story is out there it looks for a new angle, and if there's nothing new to say it suggests a different topic.
 
-You first get a review pack (script, frames, fact sources). **Nothing is voiced or rendered until you approve it**, and nothing is ever published automatically. After that, you're only asked again if the facts, the meaning, the voice, the cover or the opening change; timing and volume fixes are checked automatically, and a small visual fix is shown to you as just that clip.
+You first get a review pack (script, frames, fact sources). **Nothing is voiced or rendered until you approve it**, and nothing is ever published automatically. After that, you're only asked again if the facts, the meaning, the voice, the cover or the opening change; timing and volume fixes are checked automatically, and a small visual fix is shown to you as just that clip. For a big visual change you first see a sheet of key frames, before the full render.
 
 ## Defaults
 
@@ -64,7 +65,7 @@ You first get a review pack (script, frames, fact sources). **Nothing is voiced 
 | Language | US English | Say "Language: Chinese, for the China market" |
 | Voice | Fish Audio "Sawyer" (Drama 3), each scene read in one take, 1.15× speed | Say "change the voice" — you'll get samples first |
 | Music & sound | Real tracks and effects from royalty-free libraries (e.g. Pixabay), downloaded only after you pick them | Say "change the music" or "this sound effect doesn't work" |
-| Brand ending | ACEMODE brand card, reading "10x Faster, Log Off Earlier." | Say "no brand ending", or give your own brand |
+| Brand ending | ACEMODE brand card, reading "10x Faster. Reclaim Your Time." | Say "no brand ending", or give your own brand |
 | Length | 55–65 seconds | Up to 75 seconds with a stated reason |
 
 ## Voice API key

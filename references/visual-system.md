@@ -1,6 +1,6 @@
 # Vertical motion system
 
-Build natively at 1080×1920 and 30 fps. Use a warm near-white background, near-black text, one cool accent, and one warm accent. Avoid branded imitation, glassmorphism, neon HUDs, generic particles, and decorative camera motion.
+Build natively at 1080×1920 and 30 fps. Use a warm near-white background, near-black text, one cool accent, and one warm accent. Avoid branded imitation, glassmorphism, neon HUDs, generic particles, and decorative zooms. A very slow push (about 3% over a scene) with a faint handheld sway is fine: it keeps frames alive without pulling attention.
 
 ## Reusable scenes
 
@@ -33,7 +33,28 @@ Check every scene, not only the whole video. Render a still at each scene's busi
 - **Transitions between phases.** Every scene change gets a short entrance (about 0.4 s) that cycles slide, circle wipe, and rise; set a scene's `enter` (`slide`, `wipe`, `rise`, `none`) to choose one. A phase change (before → AI handoff or after, after → human check) gets a readable full-frame chapter card from `story.transitions` (about 2.2 s, at least 2.0; ends at the next scene's start; no narration over it). Give each card `kicker` (a 1–2 word tag such as "NOW" or "YOUR TURN") and, whenever the phase change has a cause, `from` and `to` icon lists so the card shows the handoff (three notes become one table; a table becomes a date and a person to check) over a gradient background. Use at most two or three chapter cards, each with its own color and symbol; `check_story.py` requires one between before and after.
 - **Progress bar.** The template draws a thin chapter progress bar at the top (one segment per scene, hidden on the brand card). Set `"progress": false` in story.json only when the platform already shows one.
 
+- **Color carries meaning.** Give each color one job for the whole video and say it in one sentence (for example: purple is the AI result and the current step, coral is the problem or what to check, everything else is neutral). Never color items by position, so that step ① and step ③ come out the same orange for no reason. Tint backgrounds a little toward a palette color, never toward grey, which reads muddy; texture or grain must not darken the frame.
+- **Step chips are a stepper.** When a row of chips names the steps of a workflow, the current step is filled in the accent color, finished steps turn white with a ✓ in place of their number, and later steps stay pale. A "Before" chip uses the problem color while the old way plays, then goes pale.
+
 `scripts/check_story.py` enforces the word limit and the 4-second rule (both in `scripts/limits.json`) and lists neighboring scenes that share a form.
+
+## Look made by a person, not by AI
+
+Viewers tune out what looks machine-made. Check every screen for these tells and replace them:
+
+- **Words:** marketing lines such as "turns new tools into real productivity". Write what a person would say out loud, with a little attitude ("And somehow, a new AI tool every day").
+- **Pictures:** sparkle ✦ icons for "AI", glowing logos, abstract funnels and arrows-into-boxes diagrams, perfect symmetry everywhere. Show real content instead: a real screen, a frame from the actual result, our own earlier video playing in a phone.
+- **Placeholders:** grey bars standing in for text. Put real, readable specifics: names, times, amounts ("Re: Q4 numbers?", "Recording 30:12").
+- **Type:** cute or decorative fonts (serif italics, handwriting) clash with a clean bold sans; set a key word apart by color only.
+- **People:** do not draw people in code; dot eyes, big heads and block bodies look childish. Use a professional illustration set (Humaaans by Pablo Stanley is CC0), recolor its clothes to the palette, and record the source. People must be physically sensible: hands attached, nothing floating, faces not hidden behind props, no chair legs poking out under a desk.
+- **Human touch:** circle the one result that matters with a marker stroke, as a person would; add soft grain and the slow push above.
+
+## Marks, comparisons and reused footage
+
+- **Marker marks never cross text.** A circle is a true ellipse drawn outside the words with a little wobble and an overlapping finish; mark a block of text with one stroke down its left side instead of a circle.
+- **Before → after as picture-in-picture.** When the old way and the new result both come from footage, shrink the "before" into a corner card that keeps playing (about 0.5 s to shrink, about 1 s held, labeled BEFORE) while the result fills the frame beneath it. It keeps the comparison visible without a strike-out, and it differs from the sideways push used between chapters. The corner card must not cover a headline.
+- **Crop out the source video's own chrome.** When reusing our earlier videos, cut away their captions, progress bars and transition frames (check the last half second of every segment); clip the bottom of a crop when the source caption would show.
+- **Name the feature and show the payoff.** An example from footage names the new feature in the narration ("with ChatGPT's new audio uploads") and ends on its most striking result (a live calculator, a drafted email), not on the first table it produces.
 
 ## Story beats in story.json
 

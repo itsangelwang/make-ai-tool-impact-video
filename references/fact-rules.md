@@ -18,4 +18,6 @@ Use readiness consistently:
 - `watch`: demo, waitlist, narrow rollout, or insufficient independent evidence.
 - `future`: research or prototype with no practical access path.
 
+Claims about the channel itself follow the same rules. Do not say "we test them for you" or "tested for real" unless every case in the video was tested by us. In evergreen copy (a channel intro, a bio, a pinned video) avoid promising a fixed format such as "one-minute videos" or "step by step"; say the value instead, softened where it is approximate ("in about a minute").
+
 Record asset rights separately. Official screenshots may still carry usage conditions. Label AI-generated explanatory images as illustration and never as product proof.
