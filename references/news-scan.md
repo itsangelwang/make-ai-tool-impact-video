@@ -6,6 +6,7 @@ Use this when the user asks what to make this week, or when a scheduled scan run
 
 Keep one backlog for all videos at `<workspace>/topic-backlog.md`, where `<workspace>` is the folder that holds the project folders. Create it from the template below if it is missing. Read it before searching:
 
+- `Creator` holds what the user pays for, the video language, and the channel's focus. Propose only topics the user can record with those plans, unless marked `watch`. Fill it in by asking the user if it is missing, and update it when they change a plan or focus.
 - `Last scan` sets the search window: everything announced since then (7 days if there is no date).
 - Skip anything already listed under `Made`, `Dropped`, or `Candidates`, unless something important changed (wider access, a new plan tier, a new region).
 - Report every `Follow-ups` entry whose date has passed.
@@ -69,6 +70,11 @@ Then update the backlog: set `Last scan`, add new items to the right section, an
 # Topic backlog
 
 Last scan: YYYY-MM-DD
+
+## Creator
+- Plans: <paid plans and free tools the creator can record with>
+- Language: <main video language>
+- Focus: <what the channel covers and what it leaves out>
 
 ## Candidates
 | Added | Item (official link) | Bucket | Score | Plan | Note |

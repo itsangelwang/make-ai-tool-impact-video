@@ -26,7 +26,7 @@ Rank how far it changes the workflow; prefer the higher levels:
 
 ### Can the creator record it?
 
-Ask which plans the creator pays for, and check plan access on the official pages before outlining. A launch is often limited to higher tiers or one region, and secondary coverage often gets this wrong. A feature the creator cannot open can only be explained with official footage and labeled diagrams; mark it `watch` and say so before proposing it.
+Read the creator's plans from the `Creator` section of the topic backlog (ask if it is missing), and check plan access on the official pages before outlining. A launch is often limited to higher tiers or one region, and secondary coverage often gets this wrong. A feature the creator cannot open can only be explained with official footage and labeled diagrams; mark it `watch` and say so before proposing it.
 
 ### Angles beyond one feature
 
@@ -41,7 +41,7 @@ When single features are thin, offer one of these, keeping one task and one exam
 
 New launches are only one source. When they are thin, also look at:
 
-- **Life admin:** leases, insurance policies, medical bills, phone plans, tax paperwork. Use fictional documents, and end with "check the original or ask a professional".
+- **Life admin:** only with a surprising or visible result; plain document Q&A is not fun enough. Leases, insurance policies, medical bills, phone plans, tax paperwork. Use fictional documents, and end with "check the original or ask a professional".
 - **Features people pay for but don't use:** memory, projects, scheduled tasks, voice. Tie each to one task, never a feature list.
 - **AI tools beyond the big chatbots:** meeting notes, research-to-audio, slide makers, AI browsers, video editors.
 - **One role at a time:** the same feature used by a teacher, a realtor, or a shop owner.
@@ -54,6 +54,7 @@ Recommend only topics whose value is high. Before proposing any candidate, judge
 - **Difference:** what this video adds over existing tools and existing coverage.
 - **Recordable:** the creator can show real UI with their plans.
 - **Wow:** would a viewer stop scrolling? Prefer features that are visual or audible (voice, live translation, AI acting on a screen or calling someone) over text in, text out.
+- **Fun or genuinely new:** a topic needs one of two things. Either a surprise or fun moment ("AI can actually do this?", something a viewer would laugh at or send to a friend), or a practical use the viewer has never seen. Useful alone is not enough: a practical topic fails when it is old news, obvious, or widely covered, even with strong visuals.
 - **New to the viewer:** would viewers already think of doing this themselves? "Upload it to AI and ask" is obvious to most people, so a video built on it teaches nothing. The video must teach something about the AI tool they would not work out alone: a capability they don't know exists, a setup step that is not obvious, or a failure they would not expect. Know-how about the task itself (what to ask the hospital for) does not count.
 - **Likely result:** predict the outcome before testing. If the likely result is flat (both tools pass an easy test, or the change is one saved step), the value is low.
 
