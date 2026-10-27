@@ -53,6 +53,7 @@ Recommend only topics whose value is high. Before proposing any candidate, judge
 - **Impact:** how many ordinary viewers do this task, and how much it matters when it goes wrong.
 - **Difference:** what this video adds over existing tools and existing coverage.
 - **Recordable:** the creator can show real UI with their plans.
+- **New to the viewer:** would viewers already think of doing this themselves? "Upload it to AI and ask" is obvious to most people, so a video built on it teaches nothing. The video must teach something about the AI tool they would not work out alone: a capability they don't know exists, a setup step that is not obvious, or a failure they would not expect. Know-how about the task itself (what to ask the hospital for) does not count.
 - **Likely result:** predict the outcome before testing. If the likely result is flat (both tools pass an easy test, or the change is one saved step), the value is low.
 
 Drop low-value candidates instead of recommending them; at most name them in one line with the reason, so the user knows they were considered. If no candidate is high value, say so and suggest where to look next rather than padding the list. A tool the user names themselves still gets the coverage check below, and the user decides.
