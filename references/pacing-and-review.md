@@ -6,7 +6,7 @@ Treat display completion and speakability as different constraints.
 
 - Target roughly 150–190 Han characters for a 55–65 second video with readable transitions.
 - Target 3–4 Han characters per second per spoken cue; flag any cue above 4.2.
-- For English, target roughly 90–135 words: use 90–105 for an intentionally fast, energetic delivery with readable transition gaps, and 105–135 for a calmer delivery. Flag a cue above 2.7 words per spoken second.
+- For English, roughly 90–135 words fits 55–65 seconds. Treat the count as a warning, not a tone choice: set timing from the measured narration, then give each action, result hold, and pause the time it needs. Flag a cue above 2.7 words per spoken second.
 - End a cue before a readable chapter transition begins.
 - Preserve a short pause after the last spoken word and a stable hold after character animation completes.
 - Cut narration that merely repeats an obvious action before extending duration.

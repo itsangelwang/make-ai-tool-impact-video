@@ -12,7 +12,7 @@ Use this reference for English-speaking audiences. Default to US English unless 
 
 ## Pace and captions
 
-- Target roughly 90–135 spoken English words for 55–65 seconds, including deliberate pauses; the 90–105 range suits the default energetic Fish Audio delivery with readable transitions.
+- Roughly 90–135 spoken English words fits 55–65 seconds. Use the count as a warning only: generate the narration, measure it, and fit actions, holds, and pauses around it.
 - Keep the average near 2.0–2.5 words per spoken second and flag individual cues above 2.7 words per second.
 - Reveal captions by word or short phrase, not letter by letter. Use 3–7 words per visual beat and no more than two mobile lines.
 - Use sentence case. Reserve all caps for a one- or two-word label.
