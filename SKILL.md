@@ -25,7 +25,7 @@ Read [references/fact-rules.md](references/fact-rules.md).
 
 ## 2. Check the topic is worth making
 
-Read [references/topic-check.md](references/topic-check.md). When the user asks what to make, propose candidates from recent official announcements first. For the chosen tool, find the official launch material and the most visible creator videos on the same feature, then record `coverage` (what exists, this video's different angle, and `make` / `change-angle` / `skip`) in `script-package.json`. If the honest answer is `skip`, stop and tell the user why with a better candidate; never skip silently.
+Read [references/topic-check.md](references/topic-check.md). When the user asks what to make, run the weekly scan in [references/news-scan.md](references/news-scan.md): read the topic backlog, search official sources first, score and sort what is new, and update the backlog. For the chosen tool, find the official launch material and the most visible creator videos on the same feature, then record `coverage` (what exists, this video's different angle, and `make` / `change-angle` / `skip`) in `script-package.json`. If the honest answer is `skip`, stop and tell the user why with a better candidate; never skip silently.
 
 Choose exactly one audience, task, and example thread. Define `before_steps`, `ai_change`, `after_steps`, `human_check`, `readiness`, and `next_action`.
 

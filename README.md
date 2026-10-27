@@ -51,7 +51,7 @@ Make a one-minute vertical video for this AI tool: <product name or link>
 The task: turn a week of meeting notes into a weekly update
 ```
 
-No idea yet? Say "find me an AI feature worth covering this week" and it will suggest a few topics and recommend one.
+No idea yet? Say "find me an AI feature worth covering this week". It scans official release notes since your last scan, scores what is new, recommends one, and suggests follow-on videos. It keeps a `topic-backlog.md` next to your project folders, so nothing repeats and re-tests come back when they are due.
 
 Before starting, it checks whether the company or other creators have already covered the feature. If the same story is out there it looks for a new angle, and if there's nothing new to say it suggests a different topic.
 
