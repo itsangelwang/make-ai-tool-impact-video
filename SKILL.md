@@ -43,7 +43,7 @@ Use this order:
 4. The new workflow, including the exact handoff or import step.
 5. One concrete example carried through input, AI output, downstream use, and verification.
 6. What AI changed and what the person still owns.
-7. Fit, readiness boundary, reversible next action, and the brand ending (ACEMODE by default).
+7. Fit, readiness boundary (including the plan or admin switch it needs), a reversible next action that is safe to try at work, and the brand ending (ACEMODE by default).
 
 Carry the same task object through the story. An item found in the old record must become the AI input, appear in the summary, become the next action or question, and remain the item the person verifies. Do not introduce “draft,” “source,” “old material,” “owner,” or “deadline” without showing the concrete artifact or value.
 
@@ -167,7 +167,7 @@ python3 <skill-dir>/scripts/verify_video.py \
   --report <project-dir>/video/qa/final-qa.json
 ```
 
-Visually inspect the full video and representative frames. Confirm native 1080×1920, complete decoding, safe captions, natural speech pace, semantic highlighting, readable transitions, real product evidence, and a viewer-recountable before → change → after → human responsibility chain.
+The check also fails when the sound drops out for longer than 0.8 seconds or the screen goes black (nothing on it) for longer than 0.25 seconds; find the cause in the timeline or mix and rerender rather than raising the limits in `scripts/limits.json`. Visually inspect the full video and representative frames. Confirm native 1080×1920, complete decoding, safe captions, natural speech pace, semantic highlighting, readable transitions, real product evidence, and a viewer-recountable before → change → after → human responsibility chain.
 
 ## 7. Deliver
 

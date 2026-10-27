@@ -13,5 +13,6 @@
   "after_steps": {"min": 2, "max": 4},
   "brand_card_sec": {"min": 3, "max": 4},
   "screen_words_max": 18,
-  "static_hold_max_sec": 4.0
+  "static_hold_max_sec": 4.0,
+  "dropout": {"silence_db": -50, "silence_sec": 0.8, "black_luma_max": 40, "black_sec": 0.25}
 }
