@@ -9,7 +9,7 @@
     "opening": "remotion render src/index.jsx VerticalImpact qa/opening.mp4 --frames 0-89 --codec h264 --crf 20"
   },
   "dependencies": {
-    "@remotion/cli": "4.0.512",
+    "@remotion/cli": "4.0.540",
     "react": "19.2.5",
     "react-dom": "19.2.5",
     "remotion": "4.0.512"
