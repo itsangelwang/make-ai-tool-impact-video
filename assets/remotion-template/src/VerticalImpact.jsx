@@ -1,6 +1,6 @@
-import React, {createContext, useContext} from 'react';
-import {AbsoluteFill, Audio, Img, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
-import {TimedCaptions} from './TimedCaptions';
+import React, {createContext, useContext, useLayoutEffect, useRef, useState} from 'react';
+import {AbsoluteFill, Audio, Freeze, Img, Sequence, continueRender, delayRender, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
+import {CAPTION_BOTTOM, TimedCaptions} from './TimedCaptions';
 import {ProgressBar} from './components/ProgressBar';
 import {Icon, objectColor} from './components/Icon';
 import {SfxFilter} from './components/Sfx';
@@ -32,6 +32,10 @@ export const localeOf = (story) => (String(story.language || 'en-US').startsWith
 const FontContext = createContext(FONTS.zh.body);
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'};
 const FPS = 30;
+// The platforms' top tabs and search cover about the first 200 px, so the progress bar and
+// the scene label start below them.
+const PROGRESS_TOP = 190;
+const CONTENT_TOP = 214;
 // Beat times in story.json are seconds from the scene start.
 const at = (sec) => Math.round((Number(sec) || 0) * FPS);
 const withFrames = (item) => (item ? {...item, at: at(item.at_sec)} : item);
@@ -123,7 +127,56 @@ export const BrandEnding = ({brand, palette, displayFont}) => {
   </AbsoluteFill>;
 };
 
-const Scene = ({scene, palette: base, labels, sound}) => {
+// Fit the scene body above the captions. Hidden copies of the scene, frozen at moments spread
+// across it, measure how tall the body gets; if its tallest moment does not fit, the whole
+// scene's body is scaled down by one factor (no size changes mid-scene). `npm run layout`
+// reads the factor of every scene and fails when one is too small (the scene is too dense).
+const FIT_SAMPLE_FRAMES = 15;
+const bodyExtent = (node) => {
+  if (!node) return 0;
+  let top = Infinity, bottom = -Infinity;
+  for (const child of node.children) {
+    if (getComputedStyle(child).position === 'absolute') continue;
+    top = Math.min(top, child.offsetTop);
+    bottom = Math.max(bottom, child.offsetTop + child.offsetHeight);
+  }
+  return bottom > top ? bottom - top + 40 : 0; // + the body's bottom padding
+};
+
+const Scene = ({scene, palette: base, labels, sound, measure}) => {
+  const area = useRef(null);
+  const content = useRef(null);
+  const samples = useRef({});
+  const [fit, setFit] = useState(1);
+  const waiting = useRef(null);
+  const measured = useRef(null);
+  const [, setPass] = useState(0);
+  const sceneFrames = Math.max(1, Math.round((scene.end_sec - scene.start_sec) * FPS));
+  useLayoutEffect(() => {
+    if (measure) {
+      measure.current[measure.key] = bodyExtent(content.current);
+      return;
+    }
+    // The hidden copies report their height after this scene's first layout pass, so every
+    // frame takes one extra pass before the scale is decided. The frame is held meanwhile.
+    if (measured.current !== frame) {
+      measured.current = frame;
+      if (waiting.current === null) waiting.current = delayRender('fit scene body');
+      setPass((n) => n + 1);
+      return;
+    }
+    const tallest = Math.max(0, ...Object.values(samples.current));
+    const room = area.current ? area.current.clientHeight : 0;
+    const next = tallest > room && room > 0 ? room / tallest : 1;
+    if (Math.abs(next - fit) > 0.001) {
+      // Hold the frame until the new scale is on screen, or the render captures the old one.
+      if (waiting.current === null) waiting.current = delayRender('fit scene body');
+      setFit(next);
+      return;
+    }
+    if (waiting.current !== null) { continueRender(waiting.current); waiting.current = null; }
+    if (frame === 0) console.log(`[layout] ${JSON.stringify({scene: scene.id, fit: Number(next.toFixed(3))})}`);
+  });
   const font = useContext(FontContext);
   const phase = phaseOf(scene.type, base);
   // Beats keep the story palette for warm/cool meaning; the scene paper follows the phase.
@@ -145,14 +198,15 @@ const Scene = ({scene, palette: base, labels, sound}) => {
   const introAt = scene.new_feature ? at(scene.new_feature.at_sec) : null;
   const stackOpacity = introAt === null ? 1 : interpolate(local, [introAt - 6, introAt], [1, 0], clamp);
   return (
-    <AbsoluteFill style={{padding: '112px 72px 360px', background: phase.paper, color: palette.ink, overflow: 'hidden'}}>
+    <AbsoluteFill style={{padding: `${CONTENT_TOP}px 72px ${CAPTION_BOTTOM + 230}px`, background: phase.paper, color: palette.ink, overflow: 'hidden'}}>
       <div style={{position: 'absolute', width: 650, height: 650, right: -350, top: -260, borderRadius: '50%', background: `${phase.accent}1F`, transform: `scale(${pulse})`}} />
       <div style={{position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column'}}>
         <div><Badge color={phase.accent}>{scene.label}</Badge></div>
         {scene.new_tag ? <div style={{marginTop: 22}}><NewTag at={0} {...beat}>{scene.new_tag}</NewTag></div> : null}
         <h1 style={{textWrap: 'balance', fontWeight: 800, fontFamily: font, fontSize: scene.type === 'pain-hook' ? 92 : 72, lineHeight: 1.08, margin: '38px 0 20px', letterSpacing: -2}}><Headline text={scene.headline} accent={phase.accent} /></h1>
-        {/* The body sits centered between the headline and the caption zone. */}
-        <div style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', paddingBottom: 40}}>
+        {/* The body sits centered between the headline and the caption zone, scaled to fit it. */}
+        <div ref={area} style={{flex: 1, minHeight: 0, position: 'relative'}}>
+        <div ref={content} style={{position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: 40, transform: fit < 1 ? `scale(${fit})` : undefined, transformOrigin: '50% 50%'}}>
         {scene.call_end ? <div style={{marginBottom: 30, opacity: scene.new_feature ? stackOpacity : 1}}><CallEnd call={{...withFrames(scene.call_end), end_at: at(scene.call_end.end_at_sec)}} {...beat} /></div> : null}
         {scene.toast ? <div style={{marginBottom: 30, opacity: scene.new_feature ? stackOpacity : 1}}><Toast toast={until(scene.toast)} {...beat} /></div> : null}
         {scene.replay ? <div style={{marginTop: 120, marginBottom: 40}}><ReplayPlayer {...scene.replay} at={at(scene.replay.at_sec)} jump={at(scene.replay.jump_sec)} replay={scene.replay.replay_sec === undefined ? undefined : at(scene.replay.replay_sec)} {...beat} /></div> : null}
@@ -175,7 +229,11 @@ const Scene = ({scene, palette: base, labels, sound}) => {
         {scene.checks ? <div style={{marginTop: 30}}><CheckCards at={at(scene.checks_at_sec)} checks={scene.checks} {...beat} /></div> : null}
         {scene.access ? <div style={{marginTop: 30}}><AccessChips at={at(scene.access.at_sec)} label={scene.access.label} plans={scene.access.plans} {...beat} /></div> : null}
         </div>
+        </div>
       </div>
+      {measure ? null : Array.from({length: Math.ceil(sceneFrames / FIT_SAMPLE_FRAMES) + 1}, (_, i) => Math.min(sceneFrames - 1, i * FIT_SAMPLE_FRAMES)).map((at) => (
+        <Freeze key={at} frame={at}><AbsoluteFill style={{visibility: 'hidden', pointerEvents: 'none'}}><Scene scene={scene} palette={base} labels={labels} sound={false} measure={{current: samples.current, key: at}} /></AbsoluteFill></Freeze>
+      ))}
     </AbsoluteFill>
   );
 };
@@ -218,7 +276,7 @@ export const VerticalImpact = ({story, captions = true}) => {
         const first = Math.round(story.scenes[0].start_sec * fps);
         const last = Math.round(story.scenes[story.scenes.length - 1].end_sec * fps);
         const durations = story.scenes.map((scene) => Math.max(1, Math.round((scene.end_sec - scene.start_sec) * fps)));
-        return <Sequence from={first} durationInFrames={Math.max(1, last - first)}><ProgressBar durationsInFrames={durations} colors={story.scenes.map((scene) => phaseOf(scene.type, story.palette).accent)} top={64} height={8} color={story.palette.cool} trackColor={`${story.palette.ink}22`} /></Sequence>;
+        return <Sequence from={first} durationInFrames={Math.max(1, last - first)}><ProgressBar durationsInFrames={durations} colors={story.scenes.map((scene) => phaseOf(scene.type, story.palette).accent)} top={PROGRESS_TOP} height={8} color={story.palette.cool} trackColor={`${story.palette.ink}22`} /></Sequence>;
       })() : null}
       {story.audio ? <Audio src={staticFile(story.audio)} /> : null}
       {captions ? <TimedCaptions /> : null}
