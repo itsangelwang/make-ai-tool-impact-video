@@ -24,7 +24,7 @@
 
 ## 安装
 
-需要 [Python 3](https://www.python.org/)、[Node.js](https://nodejs.org/) 和 [FFmpeg](https://ffmpeg.org/)。
+需要 [Python 3](https://www.python.org/)（外加 Pillow：`pip install pillow`，检查封面用）、[Node.js](https://nodejs.org/) 和 [FFmpeg](https://ffmpeg.org/)。
 
 最简单的方法是打开 Codex 或 Claude Code，直接说：
 

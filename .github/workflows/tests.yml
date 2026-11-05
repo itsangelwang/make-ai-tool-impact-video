@@ -16,6 +16,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - run: python -m pip install pillow
       - run: python -m unittest discover -s tests -v
 
   template:
@@ -30,6 +31,10 @@ jobs:
           node-version: "20"
       - run: npm ci --no-audit --no-fund
       - run: npx remotion still src/index.jsx VerticalImpact /tmp/cover.png --frame 0 --log=error
+      - name: Render both covers
+        run: |
+          npx remotion still src/index.jsx Cover /tmp/components-cover-9x16.png --log=error
+          npx remotion still src/index.jsx Cover34 /tmp/components-cover-3x4.png --log=error
       - name: Render reusable motion components
         run: |
           npx remotion still src/index.jsx ComponentsDemo /tmp/components-start.png --frame 0 --log=error

@@ -24,7 +24,7 @@ Principles:
 
 ## Install
 
-You need [Python 3](https://www.python.org/), [Node.js](https://nodejs.org/) and [FFmpeg](https://ffmpeg.org/).
+You need [Python 3](https://www.python.org/) with Pillow (`pip install pillow`, for the cover checks), [Node.js](https://nodejs.org/) and [FFmpeg](https://ffmpeg.org/).
 
 The easiest way: open Codex or Claude Code and say
 
