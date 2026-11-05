@@ -982,3 +982,28 @@ class PackagingTests(unittest.TestCase):
         skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("assets/social-titles-template.md", skill)
         self.assertIn("references/packaging.md", skill)
+
+
+class CaptionPlacementTests(unittest.TestCase):
+    """Captions sit above the platforms' account/caption area; scene bodies fit above them."""
+
+    def test_caption_bar_ends_above_platform_text(self):
+        overlay = module("platform_overlay")
+        source = (ROOT / "assets/remotion-template/src/TimedCaptions.jsx").read_text(encoding="utf-8")
+        bottom = int(re.search(r"export const CAPTION_BOTTOM = (\d+);", source).group(1))
+        caption_end = 1920 - bottom
+        for platform, zones in overlay.ZONES.items():
+            text_zone = [z for z in zones if z[0] in ("account & caption", "title & channel")][0]
+            self.assertLessEqual(caption_end, text_zone[2], platform)
+        self.assertIn("maxWidth:820", source)
+
+    def test_layout_check_matches_limits(self):
+        limits = json.loads((ROOT / "scripts/limits.json").read_text(encoding="utf-8"))
+        script = (ROOT / "assets/remotion-template/check-layout.mjs").read_text(encoding="utf-8")
+        package = json.loads((ROOT / "assets/remotion-template/package.json").read_text(encoding="utf-8"))
+        default = float(re.search(r": (0\.\d+); // same as body_fit_min", script).group(1))
+        self.assertEqual(default, limits["body_fit_min"])
+        self.assertEqual(package["scripts"]["layout"], "node check-layout.mjs")
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn(f"--min-fit {limits['body_fit_min']}", skill)
+        self.assertIn("[layout]", (ROOT / "assets/remotion-template/src/VerticalImpact.jsx").read_text(encoding="utf-8"))

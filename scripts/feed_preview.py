@@ -35,7 +35,8 @@ SLOTS_916 = [
 SLOT_34 = ("Xiaohongshu feed", 190, "3:4", 14)
 COMPARE_TITLE_PT = 14  # grids without a title are compared with ordinary 14-point UI text
 FONT_CANDIDATES = [
-    "/System/Library/Fonts/PingFang.ttc",
+    "/System/Library/Fonts/Hiragino Sans GB.ttc",
+    "/System/Library/Fonts/STHeiti Medium.ttc",
     "/System/Library/Fonts/SFNS.ttf",
     "/System/Library/Fonts/Helvetica.ttc",
     "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",

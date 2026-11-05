@@ -278,10 +278,6 @@
           {
             "name": "Pro",
             "on": true
-          },
-          {
-            "name": "Team",
-            "on": true
           }
         ]
       },
