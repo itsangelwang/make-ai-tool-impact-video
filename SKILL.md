@@ -72,6 +72,8 @@ python3 <skill-dir>/scripts/validate_sources.py \
   <project-dir>/video/source-ledger.json
 ```
 
+This preview check passes with a warning when an asset is not yet cleared (`publication_blockers`); name those assets in the review as blockers.
+
 Write the cover headline and the title options together from one promise (see [references/packaging.md](references/packaging.md)), set `story.cover`, render both covers with `npm run cover`, and check them at feed size with `scripts/feed_preview.py`. Produce one review containing the coverage check and chosen angle, the narration, factual boundaries, scene plan, the covers with their feed preview and the picked title, first-three-second preview, target voice/palette, and blockers. For silent review captions, create `timeline.json` and run:
 
 ```bash
@@ -173,7 +175,7 @@ python3 <skill-dir>/scripts/verify_video.py \
   --report <project-dir>/video/qa/final-qa.json
 ```
 
-The check also fails when the sound drops out for longer than 0.8 seconds or the screen goes black (nothing on it) for longer than 0.25 seconds; find the cause in the timeline or mix and rerender rather than raising the limits in `scripts/limits.json`. Lay the platform interfaces over stills of every scene and of the busiest caption moments, and move anything important out from under them:
+The check also fails when a caption ends after the video does, or when the sound drops out for longer than 0.8 seconds or the screen goes black (nothing on it) for longer than 0.25 seconds; find the cause in the timeline or mix and rerender rather than raising the limits in `scripts/limits.json`. Lay the platform interfaces over stills of every scene and of the busiest caption moments, and move anything important out from under them:
 
 ```bash
 python3 <skill-dir>/scripts/platform_overlay.py <project-dir>/video/qa/still-*.png \
@@ -186,7 +188,14 @@ Visually inspect the full video and representative frames. Confirm native 1080×
 
 Deliver the MP4, both covers (`cover-9x16.png`, `cover-3x4.png`) with their feed preview, captions, source ledger, claim ledger, QA report, and `social-titles.md`. State actual duration and publication blockers. Do not publish automatically.
 
-Before delivery, check privacy and safety and report the result:
+Before delivery, run the sources check in delivery mode; it fails while any asset is not cleared, so resolve or replace those assets first:
+
+```bash
+python3 <skill-dir>/scripts/validate_sources.py --delivery \
+  <project-dir>/video/source-ledger.json
+```
+
+Then check privacy and safety and report the result:
 - Real screenshots: no account name, avatar, email, chat-history sidebar, browser extension, or other personal UI inside the visible crop (look at each crop, not only the full image).
 - The MP4's metadata holds no name, path or location (`ffprobe -show_entries format_tags`).
 - People and companies in a simulated test are fictional, and their names do not match a well-known brand; illustrative files and numbers use placeholders.
