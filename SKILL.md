@@ -31,7 +31,7 @@ Choose exactly one audience, task, and example thread. Define `before_steps`, `a
 
 ## 3. Build one causal story
 
-Read [references/story-contract.md](references/story-contract.md) and [references/visual-system.md](references/visual-system.md). For narration, audio, timing, or animated captions, also read [references/pacing-and-review.md](references/pacing-and-review.md). Read [references/brand-system.md](references/brand-system.md) for the brand ending.
+Read [references/story-contract.md](references/story-contract.md) and [references/visual-system.md](references/visual-system.md). For narration, audio, timing, or animated captions, also read [references/pacing-and-review.md](references/pacing-and-review.md). Read [references/brand-system.md](references/brand-system.md) for the brand ending, and [references/packaging.md](references/packaging.md) for the cover, titles and post copy.
 
 For English work (the default), also read [references/english-market.md](references/english-market.md). Write natively in English rather than translating Chinese copy line by line. Localize the hook, example names, dates, workplace vocabulary, fonts, caption units, voice, and call to action.
 
@@ -72,7 +72,7 @@ python3 <skill-dir>/scripts/validate_sources.py \
   <project-dir>/video/source-ledger.json
 ```
 
-Produce one review containing the coverage check and chosen angle, the narration, factual boundaries, scene plan, cover, first-three-second preview, target voice/palette, and blockers. For silent review captions, create `timeline.json` and run:
+Write the cover headline and the title options together from one promise (see [references/packaging.md](references/packaging.md)), set `story.cover`, render both covers with `npm run cover`, and check them at feed size with `scripts/feed_preview.py`. Produce one review containing the coverage check and chosen angle, the narration, factual boundaries, scene plan, the covers with their feed preview and the picked title, first-three-second preview, target voice/palette, and blockers. For silent review captions, create `timeline.json` and run:
 
 ```bash
 python3 <skill-dir>/scripts/audit_timeline.py \
@@ -173,11 +173,18 @@ python3 <skill-dir>/scripts/verify_video.py \
   --report <project-dir>/video/qa/final-qa.json
 ```
 
-The check also fails when the sound drops out for longer than 0.8 seconds or the screen goes black (nothing on it) for longer than 0.25 seconds; find the cause in the timeline or mix and rerender rather than raising the limits in `scripts/limits.json`. Visually inspect the full video and representative frames. Confirm native 1080×1920, complete decoding, safe captions, natural speech pace, semantic highlighting, readable transitions, real product evidence, and a viewer-recountable before → change → after → human responsibility chain.
+The check also fails when the sound drops out for longer than 0.8 seconds or the screen goes black (nothing on it) for longer than 0.25 seconds; find the cause in the timeline or mix and rerender rather than raising the limits in `scripts/limits.json`. Lay the platform interfaces over stills of every scene and of the busiest caption moments, and move anything important out from under them:
+
+```bash
+python3 <skill-dir>/scripts/platform_overlay.py <project-dir>/video/qa/still-*.png \
+  -o <project-dir>/video/qa/platform-overlay.png
+```
+
+Visually inspect the full video and representative frames. Confirm native 1080×1920, complete decoding, safe captions, natural speech pace, semantic highlighting, readable transitions, real product evidence, and a viewer-recountable before → change → after → human responsibility chain.
 
 ## 7. Deliver
 
-Deliver the MP4, cover, captions, source ledger, claim ledger, QA report, and `social-titles.md`. State actual duration and publication blockers. Do not publish automatically.
+Deliver the MP4, both covers (`cover-9x16.png`, `cover-3x4.png`) with their feed preview, captions, source ledger, claim ledger, QA report, and `social-titles.md`. State actual duration and publication blockers. Do not publish automatically.
 
 Before delivery, check privacy and safety and report the result:
 - Real screenshots: no account name, avatar, email, chat-history sidebar, browser extension, or other personal UI inside the visible crop (look at each crop, not only the full image).
@@ -186,6 +193,6 @@ Before delivery, check privacy and safety and report the result:
 - Voices are synthetic or licensed; music and sound effects have their source and license recorded in the project.
 - No key, `.env` content or personal path appears in any delivered or committed file.
 
-Write `<project-dir>/social-titles.md` with three post titles in English and three in Chinese, each set written natively for its market rather than translated. Base each title on the final video's hook and before → after change; keep every claim within `claim-ledger.json` and never add numbers, rankings, or results the video does not show. Name the tool, keep each title short enough to read on a phone at a glance (about 60 characters in English, 25 in Chinese), and avoid clickbait. Write them conversational and punchy rather than descriptive; the user preferred casual hooks ("Stop replaying client calls.") over plain summaries. Never quote an illustrative on-screen number as a fact (a demo timer of 30:12 is not a 30-minute test). When the user names platforms (for example Bilibili, Xiaohongshu, YouTube), add one set per platform in its native style. When the video introduces a new feature (released within the last 90 days, as the claim ledger records), lead every title in both languages with that fact ("New in ChatGPT:", "ChatGPT just added …", "ChatGPT 新功能") before the benefit, and note in `social-titles.md` when that framing expires. Show the titles to the user with the delivery.
+Write `<project-dir>/social-titles.md` from `assets/social-titles-template.md`, following "Titles and post copy" in [references/packaging.md](references/packaging.md): a not-for-posting header naming the MP4 and cover, three titles in English and three in Chinese written natively for each market (pick marked), and one copy-ready block per platform. Base every title on the final video's hook and before → after change and keep every claim within `claim-ledger.json`. When the video introduces a new feature (released within the last 90 days), lead every title with that fact before the benefit and note when that framing expires. Show the cover feed preview, the picked title and the platform blocks to the user with the delivery.
 
 Use [references/failure-modes.md](references/failure-modes.md) when evidence, access, rights, TTS, browser, FFmpeg, or rendering is unavailable.

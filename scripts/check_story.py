@@ -280,6 +280,32 @@ def check(story: dict, public_dir: Path, icons: set[str]) -> list[str]:
     return errors
 
 
+def cover_errors(story: dict, public_dir: Path) -> list[str]:
+    """The designed cover (story.cover) needs a headline, a moment inside the video and a crop
+    inside the 1080x1920 frame. Without story.cover the template falls back to a frame grab."""
+    cover = story.get("cover")
+    if cover is None:
+        return []
+    if not isinstance(cover, dict):
+        return ["cover must be an object"]
+    errors = []
+    if not str(cover.get("headline", "")).strip():
+        errors.append("cover.headline is required: the one promise the cover makes")
+    duration = float(story.get("duration_sec", 0) or 0)
+    at = cover.get("frame_sec", 2)
+    if not isinstance(at, (int, float)) or not 0 <= at < duration:
+        errors.append("cover.frame_sec must be a moment inside the video")
+    crop = cover.get("crop")
+    if crop is not None:
+        if not all(isinstance(crop.get(k), (int, float)) for k in ("x", "y", "w", "h")) or crop["w"] <= 0 or crop["h"] <= 0:
+            errors.append("cover.crop requires numeric x, y and positive w, h")
+        elif crop["x"] < 0 or crop["y"] < 0 or crop["x"] + crop["w"] > 1080 or crop["y"] + crop["h"] > 1920:
+            errors.append("cover.crop must stay inside the 1080x1920 frame")
+    if cover.get("logo") and not (public_dir / cover["logo"]).is_file():
+        errors.append(f"cover.logo not found under public/: {cover['logo']}")
+    return errors
+
+
 CHAPTER_CHANGES = {("before-workflow", "ai-handoff"), ("before-workflow", "after-workflow"), ("after-workflow", "human-check"), ("ai-handoff", "human-check")}
 
 
@@ -311,7 +337,8 @@ def main() -> int:
     parser.add_argument("story", type=Path, help="video/src/story.json")
     args = parser.parse_args()
     story = json.loads(args.story.read_text(encoding="utf-8"))
-    errors = check(story, args.story.resolve().parent.parent / "public", icon_names()) + transition_errors(story)
+    public = args.story.resolve().parent.parent / "public"
+    errors = check(story, public, icon_names()) + transition_errors(story) + cover_errors(story, public)
     report = {"ok": not errors, "errors": errors, "variety": variety_notes(story),
               "screen_words": {s.get("id"): screen_words(s, story) for s in story.get("scenes", [])}}
     print(json.dumps(report, ensure_ascii=False, indent=2))

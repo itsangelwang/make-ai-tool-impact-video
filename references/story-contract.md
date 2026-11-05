@@ -31,7 +31,7 @@ Treat a tool or feature as new when its official announcement is within the last
 2. **At the AI handoff result:** name the new capability by what the viewer now sees, not by its marketing name alone, such as "New in GPT-6: not just text. A table, and a chart." Mark the reveal with a short "NEW" stamp and sound.
 3. **When a second new capability appears:** flag it once, such as "Here's the new trick: ask it to build a calculator."
 4. **In the next action:** state current access from the official source with its boundary ("rolling out to all plans", "beta, US only").
-5. **Cover and title:** include the product or feature name and one concrete change.
+5. **Cover and title:** written together as one promise that names the product or feature and one concrete change; see [packaging.md](packaging.md).
 
 Every "new" must be followed by what changed; never say "new" or "just launched" without it. Do not claim it is better than the previous version unless a source supports that comparison. When the feature is not new, skip this section rather than implying novelty.
 

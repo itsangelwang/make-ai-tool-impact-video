@@ -24,7 +24,7 @@
 
 ## 安装
 
-需要 [Python 3](https://www.python.org/)、[Node.js](https://nodejs.org/) 和 [FFmpeg](https://ffmpeg.org/)。
+需要 [Python 3](https://www.python.org/)（外加 Pillow：`pip install pillow`，检查封面用）、[Node.js](https://nodejs.org/) 和 [FFmpeg](https://ffmpeg.org/)。
 
 最简单的方法是打开 Codex 或 Claude Code，直接说：
 
@@ -77,8 +77,12 @@ AI 会先给你一份审片包（脚本、画面、事实来源），**你确认
 
 ## 输出
 
-1080×1920 竖屏 MP4、封面、字幕、来源记录、质检报告，以及适合发社交媒体的中英文标题（各 3 个，存在 `social-titles.md`）。
+- 1080×1920 竖屏 MP4、字幕、来源记录、质检报告
+- 两张单独排版的封面：9:16（Shorts、TikTok、Reels）和 3:4（小红书），都按信息流里的实际小尺寸检查过
+- `social-titles.md`：中英文标题各 3 个，外加每个平台一块、复制就能发的文案（英文：YouTube Shorts、TikTok、Instagram；中文：小红书、抖音、B站）
 
 ## 来源与致谢
 
 本项目参考并改编自 [Ah-ha07/AceMode-video-skill](https://github.com/Ah-ha07/AceMode-video-skill)，感谢原作者的探索与分享。本仓库未添加开源许可证；上游代码、品牌和素材的使用权需另行确认。
+
+封面、标题和发布文案的规则借鉴了孙煜征的 [kdb-talking-head-short-production](https://github.com/sunyuzheng/kdb-talking-head-short-production)（MIT 许可；各平台发布文案模板、平台界面避让检查）和 [lizheng-video-production](https://github.com/sunyuzheng/lizheng-video-production)（封面按信息流最小尺寸检查、标题和封面作为同一个承诺来写）。没有复制代码，这里的脚本都是自己重写的。
