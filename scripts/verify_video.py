@@ -21,6 +21,21 @@ def caption_too_long(cue: dict) -> bool:
     return size > LIMITS["caption_length_max"][key]
 
 
+def caption_errors(cues: list, duration_sec: float | None, fps: float = 30) -> list[str]:
+    """Cue order, mobile length, and (when the video was measured) the video's end."""
+    errors, last = [], 0
+    limit_ms = None if not duration_sec else duration_sec * 1000 + 1000 / fps
+    for index, cue in enumerate(cues):
+        if cue["startMs"] < last or cue["endMs"] <= cue["startMs"]:
+            errors.append(f"invalid caption timing at cue {index}")
+        if caption_too_long(cue):
+            errors.append(f"caption cue {index} is too long for mobile")
+        if limit_ms is not None and cue["endMs"] > limit_ms:
+            errors.append(f"caption cue {index} ends at {cue['endMs'] / 1000:.2f}s, after the video ends ({duration_sec:.2f}s)")
+        last = cue["endMs"]
+    return errors
+
+
 def find_tools(video: Path) -> tuple[str | None, str | None, str]:
     """Prefer system FFmpeg; otherwise use the copy bundled with Remotion in the project."""
     ffprobe, ffmpeg = shutil.which("ffprobe"), shutil.which("ffmpeg")
@@ -121,6 +136,7 @@ def main() -> int:
     )
     args = parser.parse_args()
     errors = []
+    duration, fps = None, 30.0
     min_sec, max_sec = LIMITS["duration_sec"]["min"], max_duration(args.duration_exception)
     ffprobe, ffmpeg, tools = find_tools(args.video)
     if not ffprobe or not ffmpeg:
@@ -160,15 +176,11 @@ def main() -> int:
             errors.append(f"full decode failed: {detail[:200]}")
         elif videos and audios:
             errors.extend(find_dropouts(ffmpeg, args.video, duration, frame_fps(videos[0])))
+        if videos:
+            fps = frame_fps(videos[0]) or fps
     try:
         cues = json.loads(args.captions.read_text(encoding="utf-8"))
-        last = 0
-        for index, cue in enumerate(cues):
-            if cue["startMs"] < last or cue["endMs"] <= cue["startMs"]:
-                errors.append(f"invalid caption timing at cue {index}")
-            if caption_too_long(cue):
-                errors.append(f"caption cue {index} is too long for mobile")
-            last = cue["endMs"]
+        errors.extend(caption_errors(cues, duration, fps))
     except (OSError, ValueError, KeyError, TypeError) as exc:
         errors.append(f"invalid captions: {exc}")
     report = {"ok": not errors, "errors": errors, "duration_exception": args.duration_exception, "tools": tools, "probe": probe}

@@ -1014,3 +1014,34 @@ class CaptionPlacementTests(unittest.TestCase):
         skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn(f"--min-fit {limits['body_fit_min']}", skill)
         self.assertIn("[layout]", (ROOT / "assets/remotion-template/src/VerticalImpact.jsx").read_text(encoding="utf-8"))
+
+
+class DeliveryGateTests(unittest.TestCase):
+    """Uncleared assets block delivery; captions cannot outlast the video."""
+
+    def run_sources(self, rights, *flags):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "sources.json"
+            path.write_text(json.dumps({"assets": [{"path": "assets/ui.png", "origin": "screenshot", "rights": rights, "role": "product-evidence", "attribution": "Example"}]}))
+            result = subprocess.run([sys.executable, ROOT / "scripts" / "validate_sources.py", *flags, path], capture_output=True, text=True)
+            return result.returncode, json.loads(result.stdout)
+
+    def test_preview_warns_and_delivery_fails_on_uncleared_assets(self):
+        code, report = self.run_sources("unknown")
+        self.assertEqual((code, report["mode"], report["publication_blockers"]), (0, "preview", ["assets/ui.png"]))
+        self.assertIn("warning", report)
+        code, report = self.run_sources("unknown", "--delivery")
+        self.assertEqual(code, 1)
+        self.assertIn("not cleared for publication: assets/ui.png", report["errors"])
+        code, report = self.run_sources("cleared", "--delivery")
+        self.assertEqual((code, report["errors"], report["publication_blockers"]), (0, [], []))
+
+    def test_captions_must_end_with_the_video(self):
+        cues = [{"startMs": 0, "endMs": 2000, "text": "Five old notes", "language": "en-US"},
+                {"startMs": 2000, "endMs": 60020, "text": "One brief", "language": "en-US"}]
+        self.assertEqual(verify_video.caption_errors(cues, 60.0), [])  # within one frame
+        cues[-1]["endMs"] = 62500
+        errors = verify_video.caption_errors(cues, 60.0)
+        self.assertTrue(any("after the video ends" in e for e in errors))
+        self.assertEqual(verify_video.caption_errors(cues, None), [])  # video not measured
+        self.assertTrue(any("invalid caption timing" in e for e in verify_video.caption_errors([{"startMs": 5, "endMs": 5, "text": "x", "language": "en-US"}], 60.0)))
