@@ -71,4 +71,4 @@ Description:
 
 - <cover upload, linked video, topic or event tag — checked / not checked>
 
-<!-- Delete the platform blocks the user does not post to. English videos default to YouTube Shorts, TikTok and Instagram; Chinese videos to 小红书, 抖音／视频号 and B站. Never invent links, handles or results to fill a block. -->
+<!-- Delete the platform blocks the user does not post to. The video is English. Default blocks: YouTube Shorts, TikTok and Instagram in English; 小红书, 抖音／视频号 and B站 in Chinese, for posting the same video there. Never invent links, handles or results to fill a block. -->

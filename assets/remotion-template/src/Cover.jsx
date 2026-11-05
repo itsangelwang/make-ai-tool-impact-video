@@ -41,7 +41,7 @@ export const Cover = ({story, ratio = '9:16'}) => {
   const font = FONTS[locale].body;
   // Sized for the smallest slot (a 3-column profile grid, about 130 pt wide): one line's letters
   // must come out clearly bigger than 14 pt UI text. That leaves room for about 2-3 words a line.
-  const size = locale === 'en' ? (tall ? 215 : 170) : (tall ? 190 : 160);
+  const size = tall ? 215 : 170;
   return (
     <AbsoluteFill style={{background: phaseOf('ai-handoff', story.palette).paper, fontFamily: font, color: story.palette.ink}}>
       <div style={{position: 'absolute', left: 64, right: 64, top: tall ? 270 : 64, bottom: tall ? 270 : 56, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: tall ? 44 : 34}}>
@@ -52,7 +52,7 @@ export const Cover = ({story, ratio = '9:16'}) => {
               {cover.kicker}
             </div>
           ) : null}
-          <h1 style={{margin: cover.kicker ? '30px 0 0' : 0, fontSize: size, lineHeight: 1.02, fontWeight: 800, letterSpacing: locale === 'en' ? -4 : 0, textWrap: 'balance'}}>
+          <h1 style={{margin: cover.kicker ? '30px 0 0' : 0, fontSize: size, lineHeight: 1.02, fontWeight: 800, letterSpacing: -4, textWrap: 'balance'}}>
             <Headline text={cover.headline} accent={accent} />
           </h1>
         </div>

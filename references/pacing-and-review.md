@@ -4,9 +4,7 @@
 
 Treat display completion and speakability as different constraints.
 
-- Target roughly 150–190 Han characters for a 55–65 second video with readable transitions.
-- Target 3–4 Han characters per second per spoken cue; flag any cue above 4.2.
-- For English, roughly 90–135 words fits 55–65 seconds. Treat the count as a warning, not a tone choice: set timing from the measured narration, then give each action, result hold, and pause the time it needs. Flag a cue above 2.7 words per spoken second.
+- Roughly 90–135 words fits 55–65 seconds. Treat the count as a warning, not a tone choice: set timing from the measured narration, then give each action, result hold, and pause the time it needs. Flag a cue above 2.7 words per spoken second.
 - End a cue before a readable chapter transition begins.
 - Preserve a short pause after the last spoken word and a stable hold after character animation completes.
 - Cut narration that merely repeats an obvious action before extending duration.
@@ -19,10 +17,10 @@ Use this `timeline.json` shape with `scripts/audit_timeline.py`:
 {
   "duration_sec": 60,
   "captions": [
-    {"start_sec": 0, "end_sec": 3.5, "text": "明天要开会，却要翻五份旧记录。"}
+    {"start_sec": 0, "end_sec": 3.5, "text": "Thursday's meeting, and five old notes to dig through."}
   ],
   "transitions": [
-    {"start_sec": 7.5, "end_sec": 9, "label": "先看以前怎么做", "readable": true}
+    {"start_sec": 7.5, "end_sec": 9, "label": "The old way", "readable": true}
   ]
 }
 ```
@@ -30,9 +28,9 @@ Use this `timeline.json` shape with `scripts/audit_timeline.py`:
 ## Caption behavior
 
 - Split by visual beat, not punctuation alone.
-- Reveal Chinese characters or English words sequentially, then hold the completed phrase. Never animate English letter by letter.
+- Reveal words sequentially, then hold the completed phrase. Never animate letter by letter.
 - Adapt stagger to phrase length; long phrases may reveal faster but may not require faster speech.
-- Highlight complete semantic terms, never random character intervals.
+- Highlight complete semantic terms, never random letter intervals.
 - Use the cool accent for the product and AI actions; use the warm accent for pain, unfinished work, risk, and human responsibility.
 - Enlarge meaningful terms as a group: the tool name, task object, changed step, example value, and verification fields.
 - Keep ordinary text neutral and captions inside the platform-safe lower region.

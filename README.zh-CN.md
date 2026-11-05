@@ -2,7 +2,7 @@
 
 [English](README.md) | **中文**
 
-给它一个 AI 工具的名字或链接，它帮你做出一条约 1 分钟、普通人能看懂的竖屏短视频。可在 Codex 和 Claude Code 中使用。
+给它一个 AI 工具的名字或链接，它帮你做出一条约 1 分钟、普通人能看懂的英文竖屏短视频。可在 Codex 和 Claude Code 中使用。
 
 ## 视频是什么样的
 
@@ -48,7 +48,7 @@ ln -s ~/skills/make-ai-tool-impact-video ~/.claude/skills/make-ai-tool-impact-vi
 在 Codex 里输入 `$make-ai-tool-impact-video`，在 Claude Code 里输入 `/make-ai-tool-impact-video`，再描述需求：
 
 ```text
-为这个 AI 工具做一条一分钟竖屏视频：<产品名称或链接>
+为这个 AI 工具做一条一分钟英文竖屏视频：<产品名称或链接>
 具体任务：把一周的会议笔记整理成周报
 ```
 
@@ -62,7 +62,7 @@ AI 会先给你一份审片包（脚本、画面、事实来源），**你确认
 
 | 项目 | 默认 | 想改的话 |
 |---|---|---|
-| 语言 | 美式英语 | 说“语言：中文，面向中国市场” |
+| 语言 | 美式英语（视频只做英文） | 说“语言：英式英语”或“澳式英语” |
 | 配音 | Fish Audio 官方声音 “Sawyer”（Drama 3 模型），每个场景一口气连读，语速 1.15 倍 | 说“换个声音”，AI 会先给你试听 |
 | 音乐和音效 | 免版权曲库（如 Pixabay）的真实曲子和音效，你试听选好后才下载 | 说“换首音乐”或“这个音效不好听” |
 | 品牌结尾 | ACEMODE 品牌卡，并念出 “10x Faster. Reclaim Your Time.” | 说“不要品牌结尾”，或提供你自己的品牌 |
@@ -79,7 +79,7 @@ AI 会先给你一份审片包（脚本、画面、事实来源），**你确认
 
 - 1080×1920 竖屏 MP4、字幕、来源记录、质检报告
 - 两张单独排版的封面：9:16（Shorts、TikTok、Reels）和 3:4（小红书），都按信息流里的实际小尺寸检查过
-- `social-titles.md`：中英文标题各 3 个，外加每个平台一块、复制就能发的文案（英文：YouTube Shorts、TikTok、Instagram；中文：小红书、抖音、B站）
+- `social-titles.md`：英文和中文标题各 3 个，外加每个平台一块、复制就能发的文案：YouTube Shorts、TikTok、Instagram 用英文；小红书、抖音、B站用中文，用来把同一条英文视频发到这些平台
 
 ## 来源与致谢
 

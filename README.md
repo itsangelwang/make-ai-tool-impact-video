@@ -2,7 +2,7 @@
 
 **English** | [中文](README.zh-CN.md)
 
-Give it the name or link of an AI tool, and it helps you make a one-minute vertical video that anyone can follow. Works in **Codex** and **Claude Code**.
+Give it the name or link of an AI tool, and it helps you make a one-minute vertical video in English that anyone can follow. Works in **Codex** and **Claude Code**.
 
 ## What the videos look like
 
@@ -62,7 +62,7 @@ You first get a review pack (script, frames, fact sources). **Nothing is voiced 
 
 | Setting | Default | To change it |
 |---|---|---|
-| Language | US English | Say "Language: Chinese, for the China market" |
+| Language | US English (videos are English-only) | Say "Language: British English" or "Australian English" |
 | Voice | Fish Audio "Sawyer" (Drama 3), each scene read in one take, 1.15× speed | Say "change the voice" — you'll get samples first |
 | Music & sound | Real tracks and effects from royalty-free libraries (e.g. Pixabay), downloaded only after you pick them | Say "change the music" or "this sound effect doesn't work" |
 | Brand ending | ACEMODE brand card, reading "10x Faster. Reclaim Your Time." | Say "no brand ending", or give your own brand |
@@ -79,7 +79,7 @@ Voiceover needs a [Fish Audio](https://fish.audio/) API key (OpenRouter and Deep
 
 - A 1080×1920 vertical MP4, captions, source log and quality-check report
 - Two designed covers, 9:16 (Shorts, TikTok, Reels) and 3:4 (Xiaohongshu), checked at the small size they appear in a feed
-- `social-titles.md`: 3 titles each in English and Chinese, plus a ready-to-paste post for each platform (YouTube Shorts, TikTok, Instagram; Xiaohongshu, Douyin, Bilibili for Chinese)
+- `social-titles.md`: 3 English and 3 Chinese titles, plus a ready-to-paste post for each platform: YouTube Shorts, TikTok and Instagram in English; Xiaohongshu, Douyin and Bilibili in Chinese, for posting the same English video there
 
 ## Credits
 

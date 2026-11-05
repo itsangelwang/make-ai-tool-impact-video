@@ -31,10 +31,6 @@ def load(path: Path):
         return json.load(handle)
 
 
-def han_count(text: str) -> int:
-    return len(re.findall(r"[\u3400-\u9fff]", text))
-
-
 def word_count(text: str) -> int:
     return len(re.findall(r"\b[\w]+(?:[’'-][\w]+)*\b", text, flags=re.UNICODE))
 
@@ -79,19 +75,19 @@ def validate(package: dict, ledger: dict, duration_exception: str | None = None)
     if package["readiness"] not in READINESS:
         errors.append(f"readiness must be one of {sorted(READINESS)}")
     language = package["language"]
-    if language not in {"zh-CN", "en-US", "en-GB", "en-AU"}:
-        errors.append("language must be zh-CN, en-US, en-GB, or en-AU")
     narration = package["narration"]
-    key = lang_key(language)
+    try:
+        key = lang_key(language)
+    except ValueError as exc:
+        errors.append(str(exc))
+        key = "en"
     bounds = LIMITS["narration"][key]
-    count = word_count(narration) if key == "en" else han_count(narration)
+    count = word_count(narration)
     if not bounds["min"] <= count <= bounds["max"]:
         errors.append(f"narration must contain {bounds['min']}-{bounds['max']} {bounds['unit']}; got {count}")
-    if re.search(r"[（(](画面|镜头|转场|字幕|特效)|\[(画面|镜头|转场|字幕|特效)", narration):
+    if re.search(r"[(\[]\s*(?:on screen|cut to|transition|caption|sfx|b-roll)\b", narration, flags=re.IGNORECASE):
         errors.append("narration contains stage directions")
-    if re.match(r"^.{0,12}(公司|模型|发布了|推出了)", narration):
-        errors.append("narration opens with a technical release instead of the task pain")
-    if str(language).startswith("en") and re.match(
+    if re.match(
         r"^\s*(?:today|introducing|[\w.-]+\s+(?:has\s+)?(?:launched|released|announced))\b",
         narration,
         flags=re.IGNORECASE,

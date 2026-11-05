@@ -1,6 +1,6 @@
 ---
 name: make-ai-tool-impact-video
-description: Research a named AI tool and create a roughly one-minute, 9:16 workflow explainer for Chinese or English-speaking markets, with one concrete before/after case, verified claims, real product evidence, localized writing and design, natural TTS, Remotion motion, readable captions, combined review, and delivery QA. Use when turning an AI product name, launch page, demo, or capability into an accessible vertical video that explains what changes, what the person still owns, who it suits, and how to try it safely.
+description: Research a named AI tool and create a roughly one-minute, 9:16 English workflow explainer, with one concrete before/after case, verified claims, real product evidence, localized writing and design, natural TTS, Remotion motion, readable captions, combined review, and delivery QA. Use when turning an AI product name, launch page, demo, or capability into an accessible vertical video that explains what changes, what the person still owns, who it suits, and how to try it safely.
 ---
 
 # Make AI Tool Impact Video
@@ -9,7 +9,7 @@ Explain one workflow change for one person doing one task. Treat the tool as the
 
 ## Inputs
 
-Require a tool name or URL. Accept audience, task, platform, language, market, accent, voice, palette, and end-brand preferences. End with the ACEMODE brand card unless the user asks for no brand or supplies another brand. Default to `en-US` and a US audience unless the user requests another English market or Chinese (`zh-CN`, Chinese market). When audience or task is absent, research first and choose the clearest supported ordinary-person case.
+Require a tool name or URL. Accept audience, task, platform, language, market, accent, voice, palette, and end-brand preferences. End with the ACEMODE brand card unless the user asks for no brand or supplies another brand. The video is always in English: default to `en-US` and a US audience unless the user names another English market (`en-GB`, `en-AU`). Chinese appears only in the post titles and copy for Chinese platforms (section 7). When audience or task is absent, research first and choose the clearest supported ordinary-person case.
 
 Use `<skill-dir>` as this Skill directory and replace placeholders with absolute paths.
 
@@ -33,7 +33,7 @@ Choose exactly one audience, task, and example thread. Define `before_steps`, `a
 
 Read [references/story-contract.md](references/story-contract.md) and [references/visual-system.md](references/visual-system.md). For narration, audio, timing, or animated captions, also read [references/pacing-and-review.md](references/pacing-and-review.md). Read [references/brand-system.md](references/brand-system.md) for the brand ending, and [references/packaging.md](references/packaging.md) for the cover, titles and post copy.
 
-For English work (the default), also read [references/english-market.md](references/english-market.md). Write natively in English rather than translating Chinese copy line by line. Localize the hook, example names, dates, workplace vocabulary, fonts, caption units, voice, and call to action.
+Also read [references/english-market.md](references/english-market.md). Write natively in English. Localize the hook, example names, dates, workplace vocabulary, fonts, caption units, voice, and call to action.
 
 Use this order:
 
@@ -65,7 +65,7 @@ Scaffold the vertical project:
 python3 <skill-dir>/scripts/scaffold_project.py <project-dir>/video
 ```
 
-Populate `video/src/story.json` and set its `language` so built-in labels and fonts match the market (override any label with an optional `labels` object). Express the new-feature card, real screenshot clicks and reveals, the you/AI role strip, human checks, and access chips through the story beats in [references/visual-system.md](references/visual-system.md) instead of a custom composition, and check them with `scripts/check_story.py`. Add cleared assets under `video/public/assets/`, and validate sources:
+Populate `video/src/story.json` and set its `language` to the English market (override any built-in label with an optional `labels` object). Express the new-feature card, real screenshot clicks and reveals, the you/AI role strip, human checks, and access chips through the story beats in [references/visual-system.md](references/visual-system.md) instead of a custom composition, and check them with `scripts/check_story.py`. Add cleared assets under `video/public/assets/`, and validate sources:
 
 ```bash
 python3 <skill-dir>/scripts/validate_sources.py \

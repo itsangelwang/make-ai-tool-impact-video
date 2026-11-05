@@ -22,7 +22,6 @@ from limits import LIMITS, lang_key
 from safe_io import atomic_write_json
 
 WORD = re.compile(r"\b[\w]+(?:[’'-][\w]+)*\b")
-HAN = re.compile(r"[㐀-鿿]")
 
 
 def probe_seconds(path: Path) -> float:
@@ -50,7 +49,7 @@ def fit(timeline: dict, durations: list[float], gap: float = 0.3, transition_sec
         raise ValueError(f"expected {len(caps)} audio files, got {len(durations)}")
     key = lang_key(timeline.get("language", "en-US"))
     limit = LIMITS["cue_rate_max"][key]
-    units = (lambda s: len(WORD.findall(s))) if key == "en" else (lambda s: len(HAN.findall(s)))
+    units = lambda s: len(WORD.findall(s))  # noqa: E731
     brand_low, brand_high = LIMITS["brand_card_sec"]["min"], LIMITS["brand_card_sec"]["max"]
     brand_sec = brand_low + 0.5 if brand_sec is None else brand_sec
 

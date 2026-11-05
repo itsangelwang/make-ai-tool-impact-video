@@ -8,12 +8,10 @@ import {ReplayPlayer, SendClick, PlanCheck, TryItStage} from './components/Beats
 import {AccessChips, CheckCards, Correction, FeatureIntro, Flow, NewTag, ProductShot, RoleStrip, Scrub, Toast, CallEnd} from './components/Beats';
 
 export const FONTS = {
-  zh: {body: 'PingFang SC, Noto Sans CJK SC, Arial, sans-serif', display: 'Hannotate SC, Kaiti SC, PingFang SC, sans-serif'},
   // System font first: it has every weight, so the type levels stay distinct (Inter is often not installed and the fallback looks uniformly heavy)
   en: {body: "system-ui, -apple-system, 'SF Pro Display', Inter, Arial, sans-serif", display: "system-ui, -apple-system, 'SF Pro Display', Inter, Arial, sans-serif"},
 };
 const LABELS = {
-  zh: {handoff: '交给 AI 处理这一步', humanCheck: '最后一步仍由人负责', nextAction: '今天可以这样试', before: '使用前', after: '使用后', you: '你'},
   en: {handoff: 'AI takes this step', humanCheck: 'You still own the final check', nextAction: 'Try this today', before: 'Before', after: 'After', you: 'YOU'},
 };
 // Each phase of the story has its own look so viewers always know where they are:
@@ -28,8 +26,9 @@ export const phaseOf = (type, palette = {}) => {
   const [name, phase] = Object.entries(PHASES).find(([, item]) => item.types.includes(type)) || ['ai', PHASES.ai];
   return {name, ...phase, ...(palette.phases?.[name] || {})};
 };
-export const localeOf = (story) => (String(story.language || 'en-US').startsWith('en') ? 'en' : 'zh');
-const FontContext = createContext(FONTS.zh.body);
+// Videos are English-only; `story.labels` can still override any built-in label.
+export const localeOf = () => 'en';
+const FontContext = createContext(FONTS.en.body);
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'};
 const FPS = 30;
 // The platforms' top tabs and search cover about the first 200 px, so the progress bar and

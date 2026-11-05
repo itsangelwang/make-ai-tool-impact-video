@@ -37,36 +37,36 @@ mix_audio = module("mix_story_audio")
 prepare_sfx = module("prepare_sfx")
 
 
-def package(task="整理会议纪要", audience="项目经理"):
+def package(task="turn meeting notes into a brief", audience="project manager"):
     types = ["pain-hook", "before-workflow", "ai-handoff", "after-workflow", "human-check", "next-action"]
     ends = [7, 17, 27, 39, 50, 60]
     start = 0
     scenes = []
     for i, (kind, end) in enumerate(zip(types, ends), 1):
-        scenes.append({"id": f"s{i}", "type": kind, "purpose": f"说明{kind}", "start_sec": start, "end_sec": end, "headline": task, "visual": "清晰的流程变化", "claim_ids": ["c1"]})
+        scenes.append({"id": f"s{i}", "type": kind, "purpose": f"explain {kind}", "start_sec": start, "end_sec": end, "headline": task, "visual": "a clear workflow change", "claim_ids": ["c1"]})
         start = end
     return {
         "schema_version": 1,
-        "language": "zh-CN",
-        "market": "CN",
-        "tool": {"name": "Example AI", "url": "https://example.com", "one_line_capability": "整理输入材料"},
+        "language": "en-US",
+        "market": "US",
+        "tool": {"name": "Example AI", "url": "https://example.com", "one_line_capability": "organizes input material"},
         "audience": audience,
         "task": task,
-        "before_steps": ["收集材料", "逐条整理", "人工归纳"],
-        "friction": "重复搬运信息",
-        "ai_change": "先生成结构化草稿",
-        "after_steps": ["提交材料", "AI生成草稿", "人工核对"],
-        "human_check": "核对事实和负责人",
+        "before_steps": ["Collect notes", "Sort each item", "Summarize by hand"],
+        "friction": "copying the same facts again and again",
+        "ai_change": "drafts a structured brief first",
+        "after_steps": ["Upload the notes", "AI drafts the brief", "Check by hand"],
+        "human_check": "check facts and owners",
         "readiness": "try-now",
-        "next_action": "用一份非敏感材料对照测试",
-        "narration": "你" * 180,
-        "coverage": {"checked_at": "2026-10-21", "existing": [{"by": "official", "url": "https://example.com/launch", "shows": "功能总览"}], "our_angle": "一个人完成一件具体任务", "decision": "make"},
+        "next_action": "try it on one non-sensitive note",
+        "narration": " ".join(["work"] * 120),
+        "coverage": {"checked_at": "2026-10-21", "existing": [{"by": "official", "url": "https://example.com/launch", "shows": "feature overview"}], "our_angle": "one person finishing one real task", "decision": "make"},
         "scenes": scenes,
     }
 
 
 def ledger():
-    return {"claims": [{"id": "c1", "text": "工具可以整理输入材料", "level": "vendor-claim", "source_url": "https://example.com/docs", "source_type": "official", "accessed_at": "2026-08-17", "support": "官方功能说明", "boundary": "未独立测量效率"}]}
+    return {"claims": [{"id": "c1", "text": "The tool can organize input material", "level": "vendor-claim", "source_url": "https://example.com/docs", "source_type": "official", "accessed_at": "2026-08-17", "support": "official feature page", "boundary": "efficiency not measured independently"}]}
 
 
 class PackageTests(unittest.TestCase):
@@ -74,10 +74,10 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(validator.validate(package(), ledger()), [])
 
     def test_resume_editing(self):
-        self.assertEqual(validator.validate(package("针对职位修改简历", "求职者"), ledger()), [])
+        self.assertEqual(validator.validate(package("tailor a resume to a job", "job seeker"), ledger()), [])
 
     def test_trip_planning(self):
-        self.assertEqual(validator.validate(package("整理旅行计划", "周末出行者"), ledger()), [])
+        self.assertEqual(validator.validate(package("plan a weekend trip", "weekend traveler"), ledger()), [])
 
     def test_insufficient_sources_fail(self):
         self.assertTrue(validator.validate(package(), {"claims": []}))
@@ -126,7 +126,14 @@ class PackageTests(unittest.TestCase):
         self.assertFalse(verify_video.caption_too_long(english))
         english["text"] = " ".join(["word"] * 15)
         self.assertTrue(verify_video.caption_too_long(english))
-        self.assertTrue(verify_video.caption_too_long({"language": "zh-CN", "text": "长" * 35}))
+        with self.assertRaises(ValueError):
+            verify_video.caption_too_long({"language": "zh-CN", "text": "长" * 35})
+
+    def test_videos_are_english_only(self):
+        item = package()
+        item["language"], item["market"] = "zh-CN", "CN"
+        self.assertTrue(any("English-only" in e for e in validator.validate(item, ledger())))
+        self.assertTrue(any("English-only" in e for e in timeline_validator.validate({"language": "zh-CN", "duration_sec": 60, "captions": []})))
 
     def test_english_market_package(self):
         item = package("build a meeting prep brief", "project manager")
@@ -353,7 +360,7 @@ class StateAndUtilitiesTests(unittest.TestCase):
             folder = Path(tmp)
             script = folder / "package.json"
             output = folder / "captions.json"
-            script.write_text(json.dumps({"narration": "先整理材料。再让工具生成草稿。最后人工核对。"}, ensure_ascii=False))
+            script.write_text(json.dumps({"narration": "Sort the notes. Let the tool draft. Check it by hand."}))
             subprocess.run([sys.executable, ROOT / "scripts" / "caption_pipeline.py", "--script", script, "--duration-ms", "60000", "--output", output], check=True, capture_output=True)
             cues = json.loads(output.read_text())
             self.assertEqual(cues[0]["startMs"], 0)
@@ -368,23 +375,23 @@ class StateAndUtilitiesTests(unittest.TestCase):
 
     def test_timeline_accepts_speakable_captions(self):
         data = {
-            "language": "zh-CN",
+            "language": "en-US",
             "duration_sec": 60,
             "captions": [
-                {"start_sec": 0, "end_sec": 30, "text": "你" * 90},
-                {"start_sec": 32.2, "end_sec": 58, "text": "我" * 80},
+                {"start_sec": 0, "end_sec": 30, "text": " ".join(["work"] * 60)},
+                {"start_sec": 32.2, "end_sec": 58, "text": " ".join(["done"] * 50)},
             ],
             "transitions": [
-                {"start_sec": 30, "end_sec": 32.2, "label": "下一步", "readable": True}
+                {"start_sec": 30, "end_sec": 32.2, "label": "Next", "readable": True}
             ],
         }
         self.assertEqual(timeline_validator.validate(data), [])
 
     def test_timeline_rejects_fast_caption_and_overlap(self):
         data = {
-            "language": "zh-CN",
+            "language": "en-US",
             "duration_sec": 60,
-            "captions": [{"start_sec": 0, "end_sec": 5, "text": "你" * 50}],
+            "captions": [{"start_sec": 0, "end_sec": 5, "text": " ".join(["word"] * 30)}],
             "transitions": [{"start_sec": 4, "end_sec": 5, "readable": True}],
         }
         errors = timeline_validator.validate(data)
@@ -501,7 +508,7 @@ class ExampleTests(unittest.TestCase):
 
     def test_examples_pass_validators(self):
         folders = sorted(path for path in (ROOT / "examples").iterdir() if path.is_dir())
-        self.assertGreaterEqual(len(folders), 2)
+        self.assertEqual([f.name for f in folders], ["en-meeting-brief"])
         for folder in folders:
             with self.subTest(example=folder.name):
                 package_data = json.loads((folder / "script-package.json").read_text(encoding="utf-8"))
@@ -517,7 +524,7 @@ class ExampleTests(unittest.TestCase):
 
 class BuildCaptionsTests(unittest.TestCase):
     def test_examples_convert_via_cli(self):
-        for name in ("en-meeting-brief", "zh-meeting-brief"):
+        for name in ("en-meeting-brief",):
             with self.subTest(example=name), tempfile.TemporaryDirectory() as tmp:
                 folder = ROOT / "examples" / name
                 timeline = json.loads((folder / "timeline.json").read_text())
@@ -531,8 +538,8 @@ class BuildCaptionsTests(unittest.TestCase):
                     self.assertEqual(converted, {"startMs": round(source["start_sec"] * 1000), "endMs": round(source["end_sec"] * 1000), "text": source["text"], "language": timeline["language"]})
 
     def test_highlights_rounding_and_normalization(self):
-        timeline = {"language": "zh-CN", "captions": [{"start_sec": 0.1234, "end_sec": 1.2346, "text": "你好，世界！", "highlightCool": ["你好"], "highlightWarm": ["世界"]}]}
-        result = build_captions.build_captions(timeline, {"narration": "你 好。世界\n"})
+        timeline = {"language": "en-US", "captions": [{"start_sec": 0.1234, "end_sec": 1.2346, "text": "Hello, world!", "highlightCool": ["Hello"], "highlightWarm": ["world"]}]}
+        result = build_captions.build_captions(timeline, {"narration": "Hello world\n"})
         self.assertEqual(result[0]["startMs"], 123)
         self.assertEqual(result[0]["endMs"], 1235)
         for key in ("highlightCool", "highlightWarm"):
@@ -545,12 +552,12 @@ class BuildCaptionsTests(unittest.TestCase):
             output = folder / "captions.json"
             output.write_text("keep")
             for key in ("highlightCool", "highlightWarm"):
-                for value in ("五份旧记录", None, 1, {}, ["valid", 1]):
+                for value in ("five old notes", None, 1, {}, ["valid", 1]):
                     with self.subTest(key=key, value=value):
-                        timeline.write_text(json.dumps({"language": "zh-CN", "captions": [
-                            {"start_sec": 0, "end_sec": 1, "text": "第一条"},
-                            {"start_sec": 1, "end_sec": 2, "text": "五份旧记录", key: value},
-                        ]}, ensure_ascii=False))
+                        timeline.write_text(json.dumps({"language": "en-US", "captions": [
+                            {"start_sec": 0, "end_sec": 1, "text": "First cue"},
+                            {"start_sec": 1, "end_sec": 2, "text": "five old notes", key: value},
+                        ]}))
                         result = subprocess.run([sys.executable, ROOT / "scripts" / "build_captions.py", timeline], capture_output=True, text=True)
                         self.assertEqual(result.returncode, 1)
                         self.assertIn(f"caption 2 {key} must be a list of strings", result.stderr)
@@ -707,8 +714,8 @@ class LimitsConsistencyTests(unittest.TestCase):
 
     def test_narration_ranges_match(self):
         limits = json.loads((ROOT / "scripts" / "limits.json").read_text())
-        zh, en = limits["narration"]["zh"], limits["narration"]["en"]
-        self.assert_ranges(r"(\d{2,3})–(\d{2,3}) Han characters", (zh["min"], zh["max"]))
+        en = limits["narration"]["en"]
+        self.assertEqual(set(limits["narration"]), {"en"})
         self.assert_ranges(r"(\d{2,3})–(\d{2,3}) (?:spoken English )?words(?! per)", (en["min"], en["max"]))
 
     def test_target_duration_matches(self):

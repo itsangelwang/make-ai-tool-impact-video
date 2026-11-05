@@ -10,6 +10,7 @@ import sys
 import unicodedata
 from pathlib import Path
 
+from limits import lang_key
 from safe_io import atomic_write_json
 
 
@@ -33,6 +34,7 @@ def build_captions(timeline: dict, script: dict | None = None) -> list[dict]:
     language = timeline.get("language")
     if not isinstance(language, str) or not language.strip():
         raise ValueError("timeline language must be a non-empty string")
+    lang_key(language)  # videos are English-only
     cues = timeline.get("captions")
     if not isinstance(cues, list) or not cues:
         raise ValueError("timeline captions must be a non-empty list")

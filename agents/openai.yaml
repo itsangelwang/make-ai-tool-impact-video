@@ -1,4 +1,4 @@
 interface:
   display_name: "AI Tool Impact Video"
-  short_description: "制作适合中英文市场、有证据和具体案例的一分钟竖屏视频"
-  default_prompt: "使用 $make-ai-tool-impact-video，把这个 AI 工具制作成一分钟、9:16、目标市场普通人能看懂的工作流影响视频；先确认语言、市场和声音，再生成合并审片包。"
+  short_description: "One-minute vertical English videos that show what an AI tool changes, with real evidence and one concrete case"
+  default_prompt: "Use $make-ai-tool-impact-video to turn this AI tool into a one-minute, 9:16 English workflow video that an ordinary viewer can follow. Confirm the audience and voice first, then build the combined review."
