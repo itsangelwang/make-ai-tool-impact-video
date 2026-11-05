@@ -908,3 +908,77 @@ class VideoPolishLessonTests(unittest.TestCase):
     def test_real_mouse_click_is_the_documented_click(self):
         library = (ROOT / "references" / "sound-library.md").read_text(encoding="utf-8")
         self.assertIn("mouse-click-290204", library)
+
+
+class PackagingTests(unittest.TestCase):
+    """Designed covers, the feed-size check, the platform overlay and the post-copy template."""
+
+    def test_template_registers_both_covers(self):
+        root = (ROOT / "assets/remotion-template/src/Root.jsx").read_text(encoding="utf-8")
+        package = json.loads((ROOT / "assets/remotion-template/package.json").read_text(encoding="utf-8"))
+        self.assertIn('id="Cover"', root)
+        self.assertIn('id="Cover34"', root)
+        self.assertIn("height={1440}", root)
+        self.assertIn("qa/cover-9x16.png", package["scripts"]["cover"])
+        self.assertIn("qa/cover-3x4.png", package["scripts"]["cover"])
+
+    def test_cover_check(self):
+        check_story = module("check_story")
+        story = json.loads((ROOT / "assets/remotion-template/src/story.json").read_text(encoding="utf-8"))
+        public = ROOT / "assets/remotion-template/public"
+        self.assertEqual(check_story.cover_errors(story, public), [])
+        self.assertEqual(check_story.cover_errors({"duration_sec": 60}, public), [])
+        bad = {"duration_sec": 60, "cover": {"headline": " ", "frame_sec": 61, "crop": {"x": 100, "y": 0, "w": 1000, "h": 900}, "logo": "assets/missing.png"}}
+        errors = " ".join(check_story.cover_errors(bad, public))
+        for part in ("headline", "frame_sec", "inside the 1080x1920", "logo"):
+            self.assertIn(part, errors)
+
+    def test_feed_preview_sizes_and_report(self):
+        from PIL import Image
+        feed = module("feed_preview")
+        tall, card = Image.new("RGB", (1080, 1920), "white"), Image.new("RGB", (1080, 1440), "white")
+        self.assertEqual(feed.ratio_of(tall), "9:16")
+        self.assertEqual(feed.ratio_of(card), "3:4")
+        self.assertIsNone(feed.ratio_of(Image.new("RGB", (1280, 720))))
+        self.assertEqual(feed.crop_34(tall).size, (1080, 1440))
+        self.assertAlmostEqual(feed.apparent_pt(155, 1080, 130), 18.66, places=1)
+        self.assertEqual(feed.parse_cover("new=a/b.png@122"), ("new", Path("a/b.png"), 122.0))
+        # A 9:16 cover alone also fills the Xiaohongshu slot; with a 3:4 cover it does not.
+        alone = [row[1] for row in feed.plan([("a", tall, None)])]
+        both = [row[1] for row in feed.plan([("a", tall, None), ("b", card, None)])]
+        self.assertEqual(alone.count("Xiaohongshu feed"), 1)
+        self.assertEqual([r for r in both if r == "Xiaohongshu feed"], ["Xiaohongshu feed"])
+        self.assertIn("TOO SMALL", feed.report_line("a", "TikTok profile grid", 130, None, tall, 50))
+        self.assertIn("(ok)", feed.report_line("a", "TikTok profile grid", 130, None, tall, 155))
+        with tempfile.TemporaryDirectory() as tmp:
+            cover = Path(tmp) / "c.png"
+            Image.new("RGB", (1080, 1920), "white").save(cover)
+            out = Path(tmp) / "sheet.png"
+            self.assertEqual(feed.main([f"{cover}@155", "-o", str(out)]), 0)
+            self.assertTrue(out.is_file())
+            self.assertEqual(feed.main([f"{cover}@40", "-o", str(out)]), 1)
+
+    def test_platform_overlay_flags_content_under_zones(self):
+        from PIL import Image, ImageDraw
+        overlay = module("platform_overlay")
+        for zones in overlay.ZONES.values():
+            for _, x0, y0, x1, y1 in zones:
+                self.assertTrue(0 <= x0 < x1 <= 1080 and 0 <= y0 < y1 <= 1920)
+        still = Image.new("RGB", (1080, 1920), "white")
+        caption = ("c", 0, 1460, 900, 1780)
+        self.assertEqual(overlay.busy_share(still, caption), 0.0)
+        ImageDraw.Draw(still).rectangle((40, 1600, 860, 1760), fill="black")
+        self.assertGreater(overlay.busy_share(still, caption), 0.2)
+        with tempfile.TemporaryDirectory() as tmp:
+            path, out = Path(tmp) / "s.png", Path(tmp) / "o.png"
+            still.save(path)
+            self.assertEqual(overlay.main([str(path), "-o", str(out)]), 0)
+            self.assertTrue(out.is_file())
+
+    def test_post_copy_template_has_every_block(self):
+        template = (ROOT / "assets/social-titles-template.md").read_text(encoding="utf-8")
+        for block in ("not for posting", "Title options", "YouTube Shorts", "TikTok", "Instagram Reels", "小红书", "抖音／视频号", "B站", "Platform settings"):
+            self.assertIn(block, template)
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("assets/social-titles-template.md", skill)
+        self.assertIn("references/packaging.md", skill)

@@ -7,7 +7,7 @@ import {SfxFilter} from './components/Sfx';
 import {ReplayPlayer, SendClick, PlanCheck, TryItStage} from './components/Beats';
 import {AccessChips, CheckCards, Correction, FeatureIntro, Flow, NewTag, ProductShot, RoleStrip, Scrub, Toast, CallEnd} from './components/Beats';
 
-const FONTS = {
+export const FONTS = {
   zh: {body: 'PingFang SC, Noto Sans CJK SC, Arial, sans-serif', display: 'Hannotate SC, Kaiti SC, PingFang SC, sans-serif'},
   // System font first: it has every weight, so the type levels stay distinct (Inter is often not installed and the fallback looks uniformly heavy)
   en: {body: "system-ui, -apple-system, 'SF Pro Display', Inter, Arial, sans-serif", display: "system-ui, -apple-system, 'SF Pro Display', Inter, Arial, sans-serif"},
@@ -28,7 +28,7 @@ export const phaseOf = (type, palette = {}) => {
   const [name, phase] = Object.entries(PHASES).find(([, item]) => item.types.includes(type)) || ['ai', PHASES.ai];
   return {name, ...phase, ...(palette.phases?.[name] || {})};
 };
-const localeOf = (story) => (String(story.language || 'en-US').startsWith('en') ? 'en' : 'zh');
+export const localeOf = (story) => (String(story.language || 'en-US').startsWith('en') ? 'en' : 'zh');
 const FontContext = createContext(FONTS.zh.body);
 const clamp = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'};
 const FPS = 30;
@@ -48,7 +48,7 @@ const Card = ({children, index = 0, delay = null, accent = '#6857F5'}) => {
 // Type levels: eyebrow (small, spaced caps) > headline (800, one accent word) > labels (600-700) > notes (500, muted).
 const Badge = ({children, color}) => <div style={{display: 'inline-flex', alignItems: 'center', gap: 12, color, fontFamily: useContext(FontContext), fontSize: 26, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase'}}><span style={{width: 12, height: 12, borderRadius: '50%', background: color}} />{children}</div>;
 // "*word*" in a headline is drawn in the scene's accent color.
-const Headline = ({text, accent}) => String(text || '').split(/(\*[^*]+\*)/).map((part, i) => part.startsWith('*') && part.endsWith('*') ? <span key={i} style={{color: accent}}>{part.slice(1, -1)}</span> : part);
+export const Headline = ({text, accent}) => String(text || '').split(/(\*[^*]+\*)/).map((part, i) => part.startsWith('*') && part.endsWith('*') ? <span key={i} style={{color: accent}}>{part.slice(1, -1)}</span> : part);
 
 // Full-frame chapter card. Optional `from` / `to` icon lists turn it into an object handoff:
 // the previous phase's objects slide in, converge, and become the next phase's objects.
@@ -196,7 +196,8 @@ const SceneEnter = ({type, children}) => {
   return <AbsoluteFill style={{...base, transform: `translateX(${(1 - t) * 100}%)`, boxShadow: '-30px 0 60px rgba(23,25,35,.18)'}}>{children}</AbsoluteFill>;
 };
 
-export const VerticalImpact = ({story}) => {
+// `captions={false}` hides the caption bar (the cover uses this for its product inset).
+export const VerticalImpact = ({story, captions = true}) => {
   const fps = 30;
   const locale = localeOf(story);
   const labels = {...LABELS[locale], ...(story.labels || {})};
@@ -220,7 +221,7 @@ export const VerticalImpact = ({story}) => {
         return <Sequence from={first} durationInFrames={Math.max(1, last - first)}><ProgressBar durationsInFrames={durations} colors={story.scenes.map((scene) => phaseOf(scene.type, story.palette).accent)} top={64} height={8} color={story.palette.cool} trackColor={`${story.palette.ink}22`} /></Sequence>;
       })() : null}
       {story.audio ? <Audio src={staticFile(story.audio)} /> : null}
-      <TimedCaptions />
+      {captions ? <TimedCaptions /> : null}
       {(story.transitions||[]).map((transition) => <Sequence key={`${transition.start_sec}-${transition.label}`} from={Math.round(transition.start_sec*fps)} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}><FullFrameTransition transition={transition} palette={story.palette} displayFont={FONTS[locale].display} durationInFrames={Math.round((transition.end_sec-transition.start_sec)*fps)}/></Sequence>)}
       {story.brand ? <Sequence from={Math.round(story.brand.start_sec * fps)} durationInFrames={Math.round((story.brand.end_sec - story.brand.start_sec) * fps)}><BrandEnding brand={story.brand} palette={story.palette} displayFont={FONTS[locale].display} /></Sequence> : null}
     </AbsoluteFill>

@@ -309,5 +309,16 @@
     "start_sec": 56.5,
     "end_sec": 60
   },
-  "sfx": false
+  "sfx": false,
+  "cover": {
+    "kicker": "New in ChatGPT",
+    "headline": "Five old notes, *one brief*",
+    "frame_sec": 26,
+    "crop": {
+      "x": 40,
+      "y": 260,
+      "w": 1000,
+      "h": 1100
+    }
+  }
 }

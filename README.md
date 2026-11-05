@@ -77,8 +77,12 @@ Voiceover needs a [Fish Audio](https://fish.audio/) API key (OpenRouter and Deep
 
 ## Output
 
-A 1080×1920 vertical MP4, cover image, captions, source log, quality-check report, and 3 social-media titles each in English and Chinese (in `social-titles.md`).
+- A 1080×1920 vertical MP4, captions, source log and quality-check report
+- Two designed covers, 9:16 (Shorts, TikTok, Reels) and 3:4 (Xiaohongshu), checked at the small size they appear in a feed
+- `social-titles.md`: 3 titles each in English and Chinese, plus a ready-to-paste post for each platform (YouTube Shorts, TikTok, Instagram; Xiaohongshu, Douyin, Bilibili for Chinese)
 
 ## Credits
 
 Adapted from [Ah-ha07/AceMode-video-skill](https://github.com/Ah-ha07/AceMode-video-skill) — thanks to the original author for exploring and sharing it. This repository has no open-source license yet; rights to the upstream code, brand and assets need to be confirmed separately.
+
+The cover, title and post-copy rules borrow ideas from Sun Yuzheng's [kdb-talking-head-short-production](https://github.com/sunyuzheng/kdb-talking-head-short-production) (MIT; the per-platform post template and the platform-interface check) and [lizheng-video-production](https://github.com/sunyuzheng/lizheng-video-production) (checking covers at their smallest feed size, writing title and cover as one promise). No code was copied; the scripts here were written from scratch.
