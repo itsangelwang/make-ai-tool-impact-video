@@ -2,8 +2,8 @@
 
 Create JSON with `schema_version: 1` and these required fields:
 
-- `language`: BCP-47-style output language such as `zh-CN` or `en-US`.
-- `market`: intended audience market such as `CN` or `US`.
+- `language`: BCP-47-style output language: `en-US` (default), `en-GB` or `en-AU`. Videos are English-only.
+- `market`: intended audience market such as `US`, `GB` or `AU`.
 - `tool`: `name`, `url`, `one_line_capability`.
 - `audience`: one concrete role or life situation.
 - `task`: one observable task, unchanged before and after.
@@ -14,7 +14,7 @@ Create JSON with `schema_version: 1` and these required fields:
 - `human_check`: a concrete verification, judgment, privacy, or accountability duty.
 - `readiness`: one of `use-now`, `try-now`, `watch`, `future`.
 - `next_action`: a small, reversible experiment consistent with readiness that is safe to try at work: use non-sensitive or made-up material, stay within the employer's rules and approved apps, and let the AI produce a draft the person reviews rather than sending, posting, or changing records on its own. When access needs a paid plan or an admin to turn the feature on, say so.
-- `narration`: natural speech with no stage directions; normally 150–190 Han characters for `zh-CN` or 90–135 words for `en-US` when readable transitions are included. Use the low end only for a deliberately fast, energetic delivery.
+- `narration`: natural speech with no stage directions; normally 90–135 words when readable transitions are included. Use the low end only for a deliberately fast, energetic delivery.
 - `coverage`: the existing-coverage check from [topic-check.md](topic-check.md): `checked_at`, `existing` (each `by` = `official` or `creator`, `url`, `shows`), `our_angle`, and `decision` (`make` or `change-angle`; `skip` fails validation).
 - `brand`: optional; `null` or `{name, slogan, start_sec, end_sec}` for the brand card that follows the last scene. See [brand-system.md](brand-system.md).
 - `scenes`: 5–7 objects with `id`, `type`, `purpose`, `start_sec`, `end_sec`, `headline`, `visual`, and `claim_ids`.
@@ -27,7 +27,7 @@ The first scene must show the audience/task pain. Mention the product only after
 
 Treat a tool or feature as new when its official announcement is within the last 90 days, or when the user asks to highlight it. Record the announcement date in the claim's `support`. Then make the newness visible at these points, and only these:
 
-1. **Right after the pain (first scene, within about three seconds of the pain line):** one sentence that says it is new and what it changes for this task, such as "ChatGPT's new update turns this into one paste." / 「ChatGPT 刚更新的功能，把这件事变成粘贴一次。」 Add a small on-screen label such as "NEW in <product>". Never open the video with the announcement itself.
+1. **Right after the pain (first scene, within about three seconds of the pain line):** one sentence that says it is new and what it changes for this task, such as "ChatGPT's new update turns this into one paste." Add a small on-screen label such as "NEW in <product>". Never open the video with the announcement itself.
 2. **At the AI handoff result:** name the new capability by what the viewer now sees, not by its marketing name alone, such as "New in GPT-6: not just text. A table, and a chart." Mark the reveal with a short "NEW" stamp and sound.
 3. **When a second new capability appears:** flag it once, such as "Here's the new trick: ask it to build a calculator."
 4. **In the next action:** state current access from the official source with its boundary ("rolling out to all plans", "beta, US only").

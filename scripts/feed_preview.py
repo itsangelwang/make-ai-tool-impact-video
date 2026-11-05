@@ -2,12 +2,12 @@
 """Show covers at the size viewers actually see them in a feed, next to the platform's title text.
 
 Usage:
-  python3 feed_preview.py qa/cover-9x16.png@108 qa/cover-3x4.png@95 \
+  python3 feed_preview.py qa/cover-9x16.png@155 qa/cover-3x4.png@122 \
       --title "ChatGPT just added …" -o qa/feed-preview.png
 
 - Each argument is a cover file, optionally `label=path` and `@N`, where N is the height in
-  pixels of one headline line's letters in the 1080-wide cover (about 0.72 x the font size for
-  English capitals, 0.92 x for Chinese). With it the report says how big that line appears in
+  pixels of one headline line's letters in the 1080-wide cover (about 0.72 x the font size, the
+  height of a capital letter). With it the report says how big that line appears in
   each slot and how it compares with the title text beside it.
 - 9:16 covers go into the YouTube Shorts shelf and the TikTok / Instagram profile grids (which
   crop the centre 3:4); 3:4 covers go into the Xiaohongshu feed (a 9:16 cover is centre-cropped
@@ -35,6 +35,7 @@ SLOTS_916 = [
 SLOT_34 = ("Xiaohongshu feed", 190, "3:4", 14)
 COMPARE_TITLE_PT = 14  # grids without a title are compared with ordinary 14-point UI text
 FONT_CANDIDATES = [
+    # CJK fonts first: the Xiaohongshu card is previewed with the Chinese post title.
     "/System/Library/Fonts/Hiragino Sans GB.ttc",
     "/System/Library/Fonts/STHeiti Medium.ttc",
     "/System/Library/Fonts/SFNS.ttf",

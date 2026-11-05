@@ -17,7 +17,8 @@ This Skill is maintained with both Codex and Claude Code. These rules apply to e
 ## Shared limits and examples
 
 - Numeric limits live only in `scripts/limits.json`. Scripts read from it; docs repeat key numbers for readers, and a test fails if they disagree. Change both together.
-- `examples/` holds complete Chinese and English inputs that must pass every validator. Update them when a schema or limit changes.
+- Videos are English-only. Chinese is used only for the Chinese post titles and platform copy, and for `README.zh-CN.md`. Do not add Chinese video support (narration, captions, fonts, limits, examples) back to this public repository; the earlier bilingual version is archived privately.
+- `examples/` holds a complete English input that must pass every validator. Update it when a schema or limit changes.
 - The brand card defaults to ACEMODE. Do not remove or rename the ACEMODE preset.
 
 ## Keep README current and minimal

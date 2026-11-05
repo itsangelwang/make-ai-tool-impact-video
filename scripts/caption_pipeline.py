@@ -12,7 +12,7 @@ from safe_io import atomic_write_json
 
 
 def phrases(text: str) -> list[str]:
-    parts = [p.strip() for p in re.split(r"(?<=[，。！？；：,.!?;:])", text) if p.strip()]
+    parts = [p.strip() for p in re.split(r"(?<=[,.!?;:])", text) if p.strip()]
     return parts or [text.strip()]
 
 
@@ -27,10 +27,7 @@ def main() -> int:
     package = json.loads(args.script.read_text(encoding="utf-8"))
     language = str(package.get("language", "en-US"))
     chunks = phrases(package["narration"])
-    if language.startswith("en"):
-        weights = [max(1, len(re.findall(r"\b[\w]+(?:[’'-][\w]+)*\b", chunk))) for chunk in chunks]
-    else:
-        weights = [max(1, len(re.findall(r"[\u3400-\u9fffA-Za-z0-9]", chunk))) for chunk in chunks]
+    weights = [max(1, len(re.findall(r"\b[\w]+(?:[’'-][\w]+)*\b", chunk))) for chunk in chunks]
     total = sum(weights)
     cues, cursor = [], 0
     for index, (chunk, weight) in enumerate(zip(chunks, weights)):

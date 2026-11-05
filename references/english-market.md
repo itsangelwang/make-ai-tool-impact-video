@@ -1,10 +1,9 @@
 # English-market adaptation
 
-Use this reference for English-speaking audiences. Default to US English unless the user names another market.
+Videos are always in English. Default to US English unless the user names another English market.
 
 ## Write natively
 
-- Adapt the story; do not translate Chinese copy sentence by sentence.
 - Open with a recognizable task and consequence: “Tomorrow's project meeting. Five old notes. What still needs a follow-up?”
 - Use contractions, short clauses, and concrete workplace language. Prefer “prep brief,” “open action item,” “owner,” and “due Friday” over abstract productivity language.
 - Keep one named example throughout. Use locally natural names, month-first dates for the US, and English product UI labels.
@@ -21,8 +20,8 @@ Use this reference for English-speaking audiences. Default to US English unless 
 ## Visual language
 
 - Use native 9:16 full-frame composition without embedded black bars.
-- Prefer Inter, Avenir Next, SF Pro, Arial, or another clean Latin typeface. Do not use Chinese handwriting fonts for English captions.
-- Put less text on screen than in the Chinese version. Let product UI, icons, cursor actions, and object handoffs carry the explanation.
+- Prefer Inter, Avenir Next, SF Pro, Arial, or another clean Latin typeface.
+- Keep on-screen text short. Let product UI, icons, cursor actions, and object handoffs carry the explanation.
 - Use push-ins or detail zooms only to point at consequential UI or evidence.
 - Keep critical text and controls inside platform-safe regions; review the actual mobile crop.
 
