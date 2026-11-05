@@ -6,7 +6,8 @@
     "studio": "remotion studio src/index.jsx",
     "render": "remotion render src/index.jsx VerticalImpact renders/final.mp4 --codec h264 --crf 18",
     "cover": "remotion still src/index.jsx Cover qa/cover-9x16.png && remotion still src/index.jsx Cover34 qa/cover-3x4.png",
-    "opening": "remotion render src/index.jsx VerticalImpact qa/opening.mp4 --frames 0-89 --codec h264 --crf 20"
+    "opening": "remotion render src/index.jsx VerticalImpact qa/opening.mp4 --frames 0-89 --codec h264 --crf 20",
+    "layout": "node check-layout.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.540",

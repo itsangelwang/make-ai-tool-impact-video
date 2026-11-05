@@ -27,6 +27,10 @@ export const balancedBreak = (units, english) => {
   return best;
 };
 
+// The caption bar ends at y 1450, above the account name and post text that YouTube Shorts,
+// TikTok and Instagram Reels draw over the lower part of the video (about y 1460-1790).
+export const CAPTION_BOTTOM = 470;
+
 export const TimedCaptions = () => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
@@ -41,7 +45,9 @@ export const TimedCaptions = () => {
   const lineBreak = balancedBreak(units, english);
   let characterOffset = 0;
   return (
-    <div style={{position:'absolute',left:64,right:64,bottom:112,zIndex:100,display:'flex',alignItems:'center',justifyContent:'center',flexWrap:'wrap',padding:'22px 27px',borderRadius:25,background:'rgba(23,25,35,.92)',boxShadow:'0 16px 42px rgba(0,0,0,.20)'}}>
+    // The bar hugs its text (at most 820 wide, centred) so it stays clear of the button column on the right.
+    <div style={{position:'absolute',left:0,right:0,bottom:CAPTION_BOTTOM,zIndex:100,display:'flex',justifyContent:'center'}}>
+    <div style={{maxWidth:820,display:'flex',alignItems:'center',justifyContent:'center',flexWrap:'wrap',padding:'22px 27px',borderRadius:25,background:'rgba(23,25,35,.92)',boxShadow:'0 16px 42px rgba(0,0,0,.20)'}}>
       {units.map((char, index) => {
         const startIndex = characterOffset;
         characterOffset += char.length;
@@ -53,6 +59,7 @@ export const TimedCaptions = () => {
         const span = <span key={`${char}-${index}`} style={{display:'inline-block',whiteSpace:/^\s+$/.test(char)?'pre':'normal',fontFamily:english?"system-ui, -apple-system, 'SF Pro Display', Inter, Arial, sans-serif":'Hannotate SC, Kaiti SC, PingFang SC, sans-serif',fontSize:english?(emphasized?48:43):(emphasized?42:38),lineHeight:english?1.22:1.35,fontWeight:emphasized?900:650,color:warm?'#FF9B74':cool?'#B9AFFF':'#fff',opacity:progress,transform:`translateY(${(1-progress)*(emphasized?32:24)}px) rotate(${english?0:(1-progress)*(index%2?5:-4)}deg) scale(${(.78+progress*.22)*(emphasized&&!english?1.1:1)})`}}>{char}</span>;
         return index === lineBreak ? [span, <div key={`br-${index}`} style={{flexBasis:'100%',height:0}} />] : span;
       })}
+    </div>
     </div>
   );
 };

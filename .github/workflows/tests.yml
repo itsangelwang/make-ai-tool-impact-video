@@ -31,6 +31,8 @@ jobs:
           node-version: "20"
       - run: npm ci --no-audit --no-fund
       - run: npx remotion still src/index.jsx VerticalImpact /tmp/cover.png --frame 0 --log=error
+      - name: Every sample scene fits above the captions
+        run: node check-layout.mjs --min-fit 0.85
       - name: Render both covers
         run: |
           npx remotion still src/index.jsx Cover /tmp/components-cover-9x16.png --log=error
