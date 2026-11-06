@@ -618,6 +618,11 @@ class FitTimelineTests(unittest.TestCase):
         cue_errors = [e for e in timeline_validator.validate({**fitted, "duration_sec": 60}) if re.match(r"(caption|transition) \d", e)]
         self.assertEqual(cue_errors, [])
 
+    def test_default_chapter_card_passes_the_audit(self):
+        fitted = fit_timeline.fit(self.timeline(), [2.0, 2.5, 2.0, 3.6])
+        tr = fitted["transitions"][0]
+        self.assertGreaterEqual(tr["end_sec"] - tr["start_sec"], 2.0)
+
     def test_rejects_brand_line_longer_than_card(self):
         with self.assertRaises(ValueError):
             fit_timeline.fit(self.timeline(), [2.0, 2.0, 2.0, 4.5])
@@ -790,6 +795,25 @@ class NarrationTakeTests(unittest.TestCase):
         self.assertAlmostEqual(cuts[0], 0.17, places=2)
         self.assertAlmostEqual(cuts[1], 3.05, places=2)  # the long pause, not the short breath at 1.1 s
         self.assertAlmostEqual(cuts[2], 6.08, places=2)
+
+    def test_real_takes_cut_at_sentence_ends_not_colon_pauses(self):
+        # Pause data measured from Fish Audio Sawyer takes on the ChatGPT GIF video, where the
+        # character-share guess cut after "New in ChatGPT:" and inside "What worked:".
+        cases = [
+            (7.37, [(0.0, 0.22), (2.04, 2.44), (3.94, 4.32), (5.6, 5.88), (6.36, 6.5), (7.08, 7.36)],
+             ["You doodled a mascot for your café.", "You want it waving on Instagram.", "New in ChatGPT: sketch to GIF."], [2.24, 4.13]),
+            (15.15, [(0.0, 0.22), (0.66, 0.76), (1.26, 1.42), (2.28, 2.38), (3.28, 3.82), (4.32, 4.48), (5.8, 6.38), (7.0, 7.1), (7.68, 8.22),
+                     (9.5, 9.86), (10.82, 11.34), (11.86, 11.98), (12.0, 12.34), (13.4, 13.54), (14.78, 15.14)],
+             ["Watch the full loop.", "It loops back to OPEN for most of it.", "Post that, and customers think you're open.", "Fix it with an Edit note?",
+              "The preview said CLOSED.", "The loop didn't.", "What worked: say CLOSED in every single frame."], [1.34, 3.55, 6.09, 7.95, 9.68, 11.08]),
+            (11.23, [(0.0, 0.22), (0.68, 0.96), (2.7, 3.0), (5.12, 5.5), (7.36, 7.8), (8.36, 8.7), (9.54, 9.68), (10.92, 11.22)],
+             ["The catch: it starts on OPEN and flips late.", "Then it loops, so it's OPEN most of the time.",
+              "Post that, and customers think you're open.", "The fix: flip once, then hold on CLOSED."], [2.85, 5.31, 7.58]),
+        ]
+        for duration, spans, texts, want in cases:
+            cuts = split_takes.boundaries(spans, duration, texts)[1:-1]
+            for got, expected in zip(cuts, want):
+                self.assertAlmostEqual(got, expected, delta=0.06, msg=texts)
 
     def test_too_few_pauses_is_an_error(self):
         with self.assertRaises(ValueError):
