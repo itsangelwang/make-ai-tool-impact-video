@@ -59,6 +59,22 @@ Use progressive review by default:
 
 Do not repeatedly render or re-analyze an unchanged full composition. Suppress verbose renderer progress when possible and report only failures, output paths, duration, and QA findings. Reuse representative frames for unchanged components. A local clip approval does not replace the final full-video audit before delivery.
 
+## Newcomer story check (required before every review)
+
+The user should not have to find logic gaps one at a time. Before every review, read the narration with the visuals as a viewer who has never used the tool, scene by scene, and answer:
+
+1. What is on screen, and is it the exact thing the line talks about (the same GIF version, the same screenshot)?
+2. What just happened, in one sentence?
+3. When something goes wrong, what is the cause, not only the symptom? Say the cause in the narration ("it starts on OPEN and flips late, then loops", not only "it shows OPEN").
+4. What is being changed, and why? State a fix as what worked in the test, not as the only rule.
+5. Is every name, term or symbol explained the first time it appears (the example's name, an @mention, a button)? Do not show it before then.
+6. Do the first seconds show the world of the example (a café needs a coffee cup), not only the object?
+7. Does each scene carry one causal line? Cut detours that crowd it, and give the scene with the human check more time.
+8. Does the "before" scene name the AI tools that already did this job, checked on their official pages, and say only the gap that remains?
+9. Was the claim tested in the product surface viewers will use (for example the plain chat, not an agent mode), and checked on the downloaded result rather than the in-app preview?
+
+Write the answers in the review's Self-check section with what you changed. Then look past the list: note anything else a newcomer could trip on. If you found nothing, say what you checked.
+
 ## Design self-review before the user sees it
 
 Do not wait for the user to point out problems. Before showing any stills or render, critique them as a designer and fix what you can; then tell the user what the self-review caught. The list is a floor: also flag whatever your own judgment notices.
