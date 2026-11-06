@@ -11,6 +11,8 @@ Each claim ledger entry must contain `id`, `text`, `level`, `source_url`, `sourc
 
 Capability claims require an official or independent source. Outcome numbers require comparable observed evidence. Community enthusiasm is not capability evidence. A product being announced does not mean the target audience can access it.
 
+Plan access follows the official wording plan by plan. Tick a plan only when an official source names it or names a set that clearly includes it; a phrase such as "all subscription tiers" does not settle the free plan. Leave an unnamed plan out of a plan table (or mark it unconfirmed) and say so in the claim's `boundary`; a third-party report can prompt a check but cannot tick the box. Keep spoken wording to what the source says ("rolling out on every plan" only if it says so).
+
 Use readiness consistently:
 
 - `use-now`: generally accessible and core workflow supported by direct evidence.
