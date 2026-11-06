@@ -74,7 +74,9 @@ python3 <skill-dir>/scripts/validate_sources.py \
 
 This preview check passes with a warning when an asset is not yet cleared (`publication_blockers`); name those assets in the review as blockers.
 
-Write the cover headline and the title options together from one promise (see [references/packaging.md](references/packaging.md)), set `story.cover`, render both covers with `npm run cover`, and check them at feed size with `scripts/feed_preview.py`. Produce one review containing the coverage check and chosen angle, the narration, factual boundaries, scene plan, the covers with their feed preview and the picked title, first-three-second preview, target voice/palette, and blockers. For silent review captions, create `timeline.json` and run:
+Write the cover headline and the title options together from one promise (see [references/packaging.md](references/packaging.md)), set `story.cover`, render both covers with `npm run cover`, and check them at feed size with `scripts/feed_preview.py`. Produce one review containing the coverage check and chosen angle, the narration, factual boundaries, scene plan, the covers with their feed preview and the picked title, first-three-second preview, target voice/palette, and blockers.
+
+Before showing any review, key-frame sheet, or render, run the newcomer story check and the design self-review in [references/pacing-and-review.md](references/pacing-and-review.md), fix what they find, and put a **Self-check** section in the review: one row per scene with the answers and what you changed. Do this again after every round of changes, not only when the user points at a problem. A review without that section is not ready to show. For silent review captions, create `timeline.json` and run:
 
 ```bash
 python3 <skill-dir>/scripts/audit_timeline.py \

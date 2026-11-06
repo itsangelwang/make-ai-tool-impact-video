@@ -56,7 +56,7 @@ No idea yet? Say "find me an AI feature worth covering this week". It scans offi
 
 Before starting, it checks whether the company or other creators have already covered the feature. If the same story is out there it looks for a new angle, and if there's nothing new to say it suggests a different topic.
 
-You first get a review pack (script, frames, fact sources). **Nothing is voiced or rendered until you approve it**, and nothing is ever published automatically. After that, you're only asked again if the facts, the meaning, the voice, the cover or the opening change; timing and volume fixes are checked automatically, and a small visual fix is shown to you as just that clip. For a big visual change you first see a sheet of key frames, before the full render.
+You first get a review pack (script, frames, fact sources, and a self-check of every scene). **Nothing is voiced or rendered until you approve it**, and nothing is ever published automatically. After that, you're only asked again if the facts, the meaning, the voice, the cover or the opening change; timing and volume fixes are checked automatically, and a small visual fix is shown to you as just that clip. For a big visual change you first see a sheet of key frames, before the full render.
 
 ## Defaults
 
