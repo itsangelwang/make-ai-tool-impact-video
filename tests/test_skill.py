@@ -618,6 +618,13 @@ class FitTimelineTests(unittest.TestCase):
         cue_errors = [e for e in timeline_validator.validate({**fitted, "duration_sec": 60}) if re.match(r"(caption|transition) \d", e)]
         self.assertEqual(cue_errors, [])
 
+    def test_measured_cues_skip_the_planned_pause_check(self):
+        data = {"duration_sec": 60, "language": "en-US", "captions": [
+            {"start_sec": 0.3, "end_sec": 2.3, "text": "Then it loops, so it's open most of the time.", "audio_sec": 2.0}]}
+        self.assertFalse([e for e in timeline_validator.validate(data) if "pause" in e])
+        planned = {**data, "captions": [{k: v for k, v in data["captions"][0].items() if k != "audio_sec"}]}
+        self.assertTrue([e for e in timeline_validator.validate(planned) if "pause" in e])
+
     def test_default_chapter_card_passes_the_audit(self):
         fitted = fit_timeline.fit(self.timeline(), [2.0, 2.5, 2.0, 3.6])
         tr = fitted["transitions"][0]
@@ -814,6 +821,16 @@ class NarrationTakeTests(unittest.TestCase):
             cuts = split_takes.boundaries(spans, duration, texts)[1:-1]
             for got, expected in zip(cuts, want):
                 self.assertAlmostEqual(got, expected, delta=0.06, msg=texts)
+
+    def test_long_pauses_are_shortened_without_touching_speech(self):
+        import array
+        rate = 1000
+        tone = [5000, -5000] * 150  # 0.3 s of speech
+        quiet = [0] * 600  # 0.6 s pause
+        clip = array.array("h", [0] * 300 + tone + quiet + tone + [0] * 500)
+        short = split_takes.shorten_pauses(clip, rate, max_pause=0.2)
+        self.assertEqual(sum(1 for x in short if x), 2 * len(tone))  # every speech sample kept
+        self.assertAlmostEqual(len(short) / rate, 0.04 + 0.3 + 0.2 + 0.3 + 0.14, delta=0.02)
 
     def test_too_few_pauses_is_an_error(self):
         with self.assertRaises(ValueError):

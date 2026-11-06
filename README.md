@@ -63,7 +63,7 @@ You first get a review pack (script, frames, fact sources, and a self-check of e
 | Setting | Default | To change it |
 |---|---|---|
 | Language | US English (videos are English-only) | Say "Language: British English" or "Australian English" |
-| Voice | Fish Audio "Sawyer" (Drama 3), each scene read in one take, 1.15× speed | Say "change the voice" — you'll get samples first |
+| Voice | Fish Audio "Sawyer" (Drama 3), each scene read in one take, 1.2× speed, long pauses trimmed | Say "change the voice" — you'll get samples first |
 | Music & sound | Real tracks and effects from royalty-free libraries (e.g. Pixabay), downloaded only after you pick them | Say "change the music" or "this sound effect doesn't work" |
 | Brand ending | ACEMODE brand card, reading "10x Faster. Reclaim Your Time." | Say "no brand ending", or give your own brand |
 | Length | 55–65 seconds | Up to 75 seconds with a stated reason |

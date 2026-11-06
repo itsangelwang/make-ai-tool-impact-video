@@ -10,15 +10,18 @@ cue-00.wav, cue-01.wav, ... so the usual per-cue timing still works.
       --take video/public/audio/takes/s1.mp3 --cues 0,1,2 \
       --out-dir video/public/audio/cues
 
-Each clip keeps the pause that follows it, so placing the clips back to back
-reproduces the original take.
+Pauses inside each clip are shortened to --max-pause (0.2 s by default; the
+user found the take's natural pauses sleepy). Use --max-pause 0 to keep them,
+so that placing the clips back to back reproduces the original take.
 """
 
 from __future__ import annotations
 
 import argparse
+import array
 import json
 import re
+import wave
 import subprocess  # nosec B404
 import sys
 from pathlib import Path
@@ -131,6 +134,36 @@ def boundaries(spans: list[tuple[float, float]], duration: float, texts: list[st
     return [lead, *cuts, tail]
 
 
+def shorten_pauses(samples: array.array, rate: int, max_pause: float = 0.2, threshold: int = 900,
+                   lead: float = 0.04, tail: float = 0.14) -> array.array:
+    """Keep speech and shorten every quiet run inside it to at most `max_pause` seconds.
+
+    Quiet means no sample above `threshold` (16-bit) in a 10 ms window. The clip keeps
+    `lead` seconds before the first word and `tail` seconds after the last one. This removes
+    dead air only; the voice itself is never stretched or sped up."""
+    win = max(1, rate // 100)
+    loud = [max((abs(x) for x in samples[i:i + win]), default=0) > threshold for i in range(0, len(samples), win)]
+    if not any(loud):
+        return samples
+    first = loud.index(True)
+    last = len(loud) - 1 - loud[::-1].index(True)
+    out = array.array("h", [0] * int(lead * rate))
+    keep = max(1, int(max_pause * 100))
+    i = first
+    while i <= last:
+        if loud[i]:
+            out.extend(samples[i * win:(i + 1) * win])
+            i += 1
+        else:
+            j = i
+            while j <= last and not loud[j]:
+                j += 1
+            out.extend(samples[i * win:(i + min(j - i, keep)) * win])
+            i = j
+    out.extend(samples[(last + 1) * win:(last + 1) * win + int(tail * rate)])
+    return out
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--timeline", required=True, type=Path)
@@ -138,6 +171,8 @@ def main() -> int:
     parser.add_argument("--cues", required=True, help="comma-separated cue indexes read in this take, in order")
     parser.add_argument("--out-dir", required=True, type=Path)
     parser.add_argument("--threshold-db", type=float, default=-42.0)
+    parser.add_argument("--max-pause", type=float, default=0.2,
+                        help="shorten pauses inside each clip to this many seconds (0 keeps the take's pauses)")
     args = parser.parse_args()
 
     ffprobe, ffmpeg, _ = find_tools(args.out_dir)
@@ -165,7 +200,15 @@ def main() -> int:
         out = args.out_dir / f"cue-{i:02d}.wav"
         subprocess.run([ffmpeg, "-y", "-hide_banner", "-loglevel", "error", "-ss", f"{cuts[n]:.3f}", "-to", f"{cuts[n + 1]:.3f}",  # nosec B603
                         "-i", str(args.take), "-ac", "1", "-ar", "48000", "-c:a", "pcm_s16le", str(out)], check=True, env=env)
-        clips.append({"cue": i, "sec": round(cuts[n + 1] - cuts[n], 2), "text": texts[n]})
+        sec = cuts[n + 1] - cuts[n]
+        if args.max_pause > 0:
+            with wave.open(str(out)) as w:
+                rate, raw = w.getframerate(), w.readframes(w.getnframes())
+            short = shorten_pauses(array.array("h", raw), rate, args.max_pause)
+            with wave.open(str(out), "w") as w:
+                w.setnchannels(1); w.setsampwidth(2); w.setframerate(rate); w.writeframes(short.tobytes())
+            sec = len(short) / rate
+        clips.append({"cue": i, "sec": round(sec, 2), "text": texts[n]})
     print(json.dumps({"ok": True, "clips": clips}, ensure_ascii=False))
     return 0
 
