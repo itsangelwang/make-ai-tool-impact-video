@@ -3,8 +3,8 @@
   "narration": {
     "en": {"unit": "words", "min": 90, "max": 135}
   },
-  "cue_rate_max": {"en": 2.7},
-  "average_rate_max": {"en": 2.5},
+  "cue_rate_max": {"en": 4.5},
+  "average_rate_max": {"en": 3.2},
   "caption_length_max": {"en": 14},
   "readable_transition_min_sec": 2.0,
   "scenes": {"min": 5, "max": 7},

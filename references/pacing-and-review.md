@@ -4,7 +4,7 @@
 
 Treat display completion and speakability as different constraints.
 
-- Roughly 90–135 words fits 55–65 seconds. Treat the count as a warning, not a tone choice: set timing from the measured narration, then give each action, result hold, and pause the time it needs. Flag a cue above 2.7 words per spoken second.
+- Roughly 90–135 words fits 55–65 seconds. Treat the count as a warning, not a tone choice: set timing from the measured narration, then give each action, result hold, and pause the time it needs. Flag a cue above 4.5 words per spoken second (about 3 on average). Once a cue is fitted to its measured audio, its pause is the real one, so only the speed is checked.
 - End a cue before a readable chapter transition begins.
 - Preserve a short pause after the last spoken word and a stable hold after character animation completes.
 - Cut narration that merely repeats an obvious action before extending duration.

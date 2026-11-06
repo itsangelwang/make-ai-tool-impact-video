@@ -62,7 +62,8 @@ def validate(data: dict, duration_exception: str | None = None) -> list[str]:
         unit = "words/s"
         if rate > limit:
             errors.append(f"caption {index} is too fast: {rate:.2f} {unit}")
-        if cue_duration < count / limit + 0.2:
+        # A planned cue needs room for a pause; a cue fitted to measured audio (`audio_sec`) already has its real one.
+        if "audio_sec" not in cue and cue_duration < count / limit + 0.2:
             errors.append(f"caption {index} lacks a spoken pause")
         previous_end = end
         total_units += count

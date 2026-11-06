@@ -12,7 +12,7 @@ Videos are always in English. Default to US English unless the user names anothe
 ## Pace and captions
 
 - Roughly 90–135 spoken English words fits 55–65 seconds. Use the count as a warning only: generate the narration, measure it, and fit actions, holds, and pauses around it.
-- Keep the average near 2.0–2.5 words per spoken second and flag individual cues above 2.7 words per second.
+- Keep the average near 2.7–3.2 words per spoken second and flag individual cues above 4.5 words per second. The user found 2.3 words per second sleepy; a brisk read with short pauses keeps attention.
 - Reveal captions by word or short phrase, not letter by letter. Use 3–7 words per visual beat and no more than two mobile lines.
 - Use sentence case. Reserve all caps for a one- or two-word label.
 - Highlight complete meaning units only: the task, changed step, example value, owner, due date, and human check.
@@ -28,7 +28,7 @@ Videos are always in English. Default to US English unless the user names anothe
 ## Voice
 
 - Prefer a conversational American voice that sounds like a capable coworker, not an ad read or customer-service bot.
-- Default to Fish Audio with the approved preset: `scripts/fish_audio_tts.py --preset en-sawyer` (Fish Official "Sawyer", US male, model `drama-3`, temperature `0.85`, speed `1.15`). Skip auditions and reuse it unless the user asks for a different voice. To search for another voice, prefer Fish Official voices (author "Fish Official") and avoid community voices that imitate real people or characters.
+- Default to Fish Audio with the approved preset: `scripts/fish_audio_tts.py --preset en-sawyer` (Fish Official "Sawyer", US male, model `drama-3`, temperature `0.85`, speed `1.2`, Fish Audio's maximum). Skip auditions and reuse it unless the user asks for a different voice. To search for another voice, prefer Fish Official voices (author "Fish Official") and avoid community voices that imitate real people or characters.
 - Use OpenRouter or Deepgram only when Fish Audio is unavailable, and require a fresh voice approval.
 
 ### Natural delivery (Fish Audio)
@@ -36,7 +36,7 @@ Videos are always in English. Default to US English unless the user names anothe
 Viewers judged per-sentence takes with emotion tags as acted and unnatural: every sentence restarted its pitch, and tags pushed `drama-3` into an ad-read tone. The approved delivery is plainer:
 
 - Read each scene as one continuous take of its cue texts, with no bracket tags, at the preset speed. Write the drama into the words instead: short beats ("Now?"), contrast, contractions. Any word that is spoken must also appear in the caption.
-- Split each take into cue clips with `scripts/split_scene_takes.py`; it cuts at the natural pause nearest each sentence boundary, and each clip keeps the pause that follows it.
+- Split each take into cue clips with `scripts/split_scene_takes.py`; it cuts at the pause that ends each sentence and shortens pauses inside a clip to 0.2 s (dead air only, never a faster voice).
 - Use a cue's optional `voice` field in `timeline.json` only to fix pronunciation (`AceMode` reads as "Ace Mode" while the caption keeps `ACEMODE`); `audit_timeline.py` fails if `voice`, minus any tags, does not match `text`.
 - Square-bracket tags (`[calm]`, `[emphasis]`) still work on S2 and `drama-3` models; use them only for one line that a plain read gets wrong, after an audition.
 - Audition one representative scene (8–12 s) before generating everything. If the user says the voice is not natural, offer 3–4 short samples that differ in one thing each (tags removed, another model, another Fish Official voice).
