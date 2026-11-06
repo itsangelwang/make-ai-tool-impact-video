@@ -13,6 +13,8 @@ Recorded sound effects and music the user has previewed and approved. All are fr
 | `stamp` | A stamp landing | Stamp — https://pixabay.com/sound-effects/film-special-effects-stamp-81635/ | 0.05–0.28 (first hit) |
 | `tick` | Row highlights, scrubbing | Soft UI Pop – light, minimal click by humordome — https://pixabay.com/sound-effects/technology-soft-ui-pop-light-minimal-click-451232/ | 0.00–0.28 (first click) |
 
+Use `tick` for one highlight at a time. Fired in a quick run (a tick per marker mark on a frame grid, a tick per plan row) it reads as an odd "ding ding"; the user rejected that on the ChatGPT GIF video. Give a run of marks one sound, or none.
+
 The synthesized click is the fallback only; the user asked for a real recorded click. Rejected as odd-sounding: Positive Notification, Traditional Stamp, UI Checkbox Tick, and the synthesized swish, pop, coin, stamp, tick and uh-oh.
 
 ```bash
