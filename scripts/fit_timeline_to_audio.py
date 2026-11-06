@@ -42,7 +42,7 @@ def probe_seconds(path: Path) -> float:
     raise RuntimeError("ffprobe (FFmpeg) or macOS afinfo is required to measure audio")
 
 
-def fit(timeline: dict, durations: list[float], gap: float = 0.3, transition_sec: float = 1.4,
+def fit(timeline: dict, durations: list[float], gap: float = 0.3, transition_sec: float = 2.2,
         brand_sec: float | None = None) -> dict:
     caps = timeline["captions"]
     if len(durations) != len(caps):
@@ -104,7 +104,8 @@ def main() -> int:
     parser.add_argument("--audio-dir", type=Path, required=True)
     parser.add_argument("--ext", default="mp3")
     parser.add_argument("--gap", type=float, default=0.3)
-    parser.add_argument("--transition-sec", type=float, default=1.4)
+    parser.add_argument("--transition-sec", type=float, default=2.2,
+                        help="length of each readable chapter card (default 2.2 s; the audit needs at least 2.0)")
     parser.add_argument("--output", type=Path, help="defaults to overwriting the timeline")
     args = parser.parse_args()
     try:
