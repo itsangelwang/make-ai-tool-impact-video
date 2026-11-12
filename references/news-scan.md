@@ -61,7 +61,7 @@ For each deep dive and capability group, suggest the follow-on videos it support
 
 ## 5. Report
 
-Give the user a short digest, with official links for every item. Write it for a person, not a reviewer: everyday words, short sentences, and no unexplained terms or score codes in the main text.
+Before showing anything, run "Self-check before showing any candidate" in [topic-check.md](topic-check.md) on every card. Give the user a short digest, with official links for every item. Write it for a person, not a reviewer: everyday words, short sentences, and no unexplained terms or score codes in the main text.
 
 1. The search window and the sources checked, in one line.
 2. The top deep dives and capability groups (at most five). Recommend one. Give each one a card, in this order:
@@ -70,6 +70,7 @@ Give the user a short digest, with official links for every item. Write it for a
    - **Before vs after** for that scenario, side by side: the steps, time, or effort without the feature (including the AI tools people already use for it), and the same task with it. Mark anything not yet tested as expected, not proven.
    - **Can you use it**: the plan, platform, and region, from the official page.
    - **Watch out**: the main risk, such as a published video it might repeat or a claim still to verify.
+   - **Checked**: verified facts with their source, and any fact still unverified, marked so the user can tell them apart at a glance.
    - **Verdict** (`make`, `change-angle`, `watch`), with the five scores and total in one small line at the end of the card.
    Show, don't write. When the tool can render visuals, draw each card instead of filling it with sentences: before and after as rows of icon steps with arrows and a step count, a small mock of the screen or result (for example the changed cells highlighted), distinct colors for before, after, and warnings, and access and risks as short labeled chips. Text is labels of a few words; anything longer goes in the reply around the card. Without visuals, use clearly separated text blocks with short labels. The user should get the point of each card in a few seconds.
 3. Two or three follow-on videos for the recommended pick.
