@@ -62,7 +62,7 @@ Give the user a short digest, with official links for every item. Write it for a
    - **Can you use it**: the plan, platform, and region, from the official page.
    - **Watch out**: the main risk, such as a published video it might repeat or a claim still to verify.
    - **Verdict** (`make`, `change-angle`, `watch`), with the five scores and total in one small line at the end of the card.
-   Present the cards as visually as the tool allows: a rendered card, page, or visual block when one is available, otherwise clearly separated text blocks with short labels. Keep it scannable: the user should get the point of each card in a few seconds.
+   Show, don't write. When the tool can render visuals, draw each card instead of filling it with sentences: before and after as rows of icon steps with arrows and a step count, a small mock of the screen or result (for example the changed cells highlighted), distinct colors for before, after, and warnings, and access and risks as short labeled chips. Text is labels of a few words; anything longer goes in the reply around the card. Without visuals, use clearly separated text blocks with short labels. The user should get the point of each card in a few seconds.
 3. Two or three follow-on videos for the recommended pick.
 4. Follow-ups that are due.
 5. The roundup pool, one line each. When it holds three or more items, say so: they could make a roundup video, but this Skill does not have a roundup format yet.
