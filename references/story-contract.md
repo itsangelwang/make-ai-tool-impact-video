@@ -33,7 +33,7 @@ Treat a tool or feature as new when its official announcement is within the last
 4. **In the next action:** state current access from the official source with its boundary ("rolling out to all plans", "beta, US only").
 5. **Cover and title:** written together as one promise that names the product or feature and one concrete change; see [packaging.md](packaging.md).
 
-Every "new" must be followed by what changed; never say "new" or "just launched" without it. Do not claim it is better than the previous version unless a source supports that comparison. When the feature is not new, skip this section rather than implying novelty.
+Every "new" must be followed by what changed; never say "new" or "just launched" without it. Do not claim it is better than the previous version unless a source supports that comparison. When the feature is not new, skip this section rather than implying novelty. For a missed-it backup topic, say once near the start how long it has been available ("It's been in ChatGPT since March, and most people never found it").
 
 Choose one concrete example thread before writing scenes. Reuse its task object, decision, unfinished item, owner, date, and source artifact wherever those concepts appear. The new workflow must show the exact handoff: direct workspace search, file import, upload, connection, prompt, or capture action supported by evidence.
 

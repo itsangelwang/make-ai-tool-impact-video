@@ -9,8 +9,9 @@ Keep one backlog for all videos at `<workspace>/topic-backlog.md`, where `<works
 - `Creator` holds what the user pays for, the video language, the channel's focus, and the channel link. Propose only topics the user can record with those plans, unless marked `watch`. Fill it in by asking the user if it is missing, and update it when they change a plan or focus.
 - `Last scan` sets the search window: everything announced since then (7 days if there is no date).
 - Skip anything already listed under `Made`, `Dropped`, or `Candidates`, unless something important changed (wider access, a new plan tier, a new region).
-- Skip anything the channel has already published. Open the channel link in `Creator` and read every published title, including Shorts; sync any missing ones into `Made` first, since the backlog can fall behind. A repeat is the same feature, or the same task with the same kind of result in another tool (another "AI makes a table" after one already shipped). Keep it only if the new video clearly shows a capability the earlier one did not, and say which video it would repeat and what is new. Planned re-tests in `Follow-ups` are the one exception, and they need a new test result. If the channel page cannot be read, say so and ask the user for the list instead of guessing.
+- Skip anything the channel has already published. Open the channel link in `Creator` and read every published title, including Shorts; sync any missing ones into `Made` first, since the backlog can fall behind. A repeat is the same task with the same kind of on-screen result, in the same tool or another one (another "AI makes a table" after one already shipped). The same feature with a clearly different task and result (quotes compared in a table, then a trip planned on a map) is a by-job follow-on, not a repeat: at most one per published feature, and only if a viewer of the first video would not feel they had seen it. Name the earlier video and what is new whenever a candidate comes close. Planned re-tests in `Follow-ups` are also allowed, and they need a new test result. If the channel page cannot be read, say so and ask the user for the list instead of guessing.
 - Report every `Follow-ups` entry whose date has passed.
+- Read the view counts on the channel page. Say in one line which published videos did best and what they share (the promise, the tool, the kind of visual), and favor candidates with the same strengths. With few videos this is a hint, not proof.
 
 ## 2. Search
 
@@ -18,6 +19,13 @@ Start from official sources, then use discovery sources to catch what they miss:
 
 - **Official, for facts:** the release notes, changelog, and news pages of ChatGPT/OpenAI, Claude/Anthropic, Gemini/Google (including Workspace updates), Microsoft Copilot, and the productivity tools already in the backlog. Add a tool's page when it enters the backlog.
 - **Discovery, for leads only:** Product Hunt, Hacker News, AI newsletters, and the most visible creators on YouTube, TikTok, and X. Confirm every lead on the vendor's own page, with its date and plan access, before scoring it; drop it if you can't.
+
+The big vendors ship only a few strong features a month, so official pages alone leave the list thin. Every scan also checks, and names in the report:
+
+- this week's top AI and productivity launches on Product Hunt;
+- at least one AI newsletter;
+- which AI clips are spreading this week on TikTok, YouTube Shorts, X, or Xiaohongshu, as leads to features worth testing;
+- smaller tools beyond the big chatbots: meeting notes, AI browsers, design, video, voice, and research tools.
 
 Stay inside productivity: work, planning, communication, documents, meetings, research, and making things. AI is the main source. Also include new hardware or tools (smart glasses, wearables, 3D printing) when they change a work task, and mark them `watch`, since the creator can't record them.
 
@@ -39,6 +47,7 @@ Then sort each item into one bucket:
 
 - **Deep dive:** total of 12 or more, with Wow of at least 2. Run the "Is it actually different?" check in [topic-check.md](topic-check.md) before listing it.
 - **Capability group:** two or more vendors shipped the same kind of capability close together. Group them as one "AI can now ___" topic and score the group, not each item.
+- **Missed it (backup):** announced more than 90 days ago, but Wow 3, New to viewer at least 2, recordable with the creator's plans, and not yet on the channel. List one only when no deep dive passes this week, and frame it honestly ("you may have missed this"), never as new.
 - **Roundup pool:** real and new, but too thin for a video of its own. Keep one line: what it is, who can use it, and why to try it.
 - **Drop:** anything else. Give one line with the reason.
 
@@ -46,7 +55,7 @@ Then sort each item into one bucket:
 
 For each deep dive and capability group, suggest the follow-on videos it supports, so one strong item can fill several weeks:
 
-- **By job:** two or three roles that use it differently (a realtor, a teacher, a shop owner). Each one gets its own task and example.
+- **By job:** two or three roles that use it differently (a realtor, a teacher, a shop owner). Each one gets its own task, example, and a clearly different on-screen result. Once one video on the feature is published, at most one by-job follow-on may follow (see step 1).
 - **Before vs after:** the same task done the old way and the new way, side by side. Only suggest this if the difference shows on screen.
 - **Follow-up:** a re-test about 30 days after the video ships ("Is it still worth using?"). Add it to `Follow-ups` once the video is made.
 
@@ -68,7 +77,7 @@ Give the user a short digest, with official links for every item. Write it for a
 5. The roundup pool, one line each. When it holds three or more items, say so: they could make a roundup video, but this Skill does not have a roundup format yet.
 6. Dropped items, one line each with the reason.
 
-If nothing reaches deep dive, say so plainly instead of filling the list, and point to the best follow-up or capability group.
+If nothing reaches deep dive, say so plainly instead of filling the list, and point to the best follow-up, capability group, by-job follow-on of a published video, or missed-it backup.
 
 Then update the backlog: set `Last scan`, add new items to the right section, and move items the user rejects to `Dropped` with the reason. Before turning a reason into a general rule (for the backlog, `Creator`, or this Skill), check whether it holds up: is it too broad, does it contradict an earlier rule, does it mix the creator's own view with the audience's? Raise any doubt with the user and record the agreed wording. Once a video is made, move its topic to `Made` with the date and add its follow-up.
 

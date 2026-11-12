@@ -11,7 +11,7 @@ When the user asks what to make, run the weekly scan in [news-scan.md](news-scan
 - can be shown truthfully: the user can open it and record real UI, or official screenshots/video are available;
 - has an access path for the audience; flag Pro/Business-only or region-limited features as `try-now` or `watch`;
 - comes from a different vendor than the last two videos in the backlog's `Made` list, unless it clearly stands out.
-- does not repeat a video the channel already published: not the same feature, and not the same task with the same kind of result in another tool (see [news-scan.md](news-scan.md), step 1).
+- does not repeat a video the channel already published: not the same task with the same kind of result, in any tool. A by-job follow-on of a published feature needs a clearly different task and result (see [news-scan.md](news-scan.md), step 1).
 
 For each candidate give the date, the one task it changes, who can use it, and the main risk (narrow access, hard to show, vendor-only claims). Mark aggregator-only facts as unverified.
 
