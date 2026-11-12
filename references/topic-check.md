@@ -66,6 +66,19 @@ Drop low-value candidates instead of recommending them; at most name them in one
 
 Give the user a short table for the candidates that pass: new (date), different from existing tools, workflow level, recordable with the creator's plans, existing coverage, likely result, and verdict (`make`, `change-angle`, `skip`). If existing reviews already judge one thing, such as how a deck looks, look for what they skip, such as whether the content is correct.
 
+### Self-check before showing any candidate
+
+Run this on every candidate before the user sees it, without waiting to be asked. Facts from the backlog, an earlier session, memory, or a news site are leads, not facts: re-check them.
+
+1. **First date, not latest.** Find the earliest official entry for the capability the video would show, not the newest entry that mentions it. A feature is new only if that capability, not a UI change around it ("no need to pick a mode"), was announced within 90 days. Otherwise it is at most a missed-it backup.
+2. **Access from the official page.** Plan, platform, and region quoted from the vendor's own page with its date, including when the creator's plan first got it. No official page read means the card says "unverified".
+3. **Closest published video.** Name the channel's most similar published video and say in one line why this one is not the same task with the same kind of result. If you cannot, drop it.
+4. **The before is real.** Name the AI tools people already use for this task, checked on their own pages, not from memory.
+5. **Mark every fact.** Each card shows which facts are verified (with the source) and which are not. Nothing unverified goes into the headline, the score, or the recommendation.
+6. **Argue against it.** Write the strongest reason the user would reject the candidate (a repeat, not new, not wow, cannot record). If that reason holds, drop or downgrade it before showing.
+
+If a check cannot be finished, show the candidate as unverified and say which check is missing, rather than leaving it out silently or presenting it as confirmed. When a correction changes something already told to the user, say so plainly at the top of the next reply.
+
 ## Checking existing coverage
 
 Search for, and open, at least:
