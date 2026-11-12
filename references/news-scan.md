@@ -6,9 +6,10 @@ Use this when the user asks what to make this week, or when a scheduled scan run
 
 Keep one backlog for all videos at `<workspace>/topic-backlog.md`, where `<workspace>` is the folder that holds the project folders. Create it from the template below if it is missing. Read it before searching:
 
-- `Creator` holds what the user pays for, the video language, and the channel's focus. Propose only topics the user can record with those plans, unless marked `watch`. Fill it in by asking the user if it is missing, and update it when they change a plan or focus.
+- `Creator` holds what the user pays for, the video language, the channel's focus, and the channel link. Propose only topics the user can record with those plans, unless marked `watch`. Fill it in by asking the user if it is missing, and update it when they change a plan or focus.
 - `Last scan` sets the search window: everything announced since then (7 days if there is no date).
 - Skip anything already listed under `Made`, `Dropped`, or `Candidates`, unless something important changed (wider access, a new plan tier, a new region).
+- Skip anything the channel has already published. Open the channel link in `Creator` and read every published title, including Shorts; sync any missing ones into `Made` first, since the backlog can fall behind. A repeat is the same feature, or the same task with the same kind of result in another tool (another "AI makes a table" after one already shipped). Keep it only if the new video clearly shows a capability the earlier one did not, and say which video it would repeat and what is new. Planned re-tests in `Follow-ups` are the one exception, and they need a new test result. If the channel page cannot be read, say so and ask the user for the list instead of guessing.
 - Report every `Follow-ups` entry whose date has passed.
 
 ## 2. Search
@@ -75,6 +76,7 @@ Last scan: YYYY-MM-DD
 - Plans: <paid plans and free tools the creator can record with>
 - Language: <main video language>
 - Focus: <what the channel covers and what it leaves out>
+- Channel: <link to the published videos, used to skip repeats>
 
 ## Candidates
 | Added | Item (official link) | Bucket | Score | Plan | Note |
