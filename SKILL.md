@@ -142,7 +142,7 @@ python3 <skill-dir>/scripts/split_scene_takes.py --timeline <project-dir>/video/
   --take <project-dir>/video/public/audio/takes/s3.mp3 --cues 5,6 --out-dir <project-dir>/video/public/audio/cues
 ```
 
-Fit the timeline to the measured clips, rebuild captions, and move every scene, transition and beat with its words:
+Fit the timeline to the measured clips, rebuild captions, and move every scene, transition and beat with its words (place cues by hand in a scene that plays a real clip with its own sound; see "Expressive audio" in `references/pacing-and-review.md`):
 
 ```bash
 cp <project-dir>/video/src/timeline.json <project-dir>/timeline.before.json
@@ -166,7 +166,7 @@ python3 <skill-dir>/scripts/mix_story_audio.py --timeline <project-dir>/video/sr
   --output <project-dir>/video/public/audio/mix.wav --ending-jump 60
 ```
 
-Without a usable track or recorded sounds, fall back to `generate_story_audio.py music|sfx` and say so. After rendering, measure loudness (`-af loudnorm=print_format=json`), correct it with a `volume` remux to about -16 LUFS and a true peak at or below -1.5 dB, and do not rerender unchanged visuals solely to replace narration.
+Without a usable track or recorded sounds, fall back to `generate_story_audio.py music|sfx` and say so. After rendering, measure loudness (`-af loudnorm=print_format=json`). Bring it to about -16 LUFS with a true peak at or below -1.5 dB: when only the peak is too high, run `python3 <skill-dir>/scripts/limit_peaks.py <project-dir>/video/renders/final.mp4`; when the whole mix is off, use a `volume` remux. Do not rerender unchanged visuals solely to replace narration.
 
 Target 55–65 seconds. Permit a review up to 75 seconds when verified product interaction, stable result holds, or human-check evidence would otherwise become unreadable; pass the reason as `--duration-exception "<reason>"` to `validate_package.py` and `verify_video.py` so it is recorded, report the extension, and shorten later only by removing repetition. For a user-requested longer workflow, document a duration exception and validate timing/bounds independently rather than claiming the default validator passed. Do not time-stretch speech. Render `VerticalImpact`, then run:
 
@@ -202,6 +202,7 @@ Then check privacy and safety and report the result:
 - The MP4's metadata holds no name, path or location (`ffprobe -show_entries format_tags`).
 - People and companies in a simulated test are fictional, and their names do not match a well-known brand; illustrative files and numbers use placeholders.
 - Voices are synthetic or licensed; music and sound effects have their source and license recorded in the project.
+- Every AI-generated clip carries a visible "AI-generated" label in the video, and every platform block in `social-titles.md` discloses it (see `references/packaging.md`).
 - No key, `.env` content or personal path appears in any delivered or committed file.
 
 Write `<project-dir>/social-titles.md` from `assets/social-titles-template.md`, following "Titles and post copy" in [references/packaging.md](references/packaging.md): a not-for-posting header naming the MP4 and cover, three titles in English and three in Chinese written natively for each market (pick marked), and one copy-ready block per platform. Base every title on the final video's hook and before → after change and keep every claim within `claim-ledger.json`. When the video introduces a new feature (released within the last 90 days), lead every title with that fact before the benefit and note when that framing expires. Show the cover feed preview, the picked title and the platform blocks to the user with the delivery.

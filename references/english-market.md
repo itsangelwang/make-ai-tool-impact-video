@@ -7,6 +7,7 @@ Videos are always in English. Default to US English unless the user names anothe
 - Open with a recognizable task and consequence: “Tomorrow's project meeting. Five old notes. What still needs a follow-up?”
 - Use contractions, short clauses, and concrete workplace language. Prefer “prep brief,” “open action item,” “owner,” and “due Friday” over abstract productivity language.
 - Keep one named example throughout. Use locally natural names, month-first dates for the US, and English product UI labels.
+- Say what changes on screen, not an abstraction that can be misheard: "your product could change" sounded like the product itself would change; "your product could look different in every clip" did not.
 - Avoid announcer copy, startup hype, unexplained AI jargon, and unsupported time-saving claims. For a new feature, say it is new right after the pain, not as the opener ("OpenAI just dropped…"); see "Introduce what is new" in [story-contract.md](story-contract.md).
 
 ## Pace and captions

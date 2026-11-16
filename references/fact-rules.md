@@ -13,6 +13,8 @@ Capability claims require an official or independent source. Outcome numbers req
 
 Plan access follows the official wording plan by plan. Tick a plan only when an official source names it or names a set that clearly includes it; a phrase such as "all subscription tiers" does not settle the free plan. Leave an unnamed plan out of a plan table (or mark it unconfirmed) and say so in the claim's `boundary`; a third-party report can prompt a check but cannot tick the box. Keep spoken wording to what the source says ("rolling out on every plan" only if it says so).
 
+For an upgrade, take the old and the new value from official posts and scope the sentence to exactly what changed ("one clip used to be eight seconds", not "videos were limited to eight seconds" when another feature could already chain clips). Record both posts in the claim.
+
 Use readiness consistently:
 
 - `use-now`: generally accessible and core workflow supported by direct evidence.

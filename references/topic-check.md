@@ -19,6 +19,8 @@ For each candidate give the date, the one task it changes, who can use it, and t
 
 A feature can be new and still not be news. Before proposing it, name what ChatGPT, Claude, Gemini, and other mainstream tools already offer for the same job. If a viewer would say "X already does this", either drop it or find the true difference and verify it on each vendor's own pages. Never claim a difference from memory.
 
+Also check the vendor's own history. Search its update blog and help pages for the same capability under older names before calling anything new: Google Vids could already turn a photo into a talking clip (Aug 2025) and promised a consistent product (Nov 2025), so its Nov 2026 release was an upgrade (one clip 8 s → up to 15 s, better consistency, more natural voices), not a new ability. Frame an upgrade as an upgrade and lead with the change a viewer can see.
+
 "It could be done before" is not enough to drop a topic: almost any task had a slower workaround. Compare with the old way instead. Keep it only if the new way is clearly faster, simpler, or better for an ordinary person, in a way the video can show side by side.
 
 Rank how far it changes the workflow; prefer the higher levels:

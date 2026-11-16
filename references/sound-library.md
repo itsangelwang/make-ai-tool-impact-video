@@ -11,6 +11,7 @@ Recorded sound effects and music the user has previewed and approved. All are fr
 | `callend` | A call ending | End Call — https://pixabay.com/sound-effects/household-end-call-120633/ | whole clip |
 | `coin`, `notify` | A result or message appearing | Soft Notification by Universfield — https://pixabay.com/sound-effects/film-special-effects-soft-notification-131438/ | 0.06–0.80 |
 | `stamp` | A stamp landing | Stamp — https://pixabay.com/sound-effects/film-special-effects-stamp-81635/ | 0.05–0.28 (first hit) |
+| `whoosh` | Beat-synced scene cuts, stage swaps, chapter and brand cards | Simple Whoosh by DRAGON-STUDIO — https://pixabay.com/sound-effects/film-special-effects-simple-whoosh-382724/ | 0.03–0.45 (peak about 0.12 s in) |
 | `tick` | Row highlights, scrubbing | Soft UI Pop – light, minimal click by humordome — https://pixabay.com/sound-effects/technology-soft-ui-pop-light-minimal-click-451232/ | 0.00–0.28 (first click) |
 
 Use `tick` for one highlight at a time. Fired in a quick run (a tick per marker mark on a frame grid, a tick per plan row) it reads as an odd "ding ding"; the user rejected that on the ChatGPT GIF video. Give a run of marks one sound, or none.
@@ -23,3 +24,7 @@ python3 <skill-dir>/scripts/prepare_sfx.py --out <project-dir>/video/public/audi
 ```
 
 Music used so far: "Corporate Upbeat" by NastelBom (https://pixabay.com/music/upbeat-corporate-upbeat-323642/): light 16 s intro, full energy from 0:16, breakdown 1:04–1:20, ending at 1:52–1:54; 2 s bars. Starting it at 0:00 puts the full-energy entry on a handoff about 16 s in; `--ending-jump 60` lands its ending on a brand card near 50 s.
+
+"Product - Product Launch" by Monume (https://pixabay.com/music/old-school-funk-product-product-launch-603962/, no Content ID notice): old-school funk, about 109.8 BPM (bar ≈ 2.19 s), groove from 0:08 (avoid 0:00–0:08: its hits have silent gaps), ending from about 1:20. Picked for the Google Vids product-ad video; start it around 0:10.3 so a downbeat lands on a chapter card 16 s in, and jump a whole number of bars to reach 1:20 under the brand card.
+
+Rejected: "Dance Upbeat Pop" by Kulakovka for a product-ad explainer (wrong style, felt off the beat); the Soft Notification chime on a feature-card title (heard as an odd "ding").

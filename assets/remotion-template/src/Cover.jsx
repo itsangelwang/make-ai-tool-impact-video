@@ -15,8 +15,9 @@ import {FONTS, Headline, VerticalImpact, localeOf, phaseOf} from './VerticalImpa
 // Instagram profile grids crop the cover to 3:4.
 const DEFAULT_CROP = {x: 0, y: 300, w: 1080, h: 1100};
 
-const Inset = ({story, cover}) => {
-  const crop = {...DEFAULT_CROP, ...(cover.crop || {})};
+const Inset = ({story, cover, ratio}) => {
+  // crop_3x4 (optional): the 3:4 box is taller, so it may need its own crop.
+  const crop = {...DEFAULT_CROP, ...((ratio === '3:4' && cover.crop_3x4) || cover.crop || {})};
   const width = 952;
   const scale = width / crop.w;
   return (
@@ -56,7 +57,7 @@ export const Cover = ({story, ratio = '9:16'}) => {
             <Headline text={cover.headline} accent={accent} />
           </h1>
         </div>
-        <Inset story={story} cover={cover} />
+        <Inset story={story} cover={cover} ratio={ratio} />
       </div>
     </AbsoluteFill>
   );

@@ -27,6 +27,7 @@ The template renders a designed cover from `story.cover`, laid out separately fo
 
 - `headline`: the one promise, 2–3 short lines; `*word*` takes the accent color. Mark the word that carries the change.
 - `kicker` (optional): a small chip, such as "New in ChatGPT" for a feature from the last 90 days. `logo` (optional) is the official icon already recorded in `source-ledger.json`.
+- `crop_3x4` (optional): a separate crop for the 3:4 cover. Its box is taller, so the 9:16 crop can pull in a scene headline; check both and check that badges (such as the AI label) are not cut at the edge.
 - `frame_sec` and `crop`: the moment of the video and the part of the 1080×1920 frame shown below the headline as real evidence, usually the AI result. The inset never shows captions.
 - `npm run cover` writes `qa/cover-9x16.png` (Shorts, TikTok, Reels) and `qa/cover-3x4.png` (Xiaohongshu). `check_story.py` checks the fields. Without `story.cover` the template falls back to a frame 2 seconds in; use that only for a quick draft, never for delivery.
 - In 9:16, keep everything inside the centre 3:4 band (y 240–1680): TikTok and Instagram profile grids crop the cover to that. The template already does.
@@ -53,6 +54,7 @@ Write `<project-dir>/social-titles.md` from [assets/social-titles-template.md](.
 - **One block per platform**, ready to paste: YouTube Shorts (title and description), TikTok and Instagram Reels (one caption each) in English; Xiaohongshu (short title and body), Douyin / Channels (one block, say which) and Bilibili in Chinese. When the user names platforms, write only those.
 - The first sentence of a caption goes straight into the situation or the change, not "In this video…". Keep the conditions that change the meaning next to the claim ("Plus plan, rolling out"). Skip empty praise ("game changer", "must-watch").
 - Links: only the official page the viewer needs next, checked by opening it, with a few words on what it is. Instagram captions do not make links clickable; name the domain instead. Do not invent account handles; `#tag` and `@account` are different things.
+- AI disclosure: when the video shows AI-generated people or scenes, every platform block states it in its own language ("The clips in this video are AI-generated.", 「声明：视频中的人物片段由 AI 生成」) and English blocks add #AIGenerated. Still tell the user to tick the platform's AI label; the caption and the on-screen badge cover the case where nobody does.
 - Hashtags: a few that match the tool, the task and the audience; no fixed count.
 - **Platform settings (not for posting):** anything to set in the app, such as the cover upload or a linked video, marked checked or not checked.
 
