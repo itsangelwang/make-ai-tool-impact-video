@@ -1,14 +1,14 @@
 # Weekly news scan
 
-Use this when the user asks what to make this week, or when a scheduled scan runs. The scan finds new tools and capabilities, scores them, and turns each strong one into several possible videos. The user only picks from the list. Then run the coverage check in [topic-check.md](topic-check.md) on the pick.
+Use this when the user asks what to make, or when a scheduled scan runs. The scan finds new tools and capabilities, scores them, and turns each strong one into several possible videos. The user only picks from the list. Then run the coverage check in [topic-check.md](topic-check.md) on the pick.
 
 ## 1. Read the backlog first
 
 Keep one backlog for all videos at `<workspace>/topic-backlog.md`, where `<workspace>` is the folder that holds the project folders. Create it from the template below if it is missing. Read it before searching:
 
 - `Creator` holds what the user pays for, the video language, the channel's focus, and the channel link. Propose only topics the user can record with those plans, unless marked `watch`. Fill it in by asking the user if it is missing, and update it when they change a plan or focus.
-- `Last scan` sets the search window: everything announced since then (7 days if there is no date).
-- Skip anything already listed under `Made`, `Dropped`, or `Candidates`, unless something important changed (wider access, a new plan tier, a new region).
+- Search window: the last 30 days, not only what came out since the last scan. A strong feature from a few weeks ago is still a good topic. `Last scan` only marks what appeared since the previous scan: tag those items "new since last scan" in the report.
+- Never show the user the same item twice. Skip anything already in the backlog (`Made`, `Dropped`, `Candidates`, `Roundup pool`, `Research pending`) unless something important changed (wider access, a new plan tier, a new region); then say what changed.
 - Skip anything the channel has already published. Open the channel link in `Creator` and read every published title, including Shorts; sync any missing ones into `Made` first, since the backlog can fall behind. A repeat is the same task with the same kind of on-screen result, in the same tool or another one (another "AI makes a table" after one already shipped). The same feature with a clearly different task and result (quotes compared in a table, then a trip planned on a map) is a by-job follow-on, not a repeat: at most one per published feature, and only if a viewer of the first video would not feel they had seen it. Name the earlier video and what is new whenever a candidate comes close. Planned re-tests in `Follow-ups` are also allowed, and they need a new test result. If the channel page cannot be read, say so and ask the user for the list instead of guessing.
 - Report every `Follow-ups` entry whose date has passed.
 - Read the view counts on the channel page. Say in one line which published videos did best and what they share (the promise, the tool, the kind of visual), and favor candidates with the same strengths. With few videos this is a hint, not proof.
@@ -47,7 +47,7 @@ Then sort each item into one bucket:
 
 - **Deep dive:** total of 12 or more, with Wow of at least 2. Run the "Is it actually different?" check in [topic-check.md](topic-check.md) before listing it.
 - **Capability group:** two or more vendors shipped the same kind of capability close together. Group them as one "AI can now ___" topic and score the group, not each item.
-- **Missed it (backup):** announced more than 90 days ago, but Wow 3, New to viewer at least 2, recordable with the creator's plans, and not yet on the channel. List one only when no deep dive passes this week, and frame it honestly ("you may have missed this"), never as new.
+- **Missed it (backup):** announced more than 90 days ago, but Wow 3, New to viewer at least 2, recordable with the creator's plans, and not yet on the channel. List one only when no deep dive passes, and frame it honestly ("you may have missed this"), never as new.
 - **Roundup pool:** real and new, but too thin for a video of its own. Keep one line: what it is, who can use it, and why to try it.
 - **Drop:** anything else. Give one line with the reason.
 
