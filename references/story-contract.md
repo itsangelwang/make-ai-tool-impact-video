@@ -33,8 +33,14 @@ Treat a tool or feature as new when its official announcement is within the last
 4. **In the next action:** state current access from the official source with its boundary ("rolling out to all plans", "beta, US only").
 5. **Cover and title:** written together as one promise that names the product or feature and one concrete change; see [packaging.md](packaging.md).
 
+When the release upgrades something the product already did, say "upgraded" instead of "new" and make the delta itself the evidence: an old-vs-new value bar with its source, the real UI showing the new value (zoom on a label such as "720p · 0:15"), and, for a longer or faster output, a progress marker at the old limit that the result visibly passes (see "Lessons from the Google Vids video" in [visual-system.md](visual-system.md)).
+
 Every "new" must be followed by what changed; never say "new" or "just launched" without it. Do not claim it is better than the previous version unless a source supports that comparison. When the feature is not new, skip this section rather than implying novelty. For a missed-it backup topic, say once near the start how long it has been available ("It's been in ChatGPT since March, and most people never found it").
 
 Choose one concrete example thread before writing scenes. Reuse its task object, decision, unfinished item, owner, date, and source artifact wherever those concepts appear. The new workflow must show the exact handoff: direct workspace search, file import, upload, connection, prompt, or capture action supported by evidence.
 
+Carry the same object literally: a prompt shown on screen must be the prompt of the clip that plays next, not one from another test.
+
 The example is not an appendix. Introduce it in the old workflow, carry it through the AI output, turn it into a downstream action, and use the same item for human verification.
+
+If the user removes the next-action scene, keep their decision: `validate_package.py` will report the missing `next-action` type, so record the user's choice in the review and QA notes and move the access facts (plan, quota, link) into the post copy rather than relabeling another scene to pass the check.

@@ -14,3 +14,6 @@
 - **Two transitions feel repetitive:** keep the chapter transition and replace the second with an object handoff, morph, zoom, or internal state change.
 - **Abstract nouns confuse the viewer:** replace “draft,” “source,” “old material,” “owner,” or “deadline” with the named artifact and a concrete value on screen.
 - **Changed approved input:** `project_state.py status` reports which input changed. If it changed meaning, voice, cover, or opening, rebuild and present the combined review; see the change levels in section 4 of `SKILL.md`.
+- **Retiming cut a real clip short:** `fit_timeline_to_audio.py` and `retime_story.py` rescaled a scene that plays a product clip with its own sound; restore it and place that scene's cues by hand, moving the scene as one block.
+- **Brand caption or "ac mode" reappears:** a hand-edited `timeline.json` lost the brand cue's `"brand": true` or `voice` field; restore both and rebuild captions.
+- **Feature turns out not to be new:** reframe as an upgrade (see "Is it actually different?" in `topic-check.md`), show the concrete delta with official before/after values, and ask the user before continuing, since the claim changed.

@@ -98,6 +98,17 @@ The user asked for each of these; build them in from the start.
 - **Placeholders for illustrative things.** A file, name or number that only illustrates (not evidence) uses an obvious placeholder such as `xxx`, so it cannot be mistaken for a real one. Keep fictional company names generic; check that they do not match a well-known brand.
 - **Nothing jumps.** An element that appears later keeps its space from the start, so the rest of the layout does not shift when it arrives.
 
+## Lessons from the Google Vids video
+
+- **Make an upgrade visible, not just stated.** Pair three proofs: a value bar (Before 8 s, grey → Since Nov 5 15 s, accent, source line under it), the real UI showing the new value (zoom and circle a label such as "720p · 0:15"), and a progress bar under the playing result with a red marker at the old limit that pops "Old max: 8 s" when playback passes it, ideally before the payoff (she only speaks after 8 s). Keep the marker label hidden until it is crossed; a faint pre-label reads as noise.
+- **Annotate the real UI instead of describing it.** To explain a prompt, color-highlight its words on the real screenshot (orange "Who" on "A woman", blue "Where" on "crowded subway train"), labels just above the words and outside the crop so they never sit on toolbar buttons, and give the spoken line its own speech bubble. Crop to the text lines only. A generic white pill with an icon and a phrase looks like a search box; avoid it.
+- **Warnings are stamps, not chips.** Stamp "FAKE FEATURE" in the warm color on the AI frame (with the recorded stamp sound) where it covers neither the evidence nor the AI label.
+- **Number parallel options.** Two old ways get numbered, color-coded headers at the same height ("1 · SHOOT IT", "2 · AI VIDEO APPS") so a viewer sees two separate paths, not one long scene.
+- **Make the product unmistakable.** Put the product's icon and full name ("Google Vids") on the feature card title and on every recording's evidence label, in ink at about 28 px, not small grey caps. When no official asset is available, an icon cropped from your own recording of the product is acceptable for identification; record it in `source-ledger.json`.
+- **Label every generated clip.** Burn a small "✦ AI-generated" badge (English only) into the corner of every AI-generated clip, every inset and every card thumbnail of one, so the video is disclosed even if the platform checkbox is not ticked; the cover inherits it. Put the badge where stamps and circles will not cover it.
+- **Open with a breath.** Leave at least 0.6 s after the hook line and cut the picture inside that pause, so "No camera shot this ad." and "You sell headphones." do not run together.
+- **Don't leave a card empty.** Bring a card's first row in within about 0.5 s of the card; show its proof (clips) after the rows, not before.
+
 ## Motion grammar
 
 Give every transition a cause: stack, sort, compress, hand off, verify, or complete. Change hierarchy, scale, density, direction, or media every 2–4 seconds while preserving at least 1.2 seconds for important reading. Animate in the order task object → explanatory label → evidence → caption. Use one primary movement per beat.
@@ -183,7 +194,7 @@ Give the product promise its own visual beat; a small badge is not enough. When 
 - Dim and soften the pain scene (about 15–20% opacity with a light blur) so the task stays visible behind the introduction.
 - Raise one feature card in the cool accent with a short spring and a single ring burst, synced to the product name. Contents, revealed top to bottom: a "NEW" label and the official announcement date (only when new), the product or feature name as the largest text, one plain-language capability line, two to four capability objects as icon tiles that pop in one by one, and one line connecting it to this task's object ("3 quotes → 1 paste").
 - Lead the card with the tool's real logo or app icon. During research, look for it in the official brand, press-kit, or media page, and record its source and usage terms in `source-ledger.json`. Use the same mark everywhere the product identity appears (feature card, AI reply avatar, chat header, cover), at native proportions and colors, and follow the vendor's brand rules (clear space, no recoloring, no implied endorsement). Fall back to the name set in the video font only when no official asset exists or its terms do not permit this use, and say so in the review. Keep the card inside the caption-safe area and hold it until the scene ends.
-- Sound: one swish on entry, one chime on the name, a soft pop per tile.
+- Sound: one swish on entry and a soft pop per tile. Skip the chime on the name: the user heard it as an odd "ding" on the Vids upgrade card.
 
 Then echo the newness at most twice more, each tied to visible product evidence: a short rotated "NEW in <product>" stamp on the first real AI result, and a small "NEW" tag where a second new capability is requested. The rollout or access status appears as concrete chips (plans, regions, platforms) in the next-action scene. Never put a "NEW" mark on illustration-only UI.
 

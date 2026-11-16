@@ -1086,3 +1086,19 @@ class DeliveryGateTests(unittest.TestCase):
         self.assertTrue(any("after the video ends" in e for e in errors))
         self.assertEqual(verify_video.caption_errors(cues, None), [])  # video not measured
         self.assertTrue(any("invalid caption timing" in e for e in verify_video.caption_errors([{"startMs": 5, "endMs": 5, "text": "x", "language": "en-US"}], 60.0)))
+
+
+class LimitPeaksTests(unittest.TestCase):
+    def test_peaks_stay_under_ceiling_and_quiet_parts_keep_level(self):
+        import array
+        import limit_peaks
+        rate = 48000
+        quiet = [int(3000 * ((i % 40) / 20 - 1)) for i in range(rate // 10)]
+        loud = [32000 if i % 2 else -32000 for i in range(200)]
+        mono = quiet + loud + quiet
+        stereo = array.array("h", [v for v in mono for _ in (0, 1)])
+        out = limit_peaks.limit_samples(stereo, 2, rate, -2.3)
+        ceiling = 32768 * 10 ** (-2.3 / 20)
+        self.assertLessEqual(max(abs(v) for v in out), ceiling + 1)
+        # The first quiet stretch is untouched (look-ahead is only 2 ms).
+        self.assertEqual(list(out[:2000]), list(stereo[:2000]))
