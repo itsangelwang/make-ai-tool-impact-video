@@ -54,6 +54,8 @@ The task: turn a week of meeting notes into a weekly update
 
 No idea yet? Say "find me an AI feature worth covering". It scans official release notes and launch sites from the last 30 days, scores what is new, recommends one with a plain before-and-after example, and suggests follow-on videos. It keeps a `topic-backlog.md` next to your project folders, and checks the videos already on your channel, so nothing repeats and re-tests come back when they are due.
 
+For a tool that runs in a browser, it tries the feature itself in its own browser with a test account you set up (you type passwords and accept terms), prepares the result the video will show, and hands you a few short steps for one screen recording.
+
 Before starting, it checks whether the company or other creators have already covered the feature. If the same story is out there it looks for a new angle, and if there's nothing new to say it suggests a different topic.
 
 You first get a review pack (script, frames, fact sources, and a self-check of every scene). **Nothing is voiced or rendered until you approve it**, and nothing is ever published automatically. After that, you're only asked again if the facts, the meaning, the voice, the cover or the opening change; timing and volume fixes are checked automatically, and a small visual fix is shown to you as just that clip. For a big visual change you first see a sheet of key frames, before the full render.
