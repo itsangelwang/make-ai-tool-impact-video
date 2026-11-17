@@ -14,7 +14,7 @@ from limits import LIMITS
 ICON_FILE = Path(__file__).resolve().parent.parent / "assets" / "remotion-template" / "src" / "components" / "Icon.jsx"
 # Scene types whose `visual` text the template shows in a box (an empty visual hides the box).
 VISUAL_BOX = {"human-check", "next-action", "ai-handoff"}
-BEATS = ("call_end", "toast", "new_feature", "shot", "flow", "scrub", "roles", "checks", "access", "plans", "fix", "replay", "send", "tryit")
+BEATS = ("call_end", "toast", "new_feature", "shot", "flow", "scrub", "roles", "checks", "access", "plans", "fix", "replay", "send", "tryit", "strips")
 
 
 def icon_names(icon_file: Path = ICON_FILE) -> set[str]:
@@ -59,9 +59,12 @@ def screen_words(scene: dict, story: dict) -> int:
     texts += ["Call ended"] + [name[:1] for name in call.get("people", [])] if call else []
     replay = scene.get("replay") or {}
     texts += [replay.get("quote"), replay.get("who"), (scene.get("send") or {}).get("label")]
+    for strip in scene.get("strips") or []:
+        texts.append(strip.get("label"))
+        texts += [f"{s.get('label')} {s.get('sec')} s" for s in strip.get("segments", []) if s.get("label")]
     plans = scene.get("plans") or {}
     texts += [plans.get("title"), plans.get("feature")] + [plan.get("name") for plan in plans.get("plans", [])]
-    custom = any(scene.get(key) for key in ("shot", "flow", "scrub", "fix", "replay", "plans", "tryit"))
+    custom = any(scene.get(key) for key in ("shot", "flow", "scrub", "fix", "replay", "plans", "tryit", "asset", "strips", "call_end", "toast"))
     if scene.get("type") in {"pain-hook", "before-workflow"} and not custom:
         texts += story.get("before_steps", []) if scene.get("type") == "before-workflow" or not feature else []
     if scene.get("type") == "after-workflow" and not custom:
@@ -100,6 +103,12 @@ def change_times(scene: dict) -> list[float]:
         item = shot.get(key) or {}
         if isinstance(item.get("at_sec"), (int, float)):
             times.append(item["at_sec"] + item.get("frames", 30) / 30)
+    frames, frame_sec = shot.get("frames") or [], shot.get("frame_sec")
+    if len(frames) > 1 and isinstance(frame_sec, (int, float)) and frame_sec > 0:
+        # a looping GIF keeps moving: count the start of every loop as a visible change
+        loop = len(frames) * frame_sec
+        times += [n * loop for n in range(1, int(60 / loop) + 1)]
+    times += [s["at_sec"] for s in scene.get("strips") or [] if isinstance(s.get("at_sec"), (int, float))]
     times += [band["at_sec"] for band in shot.get("focus", []) if isinstance(band.get("at_sec"), (int, float))]
     times += [item["at_sec"] for item in scene.get("flow", []) if isinstance(item.get("at_sec"), (int, float))]
     times += [t for t in scene.get("steps_at_sec", []) if isinstance(t, (int, float))]
@@ -129,7 +138,7 @@ def main_form(scene: dict) -> str:
     present = []
     for key in BEATS:
         if scene.get(key):
-            parts = [sub for sub in ("zoom", "drag", "type", "click", "focus", "callout", "stamp") if key == "shot" and scene["shot"].get(sub)]
+            parts = [sub for sub in ("frames", "zoom", "drag", "type", "click", "focus", "callout", "stamp") if key == "shot" and scene["shot"].get(sub)]
             present.append(f"{key}({','.join(parts)})" if parts else key)
     return "+".join(present) or scene.get("type", "?")
 
@@ -172,6 +181,16 @@ def check(story: dict, public_dir: Path, icons: set[str]) -> list[str]:
                 errors.append(f"{sid}.shot.crop requires numeric x, y, and positive w, h")
             elif isinstance(shot.get("source_width"), (int, float)) and crop["x"] + crop["w"] > shot["source_width"]:
                 errors.append(f"{sid}.shot.crop extends past source_width")
+            if "frames" in shot:
+                frames = shot.get("frames")
+                if not isinstance(frames, list) or len(frames) < 2:
+                    errors.append(f"{sid}.shot.frames needs at least two images (the real GIF frames)")
+                else:
+                    for src in frames:
+                        if not (public_dir / str(src)).is_file():
+                            errors.append(f"{sid}.shot.frames image not found under public/: {src}")
+                if not isinstance(shot.get("frame_sec"), (int, float)) or shot.get("frame_sec", 0) <= 0:
+                    errors.append(f"{sid}.shot.frame_sec must be the GIF's own seconds per frame")
             for beat in ("click", "reveal", "stamp", "callout", "summary", "zoom", "drag", "type", "wait"):
                 if beat in shot:
                     timed(f"{sid}.shot.{beat}", shot[beat], length)
@@ -187,7 +206,19 @@ def check(story: dict, public_dir: Path, icons: set[str]) -> list[str]:
                 timed(f"{sid}.shot.focus[{index}]", band, length)
                 if not isinstance(band.get("y"), (int, float)) or not isinstance(band.get("h"), (int, float)) or band.get("h", 0) <= 0:
                     errors.append(f"{sid}.shot.focus[{index}] requires source y and positive h")
+        strips = scene.get("strips")
+        if strips is not None:
+            if not isinstance(strips, list) or not 1 <= len(strips) <= 2:
+                errors.append(f"{sid}.strips needs 1-2 strips")
+            else:
+                for index, strip in enumerate(strips):
+                    timed(f"{sid}.strips[{index}]", strip, length)
+                    segments = strip.get("segments") or []
+                    if len(segments) < 2 or not all(isinstance(s.get("sec"), (int, float)) and s["sec"] > 0 for s in segments):
+                        errors.append(f"{sid}.strips[{index}] needs 2+ segments, each with sec > 0")
         flow = scene.get("flow")
+        if flow is not None and scene.get("type") == "next-action":
+            errors.append(f"{sid}: no flow in the next-action scene; the user rejected boxed icon cards for next steps. Animate a concrete moment (tryit, plans, real UI) or leave it to the narration")
         if flow is not None:
             if not isinstance(flow, list) or not 2 <= len(flow) <= 4:
                 errors.append(f"{sid}.flow needs 2-4 items")
