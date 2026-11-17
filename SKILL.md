@@ -14,12 +14,14 @@ Explain one workflow change for one person doing one task. Treat the tool as the
 
 These are the acceptance criteria. The sections below are how to get there; when a step and a criterion disagree, the criterion wins.
 
-1. A viewer can retell it: the old way → the one step that changed → the new way → what the person still checks.
-2. A viewer knows one small, safe thing they could try next, and whether they can access it.
-3. The first seconds show what the cover and title promised.
-4. Every factual line traces to `claim-ledger.json`, and every asset to `source-ledger.json`.
-5. Every screen is readable on a phone at normal speed, and the voice sounds like a person talking.
-6. Nothing private, uncleared, or undisclosed: no personal UI or metadata, every license recorded, every AI-generated clip labeled.
+The goal: a viewer who scrolls past stops, watches to the end, understands the new tool and the workflow it changes, and follows the channel because it saves them from sorting through AI news themselves.
+
+1. **They stop.** The cover, the title, and the first 2 seconds make the same concrete promise.
+2. **They keep watching.** Something new appears on screen every few seconds, the AI result shows up early, and there is at least one "AI can do that?" moment worth sending to a friend. Nothing drags after the result.
+3. **They understand.** Someone who has never used the tool gets every line on first hearing and can retell it: the old way → the one step that changed → the new way → what the person still checks.
+4. **They can use it.** They know whether they can access it and one small, safe thing to try next.
+5. **They want more.** The ending tells them what the channel keeps giving them (see "Reason to follow" in [references/brand-system.md](references/brand-system.md)).
+6. **They can trust it.** Every factual line traces to `claim-ledger.json` and every asset to `source-ledger.json`; nothing private or uncleared; every AI-generated clip is labeled.
 
 The checks in [references/pacing-and-review.md](references/pacing-and-review.md) and the scripts below test these criteria; they do not replace them.
 
