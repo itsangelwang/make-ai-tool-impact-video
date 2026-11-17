@@ -17,7 +17,7 @@ Build natively at 1080×1920 and 30 fps. Use a warm near-white background, near-
 Check every scene, not only the whole video. Render a still at each scene's busiest moment and read it at phone size.
 
 - **One idea per screen.** Keep authored on-screen text (label, headline, card and beat labels; captions and real UI excluded) at or under 18 words per scene. If a screen needs more, split it into beats that appear one at a time, in sync with the words that name them.
-- **Animate instead of writing.** Turn a list into a `flow` of icons, a changed value into a `fix` (strike and replace), a long screenshot into `focus` bands that light one row at a time, a "find it in the recording" step into a `scrub`. Hide the human-check and next-action text boxes by leaving `visual` empty when beats already carry the point.
+- **Animate instead of writing.** Turn a list into a `flow` of icons (not in the next-action scene), a changed value into a `fix` (strike and replace), a long screenshot into `focus` bands that light one row at a time, a "find it in the recording" step into a `scrub`. Hide the human-check and next-action text boxes by leaving `visual` empty when beats already carry the point.
 - **Show the real thing, not a word for it.** When a screen can show what the thing actually looks like, simulate it instead of writing its name in a box: a phone lock screen filling with notifications for "too much news", a channel card with real thumbnails and a pointer clicking Follow for "follow us", the real product UI for a feature. Use text only for what a picture cannot carry.
 - **No cheap icons in place of words.** Do not swap text for emoji, clip-art, or a row of generic icons in boxes; they look cheap and still need reading. Icons are fine when they are simple line drawings with one stroke width and the video's colors, and better when they move (a stopwatch hand that turns, a check that draws itself). If no good picture exists, leave the point to the narration.
 - **Composition reads top to bottom.** Each screen reads in one order: what this screen is about (eyebrow or headline) at the top, the one thing to look at in the middle, the caption at the bottom. Give the screen one visual focus and no competing headings: when reusing footage from another video, crop out its own headline, labels and captions so only this screen's set remains, and zoom so the action fills the frame instead of floating in empty space.
@@ -43,7 +43,7 @@ Check every scene, not only the whole video. Render a still at each scene's busi
 Viewers tune out what looks machine-made. Check every screen for these tells and replace them:
 
 - **Words:** marketing lines such as "turns new tools into real productivity". Write what a person would say out loud, with a little attitude ("And somehow, a new AI tool every day").
-- **Pictures:** sparkle ✦ icons for "AI", glowing logos, abstract funnels and arrows-into-boxes diagrams, perfect symmetry everywhere. Show real content instead: a real screen, a frame from the actual result, our own earlier video playing in a phone.
+- **Pictures:** sparkle ✦ icons for "AI" (the small "✦ AI-generated" disclosure badge is the one exception), glowing logos, abstract funnels and arrows-into-boxes diagrams, perfect symmetry everywhere. Show real content instead: a real screen, a frame from the actual result, our own earlier video playing in a phone.
 - **Placeholders:** grey bars standing in for text. Put real, readable specifics: names, times, amounts ("Re: Q4 numbers?", "Recording 30:12").
 - **Type:** cute or decorative fonts (serif italics, handwriting) clash with a clean bold sans; set a key word apart by color only.
 - **People:** do not draw people in code; dot eyes, big heads and block bodies look childish. Use a professional illustration set (Humaaans by Pablo Stanley is CC0), recolor its clothes to the palette, and record the source. People must be physically sensible: hands attached, nothing floating, faces not hidden behind props, no chair legs poking out under a desk.
@@ -67,7 +67,7 @@ The template turns these optional scene fields into the beats proven in the firs
 - `checks` with `checks_at_sec`: up to three `{icon, label}` items the person verifies.
 - `plans`: `{at_sec, title, feature, icon, plans: [{name, on}]}` from the official source. Reads like a pricing table: `title` says whose plans ("ChatGPT plans"), `feature` heads the ✓/✕ column ("Audio uploads"), and included rows tick in turn. Prefer it to `access`, whose colored chips did not say what was included where.
 - `access`: `{at_sec, label, plans: [{name, on}]}`, the older chip row; unavailable plans are struck through.
-- `flow`: 2–4 `{icon, label, at_sec}` tiles with arrows, each appearing at its own time; labels are 1–2 words. Replaces text cards in any scene.
+- `flow`: 2–4 `{icon, label, at_sec}` tiles with arrows, each appearing at its own time; labels are 1–2 words. Use it for a short sequence when no real UI can show it, never in the `next-action` scene: the user rejected boxed icon cards for next steps, and `check_story.py` fails on it there.
 - `call_end`: `{at_sec, people: [name, name], timer, end_at_sec, file}` a generic video call (not any real product): two people, a running timer, a hang-up click at `end_at_sec`, then the saved recording slides out. Opens a story that starts from a meeting.
 - `toast`: `{at_sec, icon, title, note, until_sec}` a system-style notification that slides down. Open with one so the first frame already shows the situation ("Call ended · Recording saved") and the first seconds move fast.
 - `fix`: `{at_sec, label, wrong, right}`. The wrong value is struck through and the right one pops in.
@@ -79,6 +79,8 @@ The template turns these optional scene fields into the beats proven in the firs
 - `shot.type`: `{at_sec, frames, region, lines, mask}` uncovers the real typed text left to right, line by line, with a caret and key sounds.
 - `shot.click` now hovers first (hand pointer and a glow), presses, and ripples; `shot.wait`: `{at_sec, frames}` shows neutral progress dots (never an imitation of the product's own loading screen).
 - Build a product interaction as one flow, the way a person works: open → drag the file in → type the request → hover and click → wait → result in full → push in to the detail.
+- `shot.frames` and `shot.frame_sec`: play a generated GIF (or any short loop) inside its real UI. `frames` is the list of real screenshots, each with one real GIF frame in its player, and `frame_sec` the GIF's own seconds per frame, so the loop plays at its true speed; every other `shot` beat (click, stamp, callout, focus) still works on top.
+- `strips`: `[{at_sec, label, live, segments: [{label, sec, tone}]}]`, one or two bars that show how long each state lasts in one loop ("OPEN 1.3 s | CLOSED 0.8 s"); `tone` is `warm`, `cool`, `ink` or `muted`. Place it under a `shot.frames` loop and set `live` so a playhead follows the same clock. Two strips (before, after) make a fix measurable.
 - `shot.focus`: `[{at_sec, y, h}]` source-pixel bands; everything else in the screenshot dims so one row is read at a time.
 - `steps_at_sec`: times at which before/after step cards appear, instead of all at once.
 
@@ -192,7 +194,7 @@ Give the product promise its own visual beat; a small badge is not enough. When 
 - Lead the card with the tool's real logo or app icon. During research, look for it in the official brand, press-kit, or media page, and record its source and usage terms in `source-ledger.json`. Use the same mark everywhere the product identity appears (feature card, AI reply avatar, chat header, cover), at native proportions and colors, and follow the vendor's brand rules (clear space, no recoloring, no implied endorsement). Fall back to the name set in the video font only when no official asset exists or its terms do not permit this use, and say so in the review. Keep the card inside the caption-safe area and hold it until the scene ends.
 - Sound: one swish on entry and a soft pop per tile. Skip the chime on the name: the user heard it as an odd "ding" on the Vids upgrade card.
 
-Where the newness shows after this card (the first AI result, a second capability, access in the next action) follows "Introduce what is new" in [story-contract.md](story-contract.md). Never put a "NEW" mark on illustration-only UI.
+Where the newness shows after this card follows "Introduce what is new" in [story-contract.md](story-contract.md): a short rotated "NEW in <product>" stamp on the first real AI result, a small "NEW" tag where a second new capability is requested, and the rollout or access status as concrete plan, region or platform chips in the next-action scene. Never put a "NEW" mark on illustration-only UI.
 
 ## Collaboration, persistence, and navigation
 

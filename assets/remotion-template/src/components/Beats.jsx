@@ -588,3 +588,30 @@ export const TryItStage = ({consent, old, palette, font, sound = false}) => {
     {sound ? <><Sfx at={consent.at + 4} name="pop" volume={0.45} /><Sfx at={consent.at + 14} name="pop" volume={0.45} /><Sfx at={recAt} name="tick" volume={0.45} /><Sfx at={dragStart} name="swish" volume={0.35} /><Sfx at={dragEnd} name="pop" volume={0.5} /></> : null}
   </div>;
 };
+
+// How long each state lasts in one loop, e.g. a GIF that shows OPEN for 1.3 s and CLOSED for
+// 0.8 s. strips: [{at, label, live, segments: [{label, sec, tone}]}]; tone is warm, cool, ink or
+// muted. `live` draws a playhead on the same clock as a looping `shot.frames` above it.
+export const TimeStrips = ({strips, palette, font}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const tones = {warm: palette.warm, cool: palette.cool, ink: palette.ink, muted: '#B8BEC9'};
+  return <div style={{fontFamily: font}}>
+    {strips.map((strip, index) => {
+      const p = frame < strip.at ? 0 : spring({frame: frame - strip.at, fps, config: {damping: 16, stiffness: 160}});
+      const total = strip.segments.reduce((sum, s) => sum + s.sec, 0) || 1;
+      const head = strip.live && frame >= strip.at ? ((frame / fps) % total) / total : null;
+      return <div key={index} style={{opacity: p, transform: `translateY(${(1 - p) * 24}px)`, marginTop: index ? 22 : 0}}>
+        {strip.label ? <div style={{fontSize: 26, fontWeight: 700, letterSpacing: 2, color: palette.muted, marginBottom: 8}}>{strip.label}</div> : null}
+        <div style={{display: 'flex', height: 64, borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 22px rgba(23,25,35,.12)'}}>
+          {strip.segments.map((s, i) => <div key={i} style={{flex: s.sec, background: tones[s.tone] || tones.muted, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, fontWeight: 700, borderLeft: i ? '3px solid #fff' : 'none', whiteSpace: 'nowrap'}}>
+            {s.label ? `${s.label} ${s.sec.toFixed(1)} s` : ''}
+          </div>)}
+        </div>
+        <div style={{position: 'relative', height: head === null ? 0 : 22}}>
+          {head === null ? null : <div style={{position: 'absolute', top: 4, left: `calc(${head * 100}% - 13px)`, width: 0, height: 0, borderLeft: '13px solid transparent', borderRight: '13px solid transparent', borderBottom: `18px solid ${palette.ink}`}} />}
+        </div>
+      </div>;
+    })}
+  </div>;
+};

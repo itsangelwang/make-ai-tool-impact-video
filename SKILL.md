@@ -64,7 +64,7 @@ Use this order:
 6. What AI changed and what the person still owns.
 7. Fit, readiness boundary (including the plan or admin switch it needs), a reversible next action that is safe to try at work, and the brand ending (ACEMODE by default).
 
-Carry the same task object through the story. An item found in the old record must become the AI input, appear in the summary, become the next action or question, and remain the item the person verifies. Do not introduce “draft,” “source,” “old material,” “owner,” or “deadline” without showing the concrete artifact or value.
+Carry the same task object through the story. An item found in the old record must become the AI input, appear in the summary, become the next action or question, and remain the item the person verifies. Any abstract word (such as “draft,” “source,” “owner,” or “deadline”) needs its concrete artifact or value on screen when it first appears.
 
 Create `script-package.json` and `claim-ledger.json`, following the shape of [examples/](examples/) for the chosen language. Numeric limits (duration, narration length, caption pace) live in `scripts/limits.json`. Then validate:
 
@@ -111,7 +111,7 @@ python3 <skill-dir>/scripts/build_captions.py \
   --output <project-dir>/video/src/captions.json
 ```
 
-Register the review bundle with `project_state.py review`, passing the voice as `--voice <provider>:<preset>` (for example `fish:en-sawyer`). Wait for explicit approval before final TTS or delivery render. The approval covers what the video says and shows; how much of it needs the user again depends on the change:
+Register the review bundle with `project_state.py init <project-dir>` (once per project) and then `project_state.py review`, passing the voice as `--voice <provider>:<preset>` (for example `fish:en-sawyer`). Wait for explicit approval before final TTS or delivery render. The approval covers what the video says and shows; how much of it needs the user again depends on the change:
 
 - **Ask again with a new review:** a changed fact, claim, promise, or the meaning of the script; a different voice; a new cover or opening; a different example, scene plan, or source.
 - **Do it, then check it yourself:** typo fixes, volume and mix changes, and moving scenes, beats, and captions to fit the measured narration. `project_state.py` ignores `*_sec` timing and the story's `audio`/`sfx` fields, so these keep the approval; confirm them with stills and `verify_video.py`.

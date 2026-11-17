@@ -953,6 +953,39 @@ class VideoPolishLessonTests(unittest.TestCase):
         scene["replay"]["quote"] = "one two three four five six"
         self.assertEqual(check_story.screen_words(scene, story), before + added)
 
+    TEMPLATE = ROOT / "assets" / "remotion-template"
+
+    def story(self):
+        return json.loads((self.TEMPLATE / "src" / "story.json").read_text(encoding="utf-8"))
+
+    def test_gif_frames_strips_and_next_action_flow(self):
+        story = self.story()
+        public = self.TEMPLATE / "public"
+        shot_scene = min((s for s in story["scenes"] if "shot" in s), key=lambda s: check_story.screen_words(s, story))
+        src = shot_scene["shot"]["src"]
+        shot_scene["shot"]["frames"] = [src, src, src]
+        shot_scene["shot"]["frame_sec"] = 0.5
+        shot_scene["strips"] = [{"at_sec": 0.5, "live": True, "segments": [{"label": "OPEN", "sec": 1.3, "tone": "warm"}, {"label": "CLOSED", "sec": 0.8, "tone": "ink"}]}]
+        self.assertEqual(check_story.check(story, public, check_story.icon_names()), [])
+        self.assertIn("strips", check_story.main_form(shot_scene))
+        self.assertIn(0.5, check_story.change_times(shot_scene))
+        self.assertGreater(check_story.screen_words(shot_scene, story), check_story.screen_words({**shot_scene, "strips": None}, story))
+        shot_scene["shot"]["frames"] = ["assets/missing.png"]
+        shot_scene["strips"][0]["segments"] = [{"label": "OPEN", "sec": 1.3}]
+        errors = " ".join(check_story.check(story, public, check_story.icon_names()))
+        self.assertIn("shot.frames needs at least two", errors)
+        self.assertIn("strips[0] needs 2+ segments", errors)
+        story = self.story()
+        nxt = next(s for s in story["scenes"] if s["type"] == "next-action")
+        nxt["flow"] = [{"icon": "doc", "label": "Try", "at_sec": 0.2}, {"icon": "doc", "label": "Check", "at_sec": 0.6}]
+        self.assertTrue(any("no flow in the next-action" in e for e in check_story.check(story, public, check_story.icon_names())))
+
+    def test_asset_replaces_default_step_cards(self):
+        story = self.story()
+        scene = {"id": "x", "type": "before-workflow", "label": "Before", "headline": "Old way", "start_sec": 0, "end_sec": 3}
+        with_steps = check_story.screen_words(scene, story)
+        self.assertLess(check_story.screen_words({**scene, "asset": "assets/example-ui.svg"}, story), with_steps)
+
     def test_real_mouse_click_is_the_documented_click(self):
         library = (ROOT / "references" / "sound-library.md").read_text(encoding="utf-8")
         self.assertIn("mouse-click-290204", library)

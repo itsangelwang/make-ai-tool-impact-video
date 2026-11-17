@@ -4,7 +4,7 @@ import {CAPTION_BOTTOM, TimedCaptions} from './TimedCaptions';
 import {ProgressBar} from './components/ProgressBar';
 import {Icon, objectColor} from './components/Icon';
 import {SfxFilter} from './components/Sfx';
-import {ReplayPlayer, SendClick, PlanCheck, TryItStage} from './components/Beats';
+import {ReplayPlayer, SendClick, PlanCheck, TryItStage, TimeStrips} from './components/Beats';
 import {AccessChips, CheckCards, Correction, FeatureIntro, Flow, NewTag, ProductShot, RoleStrip, Scrub, Toast, CallEnd} from './components/Beats';
 
 export const FONTS = {
@@ -188,12 +188,14 @@ const Scene = ({scene, palette: base, labels, sound, measure}) => {
   const steps = scene.type === 'after-workflow' ? after : before;
   const beat = {palette, font, sound};
   const until = (item) => (item ? {...withFrames(item), until: item.until_sec === undefined ? undefined : at(item.until_sec)} : undefined);
-  const shot = scene.shot ? {shot: scene.shot, evidence: scene.shot.evidence, click: withFrames(scene.shot.click), reveal: withFrames(scene.shot.reveal), stamp: withFrames(scene.shot.stamp), callout: until(scene.shot.callout), summary: until(scene.shot.summary), focus: (scene.shot.focus || []).map(withFrames), zoom: withFrames(scene.shot.zoom), drag: withFrames(scene.shot.drag), type: withFrames(scene.shot.type), wait: withFrames(scene.shot.wait)} : null;
+  const shotFrames = scene.shot && scene.shot.frames && scene.shot.frames.length ? scene.shot.frames : null;
+  const shotSrc = shotFrames ? shotFrames[Math.floor(local / FPS / (scene.shot.frame_sec || 0.2)) % shotFrames.length] : null;
+  const shot = scene.shot ? {shot: shotFrames ? {...scene.shot, src: shotSrc} : scene.shot, evidence: scene.shot.evidence, click: withFrames(scene.shot.click), reveal: withFrames(scene.shot.reveal), stamp: withFrames(scene.shot.stamp), callout: until(scene.shot.callout), summary: until(scene.shot.summary), focus: (scene.shot.focus || []).map(withFrames), zoom: withFrames(scene.shot.zoom), drag: withFrames(scene.shot.drag), type: withFrames(scene.shot.type), wait: withFrames(scene.shot.wait)} : null;
   const flow = scene.flow ? scene.flow.map(withFrames) : null;
   const stepAt = (i) => (scene.steps_at_sec ? at(scene.steps_at_sec[i]) : null);
   const showBox = Boolean(scene.visual);
   // An animated beat replaces the default text cards for this scene.
-  const custom = Boolean(shot || flow || scene.scrub || scene.fix || scene.call_end || scene.toast || scene.replay || scene.plans || scene.tryit);
+  const custom = Boolean(shot || flow || scene.scrub || scene.fix || scene.call_end || scene.toast || scene.replay || scene.plans || scene.tryit || scene.asset || scene.strips);
   const introAt = scene.new_feature ? at(scene.new_feature.at_sec) : null;
   const stackOpacity = introAt === null ? 1 : interpolate(local, [introAt - 6, introAt], [1, 0], clamp);
   return (
@@ -212,7 +214,8 @@ const Scene = ({scene, palette: base, labels, sound, measure}) => {
         {scene.plans ? <div style={{marginBottom: 34}}><PlanCheck {...scene.plans} at={at(scene.plans.at_sec)} {...beat} /></div> : null}
         {scene.tryit ? <div style={{marginTop: 10}}><TryItStage consent={withFrames(scene.tryit.consent)} old={withFrames(scene.tryit.old)} {...beat} /></div> : null}
         {shot ? <div style={{marginBottom: 38}}><ProductShot {...shot} {...beat} /></div> : null}
-        {scene.asset ? <Img src={staticFile(scene.asset)} style={{width: '100%', height: 600, objectFit: 'cover', borderRadius: 34, boxShadow: '0 24px 70px rgba(31,35,48,.14)', marginBottom: 38}} /> : null}
+        {scene.asset ? <Img src={staticFile(scene.asset)} style={{width: '100%', height: 600, objectFit: 'cover', borderRadius: 34, boxShadow: '0 24px 70px rgba(31,35,48,.14)', marginBottom: 38, ...(scene.new_feature ? {opacity: 0.18 + 0.82 * stackOpacity, filter: `blur(${(1 - stackOpacity) * 4}px)`} : {})}} /> : null}
+        {scene.strips ? <div style={{marginBottom: 30}}><TimeStrips strips={scene.strips.map(withFrames)} {...beat} /></div> : null}
         {scene.new_feature ? <div style={{position: 'absolute', left: 0, right: 0, top: '50%', transform: 'translateY(-55%)'}}><FeatureIntro at={introAt} feature={scene.new_feature} {...beat} /></div> : null}
         {scene.fix ? <div style={{marginTop: 10, marginBottom: 10}}><Correction fix={withFrames(scene.fix)} {...beat} /></div> : null}
         {scene.send ? <div style={{marginTop: 30}}><SendClick at={at(scene.send.at_sec)} label={scene.send.label} {...beat} /></div> : null}

@@ -12,7 +12,7 @@
 - **Caption can display but cannot be spoken:** audit each cue by words per second, cut redundant narration, and preserve pauses; do not treat character animation completion as speech timing.
 - **Transition overlaps the next page:** use a dedicated full-frame transition ending at the next scene boundary; do not place a readable title over outgoing or incoming content.
 - **Two transitions feel repetitive:** keep the chapter transition and replace the second with an object handoff, morph, zoom, or internal state change.
-- **Abstract nouns confuse the viewer:** replace “draft,” “source,” “old material,” “owner,” or “deadline” with the named artifact and a concrete value on screen.
+- **Abstract words confuse the viewer:** whenever an abstract word appears (such as “draft,” “source,” “old material,” “owner,” or “deadline”), show the named artifact and a concrete value on screen.
 - **Changed approved input:** `project_state.py status` reports which input changed. If it changed meaning, voice, cover, or opening, rebuild and present the combined review; see the change levels in section 4 of `SKILL.md`.
 - **Retiming cut a real clip short:** `fit_timeline_to_audio.py` and `retime_story.py` rescaled a scene that plays a product clip with its own sound; restore it and place that scene's cues by hand, moving the scene as one block.
 - **Brand caption or "ac mode" reappears:** the brand cue lost `"brand": true` or its `voice` field; restore both (see [brand-system.md](brand-system.md)) and rebuild captions.
