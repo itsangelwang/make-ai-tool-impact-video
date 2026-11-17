@@ -59,70 +59,50 @@ Use progressive review by default:
 
 Do not repeatedly render or re-analyze an unchanged full composition. Suppress verbose renderer progress when possible and report only failures, output paths, duration, and QA findings. Reuse representative frames for unchanged components. A local clip approval does not replace the final full-video audit before delivery.
 
-## Newcomer story check (required before every review)
+## Self-check before every review (required)
 
-The user should not have to find logic gaps one at a time. Before every review, read the narration with the visuals as a viewer who has never used the tool, scene by scene, and answer:
+The user should not have to find problems one at a time. Before showing any review, key-frame sheet, or render, go through the video scene by scene as a viewer who has never used the tool, then watch it once without pausing. Answer every question, fix what you find, and write the answers with what you changed in the review's **Self-check** section. The list is a floor: also note anything else a newcomer could trip on, and if you found nothing, say what you checked.
 
-1. What is on screen, and is it the exact thing the line talks about (the same GIF version, the same screenshot)?
-2. What just happened, in one sentence?
-3. When something goes wrong, what is the cause, not only the symptom? Say the cause in the narration ("it starts on OPEN and flips late, then loops", not only "it shows OPEN").
-4. What is being changed, and why? State a fix as what worked in the test, not as the only rule.
-5. Is every name, term or symbol explained the first time it appears (the example's name, an @mention, a button)? Do not show it before then.
-6. Do the first seconds show the world of the example (a café needs a coffee cup), not only the object?
-7. Does each scene carry one causal line? Cut detours that crowd it, and give the scene with the human check more time.
-8. Does the "before" scene name the AI tools that already did this job, checked on their official pages, and say only the gap that remains?
-9. Was the claim tested in the product surface viewers will use (for example the plain chat, not an agent mode), and checked on the downloaded result rather than the in-app preview?
+**Story**
 
-Write the answers in the review's Self-check section with what you changed. Then look past the list: note anything else a newcomer could trip on. If you found nothing, say what you checked.
+1. **Words match the screen.** Every spoken line and caption describes what is on screen at that moment: the same GIF version, the same screenshot, the same section names.
+2. **One causal line.** Each scene answers one question and carries one causal line; cut detours, and give the human check more time. Each upstream output visibly becomes the next scene's input.
+3. **Causes, not symptoms.** When something goes wrong, say the cause ("it starts on OPEN and flips late, then loops", not only "it shows OPEN"). State a fix as what worked in the test, not as the only rule.
+4. **Nothing unexplained.** Every name, term or symbol (the example's name, an @mention, a button) is explained the first time it appears, and not shown before then. "Draft," "source," "import," "owner," and "deadline" show their concrete object on first use.
+5. **A fast, clear opening.** The first seconds show the world of the example (a café needs a coffee cup), not only the object, and confirm what the cover promised. The hook makes sense without knowing the product; for a new feature, the viewer learns in the first scene what exactly is new.
+6. **The before is real.** The "before" scene names the AI tools that already did this job, checked on their official pages, and says only the gap that remains.
+7. **Tested where viewers will use it.** The claim was tested in the product surface viewers will use (for example the plain chat, not an agent mode) and checked on the downloaded result, not the in-app preview.
+8. **Recountable.** A stranger can say what this is and why it matters to them, and can recount before, changed step, after, human check, and fit. The AI/human division is visible without reading the headline twice.
 
-## Design self-review before the user sees it
+**Screen**
 
-Do not wait for the user to point out problems. Before showing any stills or render, critique them as a designer and fix what you can; then tell the user what the self-review caught. The list is a floor: also flag whatever your own judgment notices.
+9. **Every element earns its place.** One focal point at a time; cut repeats (a big logo in the middle when the header already shows it).
+10. **Made by a person, and finished.** Mature tone: no childish shapes, over-bouncy springs, emoji, or list-in-a-box layouts. No default fonts, flat fills, or frames that sit still; soft layered shadows instead of one heavy drop shadow. No AI tells (see "Look made by a person, not by AI" in `visual-system.md`).
+11. **Physical sense; nothing covers anything.** Nothing floating, nothing hidden that should be seen. Marks never cross text, a corner card never covers a headline, and no source captions or transitions leak into crops.
+12. **Clear meaning.** Each color carries one meaning and backgrounds never drift toward grey. Product UI, explanatory graphics, and generated illustration are clearly distinguishable. Zooms land on consequential details, not decoration.
+13. **Readable at speed.** The first product screen can be read before it changes, each caption can be read once at phone size, and each cue can be spoken aloud before the next cue or transition.
 
-1. Every element earns its place; cut repeats (a big logo in the middle when the header already shows it).
-2. Mature tone: no childish shapes, over-bouncy springs, emoji, or list-in-a-box layouts.
-3. Finish: no default fonts, flat fills, or frames that sit still; soft layered shadows instead of one heavy drop shadow.
-4. Looks made by a person, not by AI (see "Look made by a person, not by AI" in `visual-system.md`).
-5. Physical sense: nothing floating, nothing hidden that should be seen, sane overlaps.
-6. Color carries one meaning per color; backgrounds never drift toward grey.
-7. A stranger can say what this is and why it matters to them; examples name the feature and show the payoff.
-8. Marks never cross text; a corner card never covers a headline; no source captions or transitions leak into crops.
-9. No dated labels or promises we cannot keep.
-10. First 2 seconds, dead air, words per screen, caption and voice sync, audio balance, licenses, the ending call to action.
+**Sound and wording**
 
-For a big visual change, send the user a key-frame sheet (one or two stills per scene, quarter size) and get an OK before the full render. Render the full video once, then sample frames around every transition for problems that only show in motion.
+14. **Sounds like a person.** A US office worker would say these lines aloud; the voice is conversational at normal speed, without forced enthusiasm. No dead air; captions and voice in sync; audio balanced.
+15. **Consistent and keepable.** The example keeps the same names, dates, owners, and artifacts. No dated labels or promises we cannot keep; licenses recorded; the ending call to action works.
 
-## Review audit
-
-Watch once without pausing and answer:
-
-1. Can the first product screen be read before it changes?
-2. Does every spoken cue describe the object currently visible?
-3. Can each cue be spoken aloud before the next cue or transition?
-4. Does every page answer one distinct question?
-5. Does each upstream output visibly become the next page's input?
-6. Are “draft,” “source,” “import,” “owner,” and “deadline” concrete on first use?
-7. Is the AI/human division visible without reading the headline twice?
-8. Are product UI, explanatory graphics, and generated illustration clearly distinguishable?
-9. Are zooms attached to consequential details rather than decoration?
-10. Can a viewer recount before, changed step, after, human check, and fit?
-
-After any timing, script, voice, or visual-direction change, invalidate the previous review and inspect the full video again.
+For a big visual change, send the user a key-frame sheet (one or two stills per scene, quarter size) and get an OK before the full render. Render the full video once, then sample frames around every transition for problems that only show in motion. After any timing, script, voice, or visual-direction change, invalidate the previous review and inspect the full video again.
 
 ## Narration and regression checks
 
-Reuse a previously accepted voice and documented auditions when the user has not changed the preference. Generate complete semantic sentences, not isolated caption fragments, and map the audio to the canonical timeline. Check each clip's natural duration before assembling; do not cut spoken words or stretch audio to conceal an overfull cue. Speech, action, and caption must describe the same state, including matching section names. User authorization to proceed after QA remains valid when that condition is satisfied.
+Reuse a previously accepted voice and documented auditions when the user has not changed the preference. Generate complete semantic sentences, not isolated caption fragments, and map the audio to the canonical timeline. Check each clip's natural duration before assembling; do not cut spoken words or stretch audio to conceal an overfull cue. User authorization to proceed after QA stays valid as long as speech, action, and caption still match (self-check 1).
 
 Final QA must inspect the entire sequence as well as changed frames: empty deliverable → manual workload → substantial handoff → AI result → persistent same-document revision → human check → same exported file. Record what was actually verified; frame sampling or decoding is not equivalent to watching the full video or listening to the narration.
 
 ## Expressive audio and scoped revisions
 
-For an energetic short-video voice, direct contrast and emphasis through the words and a continuous scene take (see "Natural delivery" in `english-market.md`), then audition one representative segment. Fast delivery alone is insufficient. Reuse accepted unchanged cues; regenerate only affected scenes. Fit visual timing around measured audio: `fit_timeline_to_audio.py`, then `retime_story.py` to move every scene, transition and beat with its words. Do not run them over a scene that plays a real clip with its own sound: packing the cues and rescaling the scene cuts the clip before its payoff. Place those cues by hand from the measured clip lengths and shift that scene as one block. When you rewrite `timeline.json` by hand, keep the brand cue's `"brand": true` (hides the caption on the brand card) and its `voice` field (`AceMode…`, or it is read "ac mode").
+For an energetic short-video voice, direct contrast and emphasis through the words and a continuous scene take (see "Natural delivery" in `english-market.md`), then audition one representative segment. Fast delivery alone is insufficient. Reuse accepted unchanged cues; regenerate only affected scenes. Fit visual timing around measured audio: `fit_timeline_to_audio.py`, then `retime_story.py` to move every scene, transition and beat with its words. Do not run them over a scene that plays a real clip with its own sound: packing the cues and rescaling the scene cuts the clip before its payoff. Place those cues by hand from the measured clip lengths and shift that scene as one block.
 
 Music: prefer a real royalty-free track over a synthesized bed; viewers found the synthesized score thin and sleepy. Find 2–3 candidates in different styles (for example on Pixabay Music), let the user preview them in the browser, and download only the one they pick, with their permission. Record title, author, page URL, license and the section used in `<project-dir>/music/SOURCE.md`. Use the track's structure: start it so its first full-energy section lands on the AI handoff, and splice its real ending under the brand card (`mix_story_audio.py --ending-jump`, a whole number of bars) instead of fading out mid-phrase. Never cut the music to silence at a transition; viewers hear that as a dropout. Prefer Pixabay tracks whose page shows no Content ID notice, so uploads are not claimed. Match the cut to the music: measure the BPM, then move scene cuts, stage swaps, chapter cards and the brand card to the nearest beat (nudges of 0.3 s or less; narration stays put), and start the track so a downbeat lands on the main chapter card. Shape the music level to the story (quieter under the pain, a lift at the handoff, fullest under the result, a dip at the human check, a lift into the brand card), and duck it by about 10 dB under any dialogue inside a product clip, which `mix_story_audio.py` does not know about. When the user says the music does not fit, ask which kind: style, beat sync or energy arc. `scripts/generate_story_audio.py music` remains a fallback when no track can be used.
 
-Sound effects: give each one a visible cause, and use recorded sounds the user has previewed (see `references/sound-library.md`); viewers found most synthesized effects odd, except the mouse clicks. When a sound is judged odd, replace it with a better recorded one rather than dropping it. Recorded typing should play only while text is visibly typed; AI generation should not sound like a person typing. Avoid piercing beeps. Limit which sounds play with `story.sfx` (a list of kinds; `true` plays all). A whoosh on each beat-synced cut helps; use "Simple Whoosh" (see `sound-library.md`) and start it about 0.12 s early so its peak hits the cut. The longer Thin Swoosh, played alone and quiet on a cut, was heard as a dull "deng". When the user calls a sound odd, list each sound's times and what is on screen so they can point at it.
+Sound effects: give each one a visible cause, keep it brief and below the narration, and place it on the exact frame of its action (a click on the button press, key taps only on visible typing, a soft tone on a completed state); a sound never justifies a faster cut. Use recorded sounds the user has previewed (see `references/sound-library.md`); viewers found most synthesized effects odd, except the mouse clicks. When a sound is judged odd, replace it with a better recorded one rather than dropping it. Recorded typing should play only while text is visibly typed; AI generation should not sound like a person typing. Avoid piercing beeps. Limit which sounds play with `story.sfx` (a list of kinds; `true` plays all). A whoosh on each beat-synced cut helps; use "Simple Whoosh" (see `sound-library.md`) and start it about 0.12 s early so its peak hits the cut. The longer Thin Swoosh, played alone and quiet on a cut, was heard as a dull "deng". When the user calls a sound odd, list each sound's times and what is on screen so they can point at it.
 
 Mix with `scripts/mix_story_audio.py`: speech near -18 dBFS RMS, music about 21 dB under speech and up in gaps, short pauses kept ducked so the music does not pump. Final loudness: about -16 LUFS integrated with true peak at or below -1.5 dB. Remotion's bundled FFmpeg can measure this with `-af loudnorm=print_format=json` (read `input_i` and `input_tp`) and can apply a `volume` correction while copying the video stream; it lacks `ebur128`, `volumedetect`, `asplit`, `sidechaincompress` and `alimiter`. Renders often come out near -16 LUFS with a true peak around 0 dB; lower only the peaks with `scripts/limit_peaks.py` (a look-ahead limiter, default ceiling -2.3 dBFS) instead of turning the whole mix down.
 
-If the requested workflow needs more than 75 seconds, first remove repetition, then explicitly record a justified duration exception in QA. Do not claim the default duration validator passed. A second model or tool should first improve one disputed 5–15 second segment from source and frames, preserving approved facts, voice and assets before expanding the scope.
+A second model or tool should first improve one disputed 5–15 second segment from source and frames, preserving approved facts, voice and assets before expanding the scope.

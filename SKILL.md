@@ -10,6 +10,19 @@ description: Research a named AI tool and create a roughly one-minute, 9:16 Engl
 
 Explain one workflow change for one person doing one task. Treat the tool as the intervention, not the protagonist.
 
+## What a finished video must do
+
+These are the acceptance criteria. The sections below are how to get there; when a step and a criterion disagree, the criterion wins.
+
+1. A viewer can retell it: the old way → the one step that changed → the new way → what the person still checks.
+2. A viewer knows one small, safe thing they could try next, and whether they can access it.
+3. The first seconds show what the cover and title promised.
+4. Every factual line traces to `claim-ledger.json`, and every asset to `source-ledger.json`.
+5. Every screen is readable on a phone at normal speed, and the voice sounds like a person talking.
+6. Nothing private, uncleared, or undisclosed: no personal UI or metadata, every license recorded, every AI-generated clip labeled.
+
+The checks in [references/pacing-and-review.md](references/pacing-and-review.md) and the scripts below test these criteria; they do not replace them.
+
 ## Inputs
 
 Require a tool name or URL. Accept audience, task, platform, language, market, accent, voice, palette, and end-brand preferences. End with the ACEMODE brand card unless the user asks for no brand or supplies another brand. The video is always in English: default to `en-US` and a US audience unless the user names another English market (`en-GB`, `en-AU`). Chinese appears only in the post titles and copy for Chinese platforms (section 7). When audience or task is absent, research first and choose the clearest supported ordinary-person case.
@@ -80,7 +93,7 @@ This preview check passes with a warning when an asset is not yet cleared (`publ
 
 Write the cover headline and the title options together from one promise (see [references/packaging.md](references/packaging.md)), set `story.cover`, render both covers with `npm run cover`, and check them at feed size with `scripts/feed_preview.py`. Produce one review containing the coverage check and chosen angle, the narration, factual boundaries, scene plan, the covers with their feed preview and the picked title, first-three-second preview, target voice/palette, and blockers.
 
-Before showing any review, key-frame sheet, or render, run the newcomer story check and the design self-review in [references/pacing-and-review.md](references/pacing-and-review.md), fix what they find, and put a **Self-check** section in the review: one row per scene with the answers and what you changed. Do this again after every round of changes, not only when the user points at a problem. A review without that section is not ready to show. For silent review captions, create `timeline.json` and run:
+Before showing any review, key-frame sheet, or render, run the self-check in [references/pacing-and-review.md](references/pacing-and-review.md), fix what it finds, and put a **Self-check** section in the review: one row per scene with the answers and what you changed. Do this again after every round of changes, not only when the user points at a problem. A review without that section is not ready to show. For silent review captions, create `timeline.json` and run:
 
 ```bash
 python3 <skill-dir>/scripts/audit_timeline.py \

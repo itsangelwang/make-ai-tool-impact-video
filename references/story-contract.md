@@ -14,12 +14,12 @@ Create JSON with `schema_version: 1` and these required fields:
 - `human_check`: a concrete verification, judgment, privacy, or accountability duty.
 - `readiness`: one of `use-now`, `try-now`, `watch`, `future`.
 - `next_action`: a small, reversible experiment consistent with readiness that is safe to try at work: use non-sensitive or made-up material, stay within the employer's rules and approved apps, and let the AI produce a draft the person reviews rather than sending, posting, or changing records on its own. When access needs a paid plan or an admin to turn the feature on, say so.
-- `narration`: natural speech with no stage directions; normally 90–135 words when readable transitions are included. Use the low end only for a deliberately fast, energetic delivery.
+- `narration`: natural speech with no stage directions; length as in "Narration capacity" in [pacing-and-review.md](pacing-and-review.md).
 - `coverage`: the existing-coverage check from [topic-check.md](topic-check.md): `checked_at`, `existing` (each `by` = `official` or `creator`, `url`, `shows`), `our_angle`, and `decision` (`make` or `change-angle`; `skip` fails validation).
 - `brand`: optional; `null` or `{name, slogan, start_sec, end_sec}` for the brand card that follows the last scene. See [brand-system.md](brand-system.md).
 - `scenes`: 5–7 objects with `id`, `type`, `purpose`, `start_sec`, `end_sec`, `headline`, `visual`, and `claim_ids`.
 
-Use scene types `pain-hook`, `before-workflow`, `ai-handoff`, `after-workflow`, `before-after`, `human-check`, and `next-action`. Include at least five distinct types. Start at 0, target an ending (including any brand card) between 55 and 65 seconds, and allow review cuts up to 75 seconds when stable product interaction or evidence holds require it. Keep scenes contiguous and assign every scene an explicit communication purpose.
+Use scene types `pain-hook`, `before-workflow`, `ai-handoff`, `after-workflow`, `before-after`, `human-check`, and `next-action`. Include at least five distinct types. Start at 0 and keep scenes contiguous; the duration target, including any brand card, is in section 6 of `SKILL.md`. Give every scene an explicit communication purpose.
 
 The first scene must show the audience/task pain. Mention the product only after relevance is clear. Keep headlines short enough for two mobile lines.
 
