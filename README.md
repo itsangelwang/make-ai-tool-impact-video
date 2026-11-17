@@ -2,6 +2,8 @@
 
 **English** | [中文](README.zh-CN.md)
 
+Made and maintained by [itsangelwang](https://github.com/itsangelwang).
+
 Give it the name or link of an AI tool, and it helps you make a one-minute vertical video in English that anyone can follow. Works in **Codex** and **Claude Code**.
 
 ## What the videos look like
@@ -85,6 +87,8 @@ Voiceover needs a [Fish Audio](https://fish.audio/) API key (OpenRouter and Deep
 - When the video shows AI-generated clips: an "AI-generated" label on each clip and an AI disclosure line in every post, so it is labeled even if nobody ticks the platform's AI box
 
 ## Credits
+
+This Skill is made and maintained by [itsangelwang](https://github.com/itsangelwang). If you share or adapt it, please keep this credit, a link to this repository, and the credits below.
 
 Adapted from [Ah-ha07/AceMode-video-skill](https://github.com/Ah-ha07/AceMode-video-skill) — thanks to the original author for exploring and sharing it. This repository has no open-source license yet; rights to the upstream code, brand and assets need to be confirmed separately.
 

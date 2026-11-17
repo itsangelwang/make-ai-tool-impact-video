@@ -1,5 +1,8 @@
 ---
 name: make-ai-tool-impact-video
+metadata:
+  author: itsangelwang
+  source: https://github.com/itsangelwang/make-ai-tool-impact-video
 description: Research a named AI tool and create a roughly one-minute, 9:16 English workflow explainer, with one concrete before/after case, verified claims, real product evidence, localized writing and design, natural TTS, Remotion motion, readable captions, combined review, and delivery QA. Use when turning an AI product name, launch page, demo, or capability into an accessible vertical video that explains what changes, what the person still owns, who it suits, and how to try it safely.
 ---
 
