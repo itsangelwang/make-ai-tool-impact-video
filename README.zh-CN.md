@@ -2,6 +2,8 @@
 
 [English](README.md) | **中文**
 
+由 [itsangelwang](https://github.com/itsangelwang) 制作和维护。
+
 给它一个 AI 工具的名字或链接，它帮你做出一条约 1 分钟、普通人能看懂的英文竖屏短视频。可在 Codex 和 Claude Code 中使用。
 
 ## 视频是什么样的
@@ -85,6 +87,8 @@ AI 会先给你一份审片包（脚本、画面、事实来源，以及逐段�
 - 视频里有 AI 生成的片段时：每段片段都带「AI-generated」标签，每个平台的文案都写明 AI 生成；就算发布时没勾平台的 AI 标签也不会漏标
 
 ## 来源与致谢
+
+本 Skill 由 [itsangelwang](https://github.com/itsangelwang) 制作和维护。转发或改编时，请保留这条署名、本仓库链接和下面的致谢。
 
 本项目参考并改编自 [Ah-ha07/AceMode-video-skill](https://github.com/Ah-ha07/AceMode-video-skill)，感谢原作者的探索与分享。本仓库未添加开源许可证；上游代码、品牌和素材的使用权需另行确认。
 
