@@ -10,6 +10,21 @@ description: Research a named AI tool and create a roughly one-minute, 9:16 Engl
 
 Explain one workflow change for one person doing one task. Treat the tool as the intervention, not the protagonist.
 
+## What a finished video must do
+
+These are the acceptance criteria. The sections below are how to get there; when a step and a criterion disagree, the criterion wins.
+
+The goal: a viewer who scrolls past stops, watches to the end, understands the new tool and the workflow it changes, and follows the channel because it saves them from sorting through AI news themselves.
+
+1. **They stop.** The cover, the title, and the first 2 seconds make the same concrete promise.
+2. **They keep watching.** Something new appears on screen every few seconds, the AI result shows up early, and there is at least one "AI can do that?" moment worth sending to a friend. Nothing drags after the result.
+3. **They understand.** Someone who has never used the tool gets every line on first hearing and can retell it: the old way → the one step that changed → the new way → what the person still checks.
+4. **They can use it.** They know whether they can access it and one small, safe thing to try next.
+5. **They want more.** The ending tells them what the channel keeps giving them (see "Reason to follow" in [references/brand-system.md](references/brand-system.md)).
+6. **They can trust it.** Every factual line traces to `claim-ledger.json` and every asset to `source-ledger.json`; nothing private or uncleared; every AI-generated clip is labeled.
+
+The checks in [references/pacing-and-review.md](references/pacing-and-review.md) and the scripts below test these criteria; they do not replace them.
+
 ## Inputs
 
 Require a tool name or URL. Accept audience, task, platform, language, market, accent, voice, palette, and end-brand preferences. End with the ACEMODE brand card unless the user asks for no brand or supplies another brand. The video is always in English: default to `en-US` and a US audience unless the user names another English market (`en-GB`, `en-AU`). Chinese appears only in the post titles and copy for Chinese platforms (section 7). When audience or task is absent, research first and choose the clearest supported ordinary-person case.
@@ -80,7 +95,7 @@ This preview check passes with a warning when an asset is not yet cleared (`publ
 
 Write the cover headline and the title options together from one promise (see [references/packaging.md](references/packaging.md)), set `story.cover`, render both covers with `npm run cover`, and check them at feed size with `scripts/feed_preview.py`. Produce one review containing the coverage check and chosen angle, the narration, factual boundaries, scene plan, the covers with their feed preview and the picked title, first-three-second preview, target voice/palette, and blockers.
 
-Before showing any review, key-frame sheet, or render, run the newcomer story check and the design self-review in [references/pacing-and-review.md](references/pacing-and-review.md), fix what they find, and put a **Self-check** section in the review: one row per scene with the answers and what you changed. Do this again after every round of changes, not only when the user points at a problem. A review without that section is not ready to show. For silent review captions, create `timeline.json` and run:
+Before showing any review, key-frame sheet, or render, run the self-check in [references/pacing-and-review.md](references/pacing-and-review.md), fix what it finds, and put a **Self-check** section in the review: one row per scene with the answers and what you changed. Do this again after every round of changes, not only when the user points at a problem. A review without that section is not ready to show. For silent review captions, create `timeline.json` and run:
 
 ```bash
 python3 <skill-dir>/scripts/audit_timeline.py \

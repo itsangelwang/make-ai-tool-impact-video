@@ -12,7 +12,6 @@ Videos are always in English. Default to US English unless the user names anothe
 
 ## Pace and captions
 
-- Roughly 90–135 spoken English words fits 55–65 seconds. Use the count as a warning only: generate the narration, measure it, and fit actions, holds, and pauses around it.
 - Keep the average near 2.7–3.2 words per spoken second and flag individual cues above 4.5 words per second. The user found 2.3 words per second sleepy; a brisk read with short pauses keeps attention.
 - Reveal captions by word or short phrase, not letter by letter. Use 3–7 words per visual beat and no more than two mobile lines.
 - Use sentence case. Reserve all caps for a one- or two-word label.
@@ -70,15 +69,3 @@ Prefer a neural provider with timestamps; Deepgram batch audio does not itself s
 - For Deepgram or OpenRouter, start at speed `0.95` or `1.0` and expressivity `0` or `1`. With any provider, do not fix an overlong script by accelerating it beyond the approved preset speed.
 - Flux TTS and `/v2/speak` are Early Access. If access or stability fails, use Aura-2 such as `aura-2-andromeda-en` or `aura-2-arcas-en`, disclose the fallback in the review, and require a fresh voice approval.
 - Never commit or print `DEEPGRAM_API_KEY`. Keep generated voice files out of reusable templates unless redistribution rights are known.
-
-## Review questions
-
-Ask a native-English review pass:
-
-1. Would a US office worker say this aloud?
-2. Does the hook make sense without knowing the product?
-3. Can each caption be read once at phone size?
-4. Do the spoken words describe what is currently visible?
-5. Does the example use consistent names, dates, owners, and artifacts?
-6. Does the voice sound conversational at normal speed, without forced enthusiasm?
-7. For a new feature, does the viewer learn it is new within the first scene, and what exactly is new?

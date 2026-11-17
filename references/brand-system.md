@@ -18,6 +18,12 @@ Presets:
 
 Preserve the exact user-supplied spelling, capitalization, punctuation, logo, and slogan. Do not normalize them or add supporting lines unless requested. Keep the brand card to roughly 3–4 seconds. Use a distinct full-frame background, restrained brand glow, and character or word-level bounce. Do not place factual product claims on the brand card.
 
+## Reason to follow
+
+Viewers follow when they know what the channel keeps giving them: about a minute on each new AI tool or feature that is actually worth their time, what it changes in their work, and the catch when there is one, so they do not have to sort through the news themselves. Say this in one short spoken line (about 4–7 words) at the end of the `next-action` scene, right before the brand card, such as "Follow for the next one worth your time." Do not add a scene for it.
+
+Keep it within the fact rules: promise the value, not a fixed format or schedule ("in about a minute", never "a new tool every day"), and do not say "tested for you" unless every case in the video was tested (see [fact-rules.md](fact-rules.md)). The channel intro's line, "Follow, and get your time back.", is an approved alternative.
+
 Configure the card with the `brand` object in `story.json` (`name`, `slogan`, optional `line`, `start_sec`, `end_sec`); the template renders it as a full-frame card. Place it after the `next-action` scene and include its 3–4 seconds in `duration_sec` and the total duration checks. Set `brand` to `null` to omit it. Do not hardcode a brand into the template components.
 
-The ACEMODE ending is spoken by default; other brands are visual only unless the user asks for a spoken ending. For a spoken ending, include the brand and slogan as the last canonical narration cue and measure it. Start the voice about 0.1 seconds after the card appears and keep the card until the voice finishes, within the 4-second limit; do not clip the last word. Hide the caption bar while the brand card is on screen because the card already shows the same words; the cue still belongs in the caption file.
+The ACEMODE ending is spoken by default; other brands are visual only unless the user asks for a spoken ending. For a spoken ending, include the brand and slogan as the last canonical narration cue and measure it. Start the voice about 0.1 seconds after the card appears and keep the card until the voice finishes, within the 4-second limit; do not clip the last word. Hide the caption bar while the brand card is on screen because the card already shows the same words; the cue still belongs in the caption file. Mark that cue `"brand": true` (this hides its caption) and keep its `voice` field (`AceMode…`, or it is read "ac mode"); keep both when you rewrite `timeline.json` by hand.
