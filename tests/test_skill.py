@@ -790,6 +790,58 @@ class StoryBeatTests(unittest.TestCase):
         story["transitions"] = [{"start_sec": boundary - 1.4, "end_sec": boundary, "label": "Hand it over", "symbol": "→", "color": "#6857F5"}]
         self.assertEqual(check_story.transition_errors(story), [])
 
+    def recording_story(self, public: Path) -> dict:
+        (public / "assets").mkdir(parents=True)
+        for name in ("rec.mov", "ui.png", "avatar.png"):
+            (public / "assets" / name).write_bytes(b"x")
+        shot = {"src": "assets/rec.mov", "source_width": 2000, "from_sec": 3, "rate": 0.75, "width": 1080,
+                "hold_start_sec": 0.5, "crop": {"x": 0, "y": 0, "w": 1200, "h": 1000}, "evidence": "Maps|our recording",
+                "masks": [{"style": "tile", "x": 10, "y": 10, "w": 100, "h": 100, "label": "Photo hidden", "until_sec": 3}, {"style": "bar", "x": 10, "y": 200, "w": 300, "h": 60}],
+                "click": {"at_sec": 1, "x": 600, "y": 500, "fade": True},
+                "alt": {"at_sec": 2, "src": "assets/rec.mov", "source_width": 2000, "from_sec": 20, "crop": {"x": 0, "y": 0, "w": 600, "h": 500}},
+                "board": {"at_sec": 6, "title": "Right place?", "rows": [{"name": "Tool A", "marks": "xv-", "mark_at_sec": [6.3, 6.5, 6.7], "tally": "1 of 3", "tally_at_sec": 7}]}}
+        return {"scenes": [
+            {"id": "s1", "type": "pain-hook", "start_sec": 0, "end_sec": 7, "label": "Saturday", "headline": "Five stops",
+             "stoplist": {"title": "Saturday", "avatar": "assets/avatar.png", "badge": "Realtor", "rows": [{"label": f"Stop {i}", "at_sec": 0.5 + i * 0.4} for i in range(5)],
+                          "extra": {"label": "+ lunch?", "at_sec": 2.8}, "shuffle_at_sec": 3.6}},
+            {"id": "s2", "type": "after-workflow", "start_sec": 7, "end_sec": 17, "label": "Test", "headline": "Same request", "shot": shot},
+            {"id": "s3", "type": "human-check", "start_sec": 17, "end_sec": 23, "label": "Fix", "headline": "Exact addresses",
+             "compare": {"img": "assets/ui.png", "img_width": 1000, "rows": [{"input": "Mueller", "at_sec": 0.2, "crop": {"x": 0, "y": 0, "w": 300}, "pin": {"x": 100, "y": 100}, "ok": False, "result": "Law firm"},
+                                                                         {"input": "1 Main St", "at_sec": 1.6, "crop": {"x": 300, "y": 0, "w": 300}, "pin": {"x": 400, "y": 100}, "ok": True, "result": "Right"}],
+                         "note": {"at_sec": 3.5, "text": "Check every pin"}, "stamp": {"at_sec": 5, "label": "TAP EVERY PIN"}}}]}
+
+    def test_recordings_boards_lists_and_compares_pass(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            story = self.recording_story(Path(tmp))
+            icons = check_story.icon_names()
+            self.assertEqual(check_story.check(story, Path(tmp), icons), [])
+            s1, s2, s3 = story["scenes"]
+            # the stop list replaces the default before-steps text, and its words count
+            self.assertEqual(check_story.screen_words(s1, {"before_steps": ["one two three four five six seven eight nine ten"]}), 2 + 1 + 1 + 10 + 2)
+            # the board hides the callout; its own words count
+            self.assertGreaterEqual(check_story.screen_words(s2, story), check_story.words("Right place?", "Tool A", "1 of 3"))
+            self.assertEqual(check_story.screen_words(s3, story), check_story.words("Fix", "Exact addresses", "Mueller", "Law firm", "1 Main St", "Right", "Check every pin", "TAP EVERY PIN"))
+            self.assertIn("compare", check_story.main_form(s3))
+            # without the recording playing, the same shot would sit still too long
+            s2["shot"]["src"] = s2["shot"]["alt"]["src"] = "assets/ui.png"
+            for key in ("from_sec", "rate", "hold_start_sec", "masks", "board"):
+                s2["shot"].pop(key)
+            self.assertTrue(any("unchanged for" in e for e in check_story.check(story, Path(tmp), icons)))
+
+    def test_recording_mistakes_are_reported(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            story = self.recording_story(Path(tmp))
+            shot = story["scenes"][1]["shot"]
+            shot["alt"]["crop"]["h"] = 900
+            shot["masks"][0]["style"] = "pixelate"
+            shot["board"]["rows"][0]["marks"] = "xy"
+            shot["width"] = 1200
+            story["scenes"][2]["compare"]["rows"][0].pop("ok")
+            story["scenes"][0]["stoplist"]["rows"][0]["icon"] = "rocket"
+            errors = "\n".join(check_story.check(story, Path(tmp), check_story.icon_names()))
+            for part in ("alt.crop must have the same aspect", "style must be tile", "marks made of", "mark_at_sec", "shot.width", "ok (true/false)", "rocket"):
+                self.assertIn(part, errors)
+
     def test_icon_names_match_component(self):
         self.assertTrue({"doc", "table", "user", "calendar", "slides"} <= check_story.icon_names())
 

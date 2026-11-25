@@ -11,10 +11,11 @@ from pathlib import Path
 
 from limits import LIMITS
 
+VIDEO_EXT = (".mov", ".mp4", ".webm")
 ICON_FILE = Path(__file__).resolve().parent.parent / "assets" / "remotion-template" / "src" / "components" / "Icon.jsx"
 # Scene types whose `visual` text the template shows in a box (an empty visual hides the box).
 VISUAL_BOX = {"human-check", "next-action", "ai-handoff"}
-BEATS = ("call_end", "toast", "new_feature", "shot", "flow", "scrub", "roles", "checks", "access", "plans", "fix", "replay", "send", "tryit", "strips")
+BEATS = ("call_end", "toast", "new_feature", "stoplist", "shot", "compare", "flow", "scrub", "roles", "checks", "access", "plans", "fix", "replay", "send", "tryit", "strips")
 
 
 def icon_names(icon_file: Path = ICON_FILE) -> set[str]:
@@ -23,6 +24,29 @@ def icon_names(icon_file: Path = ICON_FILE) -> set[str]:
 
 def words(*texts) -> int:
     return sum(len(re.findall(r"[\w’'%$:-]+", str(t))) for t in texts if t)
+
+
+def is_video(src) -> bool:
+    return str(src or "").lower().endswith(VIDEO_EXT)
+
+
+def board_texts(board: dict) -> list:
+    texts = [board.get("title"), board.get("note")]
+    for row in board.get("rows", []):
+        texts += [row.get("name"), row.get("sub"), row.get("tally"), row.get("tally_note")]
+    return texts
+
+
+def stoplist_texts(stoplist: dict) -> list:
+    texts = [stoplist.get("title"), stoplist.get("subtitle"), stoplist.get("badge"), (stoplist.get("extra") or {}).get("label")]
+    return texts + [row.get("label") for row in stoplist.get("rows", [])]
+
+
+def compare_texts(compare: dict) -> list:
+    texts = [(compare.get("note") or {}).get("text"), (compare.get("stamp") or {}).get("label")]
+    for row in compare.get("rows", []):
+        texts += [row.get("input"), row.get("result")]
+    return texts
 
 
 def screen_words(scene: dict, story: dict) -> int:
@@ -42,7 +66,12 @@ def screen_words(scene: dict, story: dict) -> int:
     texts += [item.get("label") for item in feature.get("items", [])]
     shot = scene.get("shot") or {}
     callout = shot.get("callout") or {}
-    texts += [callout.get("title"), callout.get("note"), (shot.get("stamp") or {}).get("label"), (shot.get("summary") or {}).get("text")]
+    texts += [(shot.get("stamp") or {}).get("label"), (shot.get("summary") or {}).get("text")]
+    # shot.board slides over the whole screenshot, hiding the callout inside it
+    texts += board_texts(shot["board"]) if shot.get("board") else []
+    texts += [callout.get("title"), callout.get("note")] if not shot.get("board") or words(callout.get("title"), callout.get("note")) > words(*board_texts(shot["board"])) else []
+    texts += stoplist_texts(scene["stoplist"]) if scene.get("stoplist") else []
+    texts += compare_texts(scene["compare"]) if scene.get("compare") else []
     texts += [item.get("label") for item in scene.get("flow", [])]
     roles = scene.get("roles") or {}
     texts += [(roles.get("you") or {}).get("label"), (roles.get("ai") or {}).get("name")]
@@ -64,7 +93,7 @@ def screen_words(scene: dict, story: dict) -> int:
         texts += [f"{s.get('label')} {s.get('sec')} s" for s in strip.get("segments", []) if s.get("label")]
     plans = scene.get("plans") or {}
     texts += [plans.get("title"), plans.get("feature")] + [plan.get("name") for plan in plans.get("plans", [])]
-    custom = any(scene.get(key) for key in ("shot", "flow", "scrub", "fix", "replay", "plans", "tryit", "asset", "strips", "call_end", "toast"))
+    custom = any(scene.get(key) for key in ("stoplist", "compare", "shot", "flow", "scrub", "fix", "replay", "plans", "tryit", "asset", "strips", "call_end", "toast"))
     if scene.get("type") in {"pain-hook", "before-workflow"} and not custom:
         texts += story.get("before_steps", []) if scene.get("type") == "before-workflow" or not feature else []
     if scene.get("type") == "after-workflow" and not custom:
@@ -103,6 +132,39 @@ def change_times(scene: dict) -> list[float]:
         item = shot.get(key) or {}
         if isinstance(item.get("at_sec"), (int, float)):
             times.append(item["at_sec"] + item.get("frames", 30) / 30)
+    num = lambda v: isinstance(v, (int, float))
+    # A playing recording keeps changing: count every second it plays (still before
+    # hold_start_sec, still after freeze_at_sec), and the alt clip from its switch onward.
+    end = 60.0
+    if is_video(shot.get("src")):
+        start = shot.get("hold_start_sec", 0) if num(shot.get("hold_start_sec")) else 0
+        stop = shot["freeze_at_sec"] if num(shot.get("freeze_at_sec")) else end
+        times += [start + n for n in range(int(max(0, stop - start)) + 1)] + ([stop] if stop < end else [])
+    alt = shot.get("alt") or {}
+    if num(alt.get("at_sec")):
+        times += [alt["at_sec"]] + ([alt["at_sec"] + n for n in range(1, int(end))] if is_video(alt.get("src")) else [])
+    for mask in shot.get("masks", []):
+        times += [mask[k] for k in ("from_sec", "until_sec") if num(mask.get(k))]
+    board = shot.get("board") or {}
+    if num(board.get("at_sec")):
+        times.append(board["at_sec"])
+        for row in board.get("rows", []):
+            times += [t for t in row.get("mark_at_sec", []) if num(t)] + ([row["tally_at_sec"]] if num(row.get("tally_at_sec")) else [])
+    stoplist = scene.get("stoplist") or {}
+    if stoplist:
+        times.append(stoplist.get("avatar_at_sec", 0.2) if stoplist.get("avatar") else 0)
+        times += [row["at_sec"] for row in stoplist.get("rows", []) if num(row.get("at_sec"))]
+        if num((stoplist.get("extra") or {}).get("at_sec")):
+            times.append(stoplist["extra"]["at_sec"])
+        if num(stoplist.get("shuffle_at_sec")):
+            times += [stoplist["shuffle_at_sec"], stoplist["shuffle_at_sec"] + 4 / 30]  # rows hop, "?" pops
+    compare = scene.get("compare") or {}
+    for row in compare.get("rows", []):
+        if num(row.get("at_sec")):
+            times += [row["at_sec"], row["at_sec"] + 18 / 30]  # the input, then where its pin landed
+    for key in ("note", "stamp"):
+        if num((compare.get(key) or {}).get("at_sec")):
+            times.append(compare[key]["at_sec"])
     frames, frame_sec = shot.get("frames") or [], shot.get("frame_sec")
     if len(frames) > 1 and isinstance(frame_sec, (int, float)) and frame_sec > 0:
         # a looping GIF keeps moving: count the start of every loop as a visible change
@@ -114,7 +176,6 @@ def change_times(scene: dict) -> list[float]:
     times += [t for t in scene.get("steps_at_sec", []) if isinstance(t, (int, float))]
     if isinstance(scene.get("checks_at_sec"), (int, float)):
         times.append(scene["checks_at_sec"])
-    num = lambda v: isinstance(v, (int, float))
     replay = scene.get("replay") or {}
     times += [replay[k] for k in ("at_sec", "jump_sec", "replay_sec") if num(replay.get(k))]
     if num(replay.get("jump_sec")):
@@ -138,9 +199,63 @@ def main_form(scene: dict) -> str:
     present = []
     for key in BEATS:
         if scene.get(key):
-            parts = [sub for sub in ("frames", "zoom", "drag", "type", "click", "focus", "callout", "stamp") if key == "shot" and scene["shot"].get(sub)]
+            parts = [sub for sub in ("frames", "zoom", "drag", "type", "click", "focus", "callout", "stamp", "board", "alt") if key == "shot" and scene["shot"].get(sub)]
             present.append(f"{key}({','.join(parts)})" if parts else key)
     return "+".join(present) or scene.get("type", "?")
+
+
+def shot_errors(sid: str, shot: dict, crop: dict, length: float, public_dir: Path, errors: list, timed) -> None:
+    """Recording playback, the alt switch, masks, the full-bleed width and the tally board."""
+    num = lambda v: isinstance(v, (int, float))
+    if not num(shot.get("width", 936)) or not 600 <= shot.get("width", 936) <= 1080:
+        errors.append(f"{sid}.shot.width must be 600-1080 frame pixels (1080 = full bleed)")
+    video_keys = [k for k in ("from_sec", "rate", "hold_start_sec", "freeze_at_sec") if k in shot]
+    if video_keys and not is_video(shot.get("src")):
+        errors.append(f"{sid}.shot.{video_keys[0]} needs a .mov/.mp4/.webm src")
+    if "from_sec" in shot and (not num(shot["from_sec"]) or shot["from_sec"] < 0):
+        errors.append(f"{sid}.shot.from_sec must be seconds into the recording")
+    if "rate" in shot and (not num(shot["rate"]) or not 0.25 <= shot["rate"] <= 4):
+        errors.append(f"{sid}.shot.rate must be 0.25-4")
+    for key in ("hold_start_sec", "freeze_at_sec"):
+        if key in shot:
+            timed(f"{sid}.shot", shot, length, keys=(key,))
+    if num(shot.get("hold_start_sec")) and num(shot.get("freeze_at_sec")) and shot["freeze_at_sec"] <= shot["hold_start_sec"]:
+        errors.append(f"{sid}.shot.freeze_at_sec must come after hold_start_sec")
+    alt = shot.get("alt")
+    if alt is not None:
+        timed(f"{sid}.shot.alt", alt, length)
+        ac = (alt or {}).get("crop") or {}
+        if not alt.get("src") or not num(alt.get("source_width")):
+            errors.append(f"{sid}.shot.alt requires src and source_width")
+        elif not (public_dir / alt["src"]).is_file():
+            errors.append(f"{sid}.shot.alt.src not found under public/: {alt['src']}")
+        if not all(num(ac.get(k)) for k in "xywh") or ac.get("w", 0) <= 0 or ac.get("h", 0) <= 0:
+            errors.append(f"{sid}.shot.alt.crop requires numeric x, y, and positive w, h")
+        elif crop.get("h") and abs(ac["w"] / ac["h"] - crop["w"] / crop["h"]) > 0.03 * crop["w"] / crop["h"]:
+            errors.append(f"{sid}.shot.alt.crop must have the same aspect ratio as shot.crop")
+    for index, mask in enumerate(shot.get("masks", [])):
+        where = f"{sid}.shot.masks[{index}]"
+        if not all(num(mask.get(k)) for k in "xywh") or mask.get("w", 0) <= 0 or mask.get("h", 0) <= 0:
+            errors.append(f"{where} requires x, y and positive w, h in source pixels")
+        if mask.get("style", "blur") not in ("tile", "bar", "blur"):
+            errors.append(f"{where}.style must be tile, bar or blur")
+        for key in ("from_sec", "until_sec"):
+            if key in mask and (not num(mask[key]) or not 0 <= mask[key] <= length):
+                errors.append(f"{where}.{key} must be seconds inside the scene")
+    board = shot.get("board")
+    if board is not None:
+        timed(f"{sid}.shot.board", board, length)
+        rows = (board or {}).get("rows") or []
+        if not board.get("title") or not 1 <= len(rows) <= 3:
+            errors.append(f"{sid}.shot.board requires title and 1-3 rows")
+        for index, row in enumerate(rows):
+            where = f"{sid}.shot.board.rows[{index}]"
+            marks, mark_at = str(row.get("marks", "")), row.get("mark_at_sec") or []
+            if not row.get("name") or not marks or set(marks) - set("xv-"):
+                errors.append(f"{where} requires name and marks made of x (wrong), v (right) and - (blank)")
+            if len(mark_at) != len(marks) or not all(num(t) and 0 <= t < length for t in mark_at):
+                errors.append(f"{where}.mark_at_sec needs one time inside the scene per mark")
+            timed(where, row, length, keys=("tally_at_sec",))
 
 
 def check(story: dict, public_dir: Path, icons: set[str]) -> list[str]:
@@ -206,6 +321,46 @@ def check(story: dict, public_dir: Path, icons: set[str]) -> list[str]:
                 timed(f"{sid}.shot.focus[{index}]", band, length)
                 if not isinstance(band.get("y"), (int, float)) or not isinstance(band.get("h"), (int, float)) or band.get("h", 0) <= 0:
                     errors.append(f"{sid}.shot.focus[{index}] requires source y and positive h")
+            shot_errors(sid, shot, crop, length, public_dir, errors, timed)
+        stoplist = scene.get("stoplist")
+        if stoplist is not None:
+            rows = (stoplist or {}).get("rows") or []
+            if not stoplist.get("title") or not 1 <= len(rows) <= 6:
+                errors.append(f"{sid}.stoplist requires title and 1-6 rows")
+            for index, row in enumerate(rows):
+                timed(f"{sid}.stoplist.rows[{index}]", row, length)
+                if not row.get("label"):
+                    errors.append(f"{sid}.stoplist.rows[{index}] requires label")
+                if row.get("icon") is not None:
+                    icon(f"{sid}.stoplist.rows[{index}]", row["icon"])
+            if stoplist.get("avatar") and not (public_dir / stoplist["avatar"]).is_file():
+                errors.append(f"{sid}.stoplist.avatar not found under public/: {stoplist['avatar']}")
+            if stoplist.get("extra") is not None:
+                timed(f"{sid}.stoplist.extra", stoplist["extra"], length)
+                if stoplist["extra"].get("icon") is not None:
+                    icon(f"{sid}.stoplist.extra", stoplist["extra"]["icon"])
+            for key in ("avatar_at_sec", "shuffle_at_sec"):
+                if key in stoplist:
+                    timed(f"{sid}.stoplist", stoplist, length, keys=(key,))
+        compare = scene.get("compare")
+        if compare is not None:
+            rows = (compare or {}).get("rows") or []
+            if not compare.get("img") or not isinstance(compare.get("img_width"), (int, float)):
+                errors.append(f"{sid}.compare requires img and img_width")
+            elif not (public_dir / compare["img"]).is_file():
+                errors.append(f"{sid}.compare.img not found under public/: {compare['img']}")
+            if not 1 <= len(rows) <= 3:
+                errors.append(f"{sid}.compare needs 1-3 rows")
+            for index, row in enumerate(rows):
+                timed(f"{sid}.compare.rows[{index}]", row, length)
+                rc, pin = row.get("crop") or {}, row.get("pin") or {}
+                if not row.get("input") or not row.get("result") or not isinstance(row.get("ok"), bool):
+                    errors.append(f"{sid}.compare.rows[{index}] requires input, result and ok (true/false)")
+                if not all(isinstance(rc.get(k), (int, float)) for k in "xyw") or rc.get("w", 0) <= 0 or not all(isinstance(pin.get(k), (int, float)) for k in "xy"):
+                    errors.append(f"{sid}.compare.rows[{index}] requires crop {{x, y, w}} and pin {{x, y}} in img pixels")
+            for key in ("note", "stamp"):
+                if compare.get(key) is not None:
+                    timed(f"{sid}.compare.{key}", compare[key], length)
         strips = scene.get("strips")
         if strips is not None:
             if not isinstance(strips, list) or not 1 <= len(strips) <= 2:
