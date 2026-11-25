@@ -19,6 +19,13 @@ const PATHS = {
   keyboard: <><rect x="6" y="16" width="52" height="32" rx="5" /><path d="M14 26h4M24 26h4M34 26h4M44 26h6M14 35h4M24 35h4M34 35h4M44 35h6M20 42h24" /></>,
   phone: <><path d="M8 36c14-12 34-12 48 0l-5 9-11-4v-7c-5-2-11-2-16 0v7l-11 4z" /></>,
   mail: <><rect x="6" y="14" width="52" height="36" rx="5" /><path d="M8 18l24 18 24-18" /></>,
+  pin: <><path d="M32 58C20 42 14 33 14 25a18 18 0 0 1 36 0c0 8-6 17-18 33z" /><circle cx="32" cy="25" r="7" /></>,
+  route: <><circle cx="14" cy="50" r="6" /><circle cx="50" cy="14" r="6" /><path d="M20 50h18a8 8 0 0 0 0-16H26a8 8 0 0 1 0-16h18" /></>,
+  clock: <><circle cx="32" cy="32" r="24" /><path d="M32 18v15l10 6" /></>,
+  briefcase: <><rect x="8" y="20" width="48" height="34" rx="5" /><path d="M24 20v-6h16v6M8 34h48" /></>,
+  fork: <><path d="M22 6v18a6 6 0 0 0 12 0V6M28 6v52M44 6c-6 6-6 20 0 24v28" /></>,
+  home: <><path d="M6 30L32 8l26 22" /><path d="M14 26v30h36V26" /><path d="M27 56V40h10v16" /></>,
+  drag: <><path d="M32 8v48M22 18l10-10 10 10M22 46l10 10 10-10" /></>,
 };
 
 /** Line icons for task objects. name: one of ICON_NAMES; size in px; color: stroke. */
@@ -35,6 +42,7 @@ const OBJECT_COLORS = {
   calendar: 'pink', percent: 'pink',
   user: 'blue', search: 'blue',
   doc: 'green', truck: 'green', lock: 'green', sliders: 'green',
+  pin: 'pink', route: 'violet', clock: 'teal', briefcase: 'amber', fork: 'green', drag: 'blue', home: 'blue',
 };
 export const objectColor = (name, palette = {}, override) => override || palette.objects?.[name] || OBJECT_HUES[OBJECT_COLORS[name]] || palette.cool || OBJECT_HUES.violet;
 export const Icon = ({name, size = 64, color = '#171923'}) => {

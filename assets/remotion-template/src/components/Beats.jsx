@@ -1,5 +1,5 @@
 import React from 'react';
-import {interpolate, spring, useCurrentFrame, useVideoConfig} from 'remotion';
+import {Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {Cursor, getClickState} from './Cursor';
 import {Burst} from './Emphasis';
 import {Icon, objectColor} from './Icon';
@@ -39,7 +39,7 @@ export const NewStamp = ({at, label, palette, font, sound = false, style = {}}) 
 
 /** Names the new tool right after the pain: date, name, capability, and up to
  * three objects it produces. feature: {date, name, accent, capability, items: [{icon, label}]}. */
-export const FeatureIntro = ({at, feature, palette, font, sound = false}) => {
+export const FeatureIntro = ({at, feature, palette, font, sound = false, highlightAt = null}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const p = useSpring(at, {damping: 15, stiffness: 150});
@@ -56,8 +56,10 @@ export const FeatureIntro = ({at, feature, palette, font, sound = false}) => {
       {items.length ? <div style={{display: 'flex', gap: 22, marginTop: 32}}>{items.slice(0, 3).map((item, i) => {
         const t = frame < at + 12 + i * 6 ? 0 : spring({frame: frame - at - 12 - i * 6, fps, config: {damping: 9, stiffness: 200}});
         const color = objectColor(item.icon, palette, item.color);
-        return <div key={item.label} style={{flex: 1, height: 170, borderRadius: 28, background: `${color}1A`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, transform: `scale(${t})`, opacity: Math.min(1, t * 2)}}>
-          <Icon name={item.icon} size={76} color={color} /><span style={{fontSize: 32, fontWeight: 650, color: palette.ink}}>{item.label}</span>
+        const lit = highlightAt !== null && i === (feature.highlight_index ?? items.length - 1) ? (frame < highlightAt ? 0 : spring({frame: frame - highlightAt, fps, config: {damping: 10, stiffness: 180}})) : 0;
+        const dim = highlightAt !== null && frame >= highlightAt && !lit ? 0.45 : 1;
+        return <div key={item.label} style={{flex: 1, height: 170, borderRadius: 28, background: `${color}1A`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, transform: `scale(${t * (1 + 0.1 * lit)})`, opacity: Math.min(1, t * 2) * dim, boxShadow: lit ? `0 0 0 ${6 * lit}px ${palette.cool}` : 'none'}}>
+          {item.img ? <Img src={staticFile(item.img)} style={{width: '88%', height: 104, objectFit: 'cover', objectPosition: 'top', borderRadius: 14, border: '2px solid #E6E7EC'}} /> : <Icon name={item.icon} size={76} color={color} />}<span style={{fontSize: 32, fontWeight: 650, color: palette.ink}}>{item.label}</span>
         </div>;
       })}</div> : null}
     </div>
@@ -162,7 +164,82 @@ const FocusBands = ({focus, crop, k, palette, boxHeight}) => {
  * region, lines, mask} reveals the real text left to right, line by line, with a caret; click: {at, x, y}
  * hovers (hand pointer, glow), presses, and ripples; wait: {at, frames} shows neutral progress dots;
  * reveal, stamp, focus, callout, and summary ({at, text, until}) as before. */
-export const ProductShot = ({shot, width = 936, click, reveal, stamp, callout, focus, zoom, drag, type, wait, summary, evidence, palette, font, sound = false}) => {
+/** Tally card that slides up over the shot: a question, then one row per tool whose marks pop in
+ * one by one. board: {at, title, note, rows: [{name, sub, marks: 'xxxx' | 'vvv-', mark_at: [frames], tally, tally_note, tally_at}]}. */
+const Mark = ({kind, p}) => {
+  const bg = kind === 'x' ? '#E8553A' : kind === 'v' ? '#1F9D63' : '#B8BCC6';
+  return <div style={{width: 96, height: 96, borderRadius: '50%', background: p ? bg : '#ECEDF1', display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${p ? 0.6 + 0.4 * p : 1})`}}>
+    {p ? <svg width="52" height="52" viewBox="0 0 40 40" fill="none" stroke="#fff" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round">{kind === 'x' ? <path d="M10 10 L30 30 M30 10 L10 30" /> : kind === 'v' ? <path d="M8 21 L17 29 L32 11" /> : <path d="M10 20 L30 20" />}</svg> : null}
+  </div>;
+};
+const ScoreBoard = ({board, height, palette, font}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const sp = (at, cfg = {damping: 11, stiffness: 190}) => (frame < at ? 0 : spring({frame: frame - at, fps, config: cfg}));
+  const enter = sp(board.at, {damping: 18, stiffness: 150});
+  if (!enter) return null;
+  return <div style={{position: 'absolute', left: 0, top: 0, width: '100%', height, zIndex: 8, transform: `translateY(${(1 - enter) * 105}%)`, ...card({borderRadius: 28}), padding: '44px 72px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'space-around', fontFamily: font}}>
+    <div>
+      <div style={{fontSize: 56, fontWeight: 850, color: palette.ink, lineHeight: 1.12, textWrap: 'balance'}}>{board.title}</div>
+      {board.note ? <div style={{fontSize: 36, fontWeight: 500, color: palette.muted, marginTop: 8}}>{board.note}</div> : null}
+    </div>
+    {board.rows.map((row, r) => {
+      const rowIn = sp(row.mark_at[0] - 6, {damping: 16, stiffness: 160});
+      const tallyIn = sp(row.tally_at, {damping: 9, stiffness: 200});
+      const color = row.marks.includes('x') ? '#D2452B' : '#1A8A56';
+      return <div key={r} style={{opacity: rowIn, transform: `translateX(${(1 - rowIn) * 40}px)`, borderTop: '2px solid #EEEFF3', paddingTop: 22}}>
+        <div style={{display: 'flex', alignItems: 'baseline', gap: 14}}>
+          <span style={{fontSize: 54, fontWeight: 850, color: palette.ink}}>{row.name}</span>
+          {row.sub ? <span style={{fontSize: 36, fontWeight: 600, color: palette.muted}}>{row.sub}</span> : null}
+        </div>
+        <div style={{display: 'flex', alignItems: 'center', gap: 16, marginTop: 16}}>
+          {row.marks.split('').map((m, i) => <Mark key={i} kind={m === '-' ? '-' : m} p={sp(row.mark_at[i])} />)}
+          <div style={{marginLeft: 18, opacity: Math.min(1, tallyIn * 2), transform: `scale(${0.7 + 0.3 * tallyIn})`, transformOrigin: '0 50%'}}>
+            <div style={{fontSize: 60, fontWeight: 900, color}}>{row.tally}</div>
+            {row.tally_note ? <div style={{fontSize: 32, fontWeight: 600, color: palette.muted}}>{row.tally_note}</div> : null}
+          </div>
+        </div>
+      </div>;
+    })}
+  </div>;
+};
+
+/** "What you type → where the pin lands" rows, then a short note and a stamp.
+ * compare: {img, img_width, rows: [{input, at, crop: {x, y, w}, pin: {x, y}, ok, result}], note: {at, text}, stamp: {at, label}} */
+export const PinCompare = ({compare, palette, font, sound = false}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const sp = (at, cfg = {damping: 14, stiffness: 170}) => (frame < at ? 0 : spring({frame: frame - at, fps, config: cfg}));
+  const M = 340;
+  const noteIn = compare.note ? sp(compare.note.at) : 0;
+  return <div style={{position: 'relative', display: 'flex', flexDirection: 'column', gap: 22, fontFamily: font}}>
+    {compare.rows.map((row, i) => {
+      const p = sp(row.at);
+      const res = sp(row.at + 18, {damping: 9, stiffness: 200});
+      const color = row.ok ? '#1F9D63' : '#E8553A';
+      const k = M / row.crop.w;
+      const ring = (frame - row.at - 10) / fps;
+      return <div key={i} style={{...card({borderRadius: 30}), display: 'flex', alignItems: 'center', gap: 22, padding: 22, opacity: Math.min(1, p * 1.5), transform: `translateY(${(1 - p) * 50}px)`}}>
+        <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 18, alignItems: 'flex-start'}}>
+          <div style={{display: 'flex', alignItems: 'center', gap: 14, padding: '18px 24px', borderRadius: 18, background: '#F1F2F6', border: '2px solid #E1E3EA'}}>
+            <Icon name="keyboard" size={40} color={palette.muted} />
+            <span style={{fontSize: 46, fontWeight: 800, color: palette.ink, whiteSpace: 'nowrap'}}>“{row.input}”</span>
+          </div>
+          <div style={{display: 'inline-flex', alignItems: 'center', gap: 12, padding: '12px 22px', borderRadius: 999, background: color, color: '#fff', fontSize: 40, fontWeight: 850, opacity: Math.min(1, res * 2), transform: `scale(${0.6 + 0.4 * res})`, transformOrigin: '0 50%'}}>{row.ok ? '✓' : '✗'} {row.result}</div>
+        </div>
+        <div style={{fontSize: 56, fontWeight: 900, color: palette.muted}}>→</div>
+        <div style={{position: 'relative', width: M, height: M, borderRadius: 22, overflow: 'hidden', flexShrink: 0, border: `5px solid ${res ? color : '#E1E3EA'}`}}>
+          <Img src={staticFile(compare.img)} style={{position: 'absolute', left: -row.crop.x * k, top: -row.crop.y * k, width: compare.img_width * k, maxWidth: 'none'}} />
+          {ring > 0 ? [0, 0.6].map((d) => { const r = ((ring - d) % 1.2 + 1.2) % 1.2; return ring > d ? <div key={d} style={{position: 'absolute', left: (row.pin.x - row.crop.x) * k - 40, top: (row.pin.y - row.crop.y) * k - 40, width: 80, height: 80, borderRadius: '50%', border: `6px solid ${color}`, opacity: 1 - r / 1.2, transform: `scale(${0.5 + r})`}} /> : null; }) : null}
+        </div>
+      </div>;
+    })}
+    {compare.note ? <div style={{alignSelf: 'center', display: 'flex', alignItems: 'center', gap: 14, padding: '18px 30px', borderRadius: 22, background: '#FFF4D6', border: '3px solid #F2B705', color: '#5C4300', fontSize: 40, fontWeight: 800, opacity: Math.min(1, noteIn * 2), transform: `translateY(${(1 - noteIn) * 30}px)`}}><span style={{fontSize: 44}}>⚠</span>{compare.note.text}</div> : null}
+    {compare.stamp ? <NewStamp at={compare.stamp.at} label={compare.stamp.label} palette={palette} font={font} sound={sound} style={{right: 30, bottom: 110}} /> : null}
+  </div>;
+};
+
+export const ProductShot = ({shot, width = 936, board, click, reveal, stamp, callout, focus, zoom, drag, type, wait, summary, evidence, palette, font, sound = false}) => {
   const frame = useCurrentFrame();
   const final = shot.crop;
   const zt = zoom ? smooth(interpolate(frame, [zoom.at, zoom.at + (zoom.frames || 24)], [0, 1], clamp)) : 1;
@@ -210,11 +287,14 @@ export const ProductShot = ({shot, width = 936, click, reveal, stamp, callout, f
   const lines = type ? type.lines || 1 : 1;
 
   return <div style={{position: 'relative', width}}>
-    {evidence ? <div style={{fontFamily: font, fontSize: 24, fontWeight: 700, letterSpacing: 2, color: palette.muted, marginBottom: 14}}>{evidence}</div> : null}
+    {evidence ? (() => { const [tool, note] = String(evidence).split('|'); return <div style={{display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16, paddingLeft: width >= 1080 ? 72 : 0, fontFamily: font}}>
+      <div style={{display: 'inline-flex', alignItems: 'center', gap: 12, padding: '10px 22px', borderRadius: 999, background: '#fff', border: `3px solid ${palette.accent || palette.cool}`, fontSize: 34, fontWeight: 800, color: palette.ink, boxShadow: '0 6px 18px rgba(23,25,35,.08)'}}><span style={{width: 14, height: 14, borderRadius: '50%', background: palette.accent || palette.cool}} />{tool}</div>
+      {note ? <div style={{fontSize: 26, fontWeight: 600, color: palette.muted}}>{note}</div> : null}
+    </div>; })() : null}
     {/* Overlays share the screenshot's box so source coordinates line up exactly. */}
     <div style={{position: 'relative'}}>
-    <div style={card({position: 'relative', height: boxHeight, overflow: 'hidden', clipPath: `inset(0 0 ${100 - shown}% 0)`})}>
-      <Shot src={shot.src} sourceWidth={shot.source_width} crop={crop} width={width} />
+    <div style={card({position: 'relative', height: boxHeight, overflow: 'hidden', ...(width >= 1080 ? {borderRadius: 0} : {}), clipPath: `inset(0 0 ${100 - shown}% 0)`})}>
+      <Shot src={shot.src} sourceWidth={shot.source_width} crop={crop} width={width} fromSec={shot.from_sec || 0} rate={shot.rate || 1} masks={shot.masks || []} freezeAtSec={shot.freeze_at_sec ?? null} holdStartSec={shot.hold_start_sec || 0} alt={shot.alt || null} />
       {drag && drag.region ? <div style={{position: 'absolute', ...box(drag.region), background: drag.mask || '#fff', opacity: 1 - dropPop}} /> : null}
       {type ? Array.from({length: lines}, (_, i) => {
         const r = type.region, lineH = r.h / lines;
@@ -237,14 +317,15 @@ export const ProductShot = ({shot, width = 936, click, reveal, stamp, callout, f
         <RecordingChip file={drag.file} length={drag.length} palette={palette} font={font} />
       </div>;
     })() : null}
-    {path.length ? <Cursor path={path} clicks={click ? [click.at] : []} hand={click ? [[click.at - 12, click.at + 14]] : []} rippleColor={palette.cool} /> : null}
-    {summary && summaryIn && summaryGone > 0 ? <div style={{position: 'absolute', left: '50%', top: boxHeight + 26, transformOrigin: '50% 0', transform: `translateX(-50%) scale(${summaryIn})`, opacity: Math.min(1, summaryIn * 2) * summaryGone, zIndex: 7, padding: '20px 30px', borderRadius: 22, background: palette.ink, color: '#fff', fontFamily: font, fontSize: 38, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 20px 50px rgba(23,25,35,.35)'}}>{summary.text}</div> : null}
-    {stamp ? <NewStamp at={stamp.at} label={stamp.label} palette={palette} font={font} sound={sound} style={{right: -10, top: -40}} /> : null}
+    {board ? <ScoreBoard board={board} height={boxHeight} palette={palette} font={font} /> : null}
+    {path.length ? <div style={{position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 20, opacity: click && click.fade ? interpolate(frame, [click.at + 16, click.at + 26], [1, 0], clamp) : 1}}><Cursor path={path} clicks={click ? [click.at] : []} hand={click ? [[click.at - 12, click.at + 14]] : []} rippleColor={palette.cool} /></div> : null}
+    {summary && summaryIn && summaryGone > 0 ? <div style={{position: 'absolute', left: '50%', top: boxHeight - 104, transformOrigin: '50% 0', transform: `translateX(-50%) scale(${summaryIn})`, opacity: Math.min(1, summaryIn * 2) * summaryGone, zIndex: 7, padding: '20px 30px', borderRadius: 22, background: palette.ink, color: '#fff', fontFamily: font, fontSize: 38, fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 20px 50px rgba(23,25,35,.35)'}}>{summary.text}</div> : null}
+    {stamp ? <NewStamp at={stamp.at} label={stamp.label} palette={palette} font={font} sound={sound} style={{right: width >= 1080 ? 40 : -10, top: -40}} /> : null}
     {callout && calloutIn && calloutGone > 0 ? <div style={{position: 'absolute', left: point.x - 150, top: point.y - 130, width: 300, zIndex: 6, opacity: Math.min(1, calloutIn * 2) * calloutGone, transform: `scale(${calloutIn})`, transformOrigin: '50% 100%'}}>
-      <div style={{background: palette.warm, color: '#fff', borderRadius: 20, padding: '14px 18px', fontFamily: font, textAlign: 'center', boxShadow: '0 12px 30px rgba(240,100,73,.35)'}}>
+      <div style={{background: callout.color || palette.warm, color: '#fff', borderRadius: 20, padding: '14px 18px', fontFamily: font, textAlign: 'center', boxShadow: '0 12px 30px rgba(23,25,35,.25)'}}>
         <div style={{fontSize: 34, fontWeight: 800, textWrap: 'balance'}}>{callout.title}</div>{callout.note ? <div style={{fontSize: 26, fontWeight: 500, opacity: 0.92}}>{callout.note}</div> : null}
       </div>
-      <div style={{width: 0, height: 0, margin: '0 auto', borderLeft: '16px solid transparent', borderRight: '16px solid transparent', borderTop: `18px solid ${palette.warm}`}} />
+      <div style={{width: 0, height: 0, margin: '0 auto', borderLeft: '16px solid transparent', borderRight: '16px solid transparent', borderTop: `18px solid ${callout.color || palette.warm}`}} />
     </div> : null}
     </div>
     {sound && drag ? <><Sfx at={drag.at} name="swish" volume={0.35} /><Sfx at={dragEnd} name="pop" volume={0.55} /></> : null}
@@ -613,5 +694,46 @@ export const TimeStrips = ({strips, palette, font}) => {
         </div>
       </div>;
     })}
+  </div>;
+};
+
+/** A to-do or stop list that builds itself: optional avatar and badge pop in, rows slide in on
+ * their words, an optional extra row (e.g. "+ lunch?") pops at the end, then the rows hop with a
+ * "?" for a question such as "Best order?". list: {title, subtitle, avatar, badge, avatar_at,
+ * rows: [{label, color, icon, at}], extra: {label, icon, at}, shuffle_at} (times are frames from
+ * the scene start; icon names come from Icon.jsx, default 'home'). */
+export const StopList = ({list, palette, font, sound = false}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const pop = (at, cfg = {damping: 12, stiffness: 170}) => (at === undefined || frame < at ? 0 : spring({frame: frame - at, fps, config: cfg}));
+  const head = pop(0, {damping: 18, stiffness: 140});
+  const av = pop(list.avatar_at ?? 6, {damping: 9, stiffness: 160});
+  const rowH = 84;
+  const q = pop(list.shuffle_at === undefined ? undefined : list.shuffle_at + 4, {damping: 8, stiffness: 200});
+  const rowCount = list.rows.length + (list.extra ? 1 : 0);
+  return <div style={{position: 'relative', background: '#fff', borderRadius: 34, boxShadow: '0 24px 60px rgba(23,25,35,.12)', padding: '40px 46px 44px', fontFamily: font, opacity: Math.min(1, head * 1.5), transform: `translateY(${(1 - head) * 40}px)`}}>
+    <div style={{fontSize: 60, fontWeight: 800, color: palette.ink, letterSpacing: -1}}>{list.title}</div>
+    {list.subtitle ? <div style={{fontSize: 34, color: palette.muted, marginTop: 8}}>{list.subtitle}</div> : null}
+    <div style={{display: 'flex', gap: 36, marginTop: 30}}>
+      {list.avatar ? <div style={{flex: '0 0 260px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18, transform: `scale(${0.6 + 0.4 * av})`, opacity: Math.min(1, av * 2)}}>
+        <Img src={staticFile(list.avatar)} style={{width: 250, height: 250, borderRadius: '50%'}} />
+        {list.badge ? <span style={{background: '#E3EEFC', color: '#1F5FB8', fontWeight: 700, fontSize: 34, padding: '8px 26px', borderRadius: 40}}>{list.badge}</span> : null}
+      </div> : null}
+      <div style={{position: 'relative', flex: 1, height: rowH * rowCount}}>
+        {list.rows.map((row, i) => {
+          const t = pop(row.at);
+          const hop = list.shuffle_at === undefined || frame < list.shuffle_at + i * 3 ? 0 : Math.sin(Math.min(Math.PI, (frame - list.shuffle_at - i * 3) / 5)) * 14;
+          const color = row.color || objectColor(row.icon || 'home', palette);
+          return <div key={row.label} style={{position: 'absolute', left: 0, top: i * rowH - hop, display: 'flex', alignItems: 'center', gap: 22, opacity: Math.min(1, t * 2), transform: `translateX(${(1 - t) * 80}px)`}}>
+            <Icon name={row.icon || 'home'} size={52} color={color} /><span style={{fontSize: 50, color: palette.ink, fontWeight: 500}}>{row.label}</span>
+          </div>;
+        })}
+        {list.extra ? (() => { const t = pop(list.extra.at); return <div style={{position: 'absolute', left: 0, top: list.rows.length * rowH, display: 'flex', alignItems: 'center', gap: 22, opacity: Math.min(1, t * 2), transform: `scale(${0.7 + 0.3 * t})`, transformOrigin: 'left center'}}>
+          <Icon name={list.extra.icon || 'fork'} size={52} color={palette.warm} />
+          <span style={{fontSize: 50, color: palette.warm, fontWeight: 800}}>{list.extra.label}</span></div>; })() : null}
+        {q ? <div style={{position: 'absolute', right: 0, top: rowH * 1.4, width: 120, height: 120, borderRadius: '50%', background: palette.warm, color: '#fff', fontSize: 84, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${q}) rotate(${(1 - q) * -30}deg)`, boxShadow: '0 16px 40px rgba(240,100,73,.35)'}}>?</div> : null}
+      </div>
+    </div>
+    {sound ? <>{list.rows.map((r, i) => <Sfx key={i} at={r.at} name="pop" volume={0.3} />)}{list.shuffle_at !== undefined ? <Sfx at={list.shuffle_at} name="swish" volume={0.4} /> : null}</> : null}
   </div>;
 };
